@@ -1,30 +1,69 @@
 const Discord = require("discord.js");
 
 exports.run = async (bot, message, args) => {
-	const embed = new Discord.RichEmbed()
+	let necessario = ""
+	let emote = ""
+	let classe = bot.data.get(message.author.id, 'classe')
 
-		.setTitle(bot.config.bulldozer + " Trabalhos")
-		.setDescription("Você não pode apostar enquanto trabalha!")
-		.setColor(message.member.displayColor)
-
-		.addField(`1: ${bot.jobs.desc[0]}`, "Duração: 1h\n" + `Salário: ${bot.jobs.payment[0].toLocaleString().replace(/,/g, ".")}` + bot.config.coin, true)
-		.addField(`2: ${bot.jobs.desc[1]}`, "Duração: 2h\n" + `Salário: ${bot.jobs.payment[1].toLocaleString().replace(/,/g, ".")}` + bot.config.coin, true)
-		.addField(`3: ${bot.jobs.desc[2]}`, "Duração: 3h\n" + `Salário: ${bot.jobs.payment[2].toLocaleString().replace(/,/g, ".")}` + bot.config.coin, true)
-		.addField(`4: ${bot.jobs.desc[3]}`, "Duração: 4h\n" + `Salário: ${bot.jobs.payment[3].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.faca, true)
-		.addField(`5: ${bot.jobs.desc[4]}`, "Duração: 6h\n" + `Salário: ${bot.jobs.payment[4].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config._9mm, true)
-		.addField(`6: ${bot.jobs.desc[5]}`, "Duração: 8h\n" + `Salário: ${bot.jobs.payment[5].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.tec9, true)
-		.addField(`7: ${bot.jobs.desc[6]}`, "Duração: 1h\n" + `Salário: ${bot.jobs.payment[6].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.rifle, true)
-		.addField(`8: ${bot.jobs.desc[7]}`, "Duração: 3h\n" + `Salário: ${bot.jobs.payment[7].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.escopeta, true)
-		.addField(`9: ${bot.jobs.desc[8]}`, "Duração: 12h\n" + `Salário: ${bot.jobs.payment[8].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.mp5, true)
-		.addField(`10: ${bot.jobs.desc[9]}`, "Duração: 18h\n" + `Salário: ${bot.jobs.payment[9].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.ak47, true)
-		.addField(`11: ${bot.jobs.desc[10]}`, "Duração: 24h\n" + `Salário: ${bot.jobs.payment[10].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.m4, true)
-		.addField(`12: ${bot.jobs.desc[11]}`, "Duração: 40h\n" + `Salário: ${bot.jobs.payment[11].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.goggles, true)
-		.addField(`13: ${bot.jobs.desc[12]}`, "Duração: 60h\n" + `Salário: ${bot.jobs.payment[12].toLocaleString().replace(/,/g, ".")}` + bot.config.coin + "\nNecessário: " + bot.config.rpg, true)
-
-		.setFooter(message.author.username, message.member.user.avatarURL)
+	const embed = new Discord.MessageEmbed()
+		.setTitle(`${bot.config.bulldozer} Trabalhos`)
+		.setDescription(`Você não pode apostar, roubar nem vasculhar enquanto trabalha!`)
+		.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/738106899844562984/radar_bulldozer.png")
+		.setColor('GREEN')
+		.setFooter(bot.user.username, bot.user.avatarURL())
 		.setTimestamp();
 
-	message.channel.send({
-		embed
-	})
+	Object.entries(bot.jobs).forEach(([key_job, value_job]) => {
+		if (key_job != 'mafia' && key_job != 'et') {
+			if (value_job.arma != null) {
+				Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
+					if (key_gun == value_job.arma)
+						emote = bot.config[value_gun.emote]
+				})
+				necessario = `Necessário: ${emote}`
+			}
+			let pagamento = value_job.pagamento
+			let tempo = value_job.time
+
+			if (classe == 'mafioso') {
+				pagamento = Math.round(value_job.pagamento * 0.9)
+				tempo = value_job.time.toFixed(1)
+			}
+
+			if (classe == 'empresario') {
+				pagamento = Math.round(value_job.pagamento * 1.05)
+				tempo = (value_job.time * 0.95).toFixed(1)
+			}
+			if (key_job != 'duble' && key_job != 'jacobi')
+			embed.addField(`${value_job.id}: ${value_job.desc}`, `Duração: ${tempo/60}h\nSalário: R$ ${pagamento.toLocaleString().replace(/,/g, ".")}\n${necessario}`, true)
+
+			if (key_job == 'duble')
+				embed.addField(`${value_job.id}: ${value_job.desc}`, `Duração: ${tempo/60}h\nSalário: R$ ${pagamento.toLocaleString().replace(/,/g, ".")}\nNecessário: ${bot.config.jetpack}${bot.config.katana}${bot.config.goggles}`, true)
+
+			if (key_job == 'jacobi')
+				embed.addField(`${value_job.id}: ${value_job.desc}`, `Duração: ${tempo/60}h\nSalário: R$ ${pagamento.toLocaleString().replace(/,/g, ".")}\nNecessário: ${bot.config.faca}${bot.config.colt45}${bot.config.tec9}${bot.config.rifle}${bot.config.escopeta}${bot.config.mp5}${bot.config.ak47}${bot.config.m4}${bot.config.sniper}${bot.config.katana}${bot.config.rpg}${bot.config.colete}${bot.config.goggles}`, true)
+
+		}
+		// else if (key_job == 'jacobi') {
+		// 	let pagamento = bot.jobs.jacobi.pagamento
+		// 	let tempo = bot.jobs.jacobi.time
+
+		// 	if (classe == 'mafioso') {
+		// 		pagamento = Math.round(bot.jobs.jacobi.pagamento * 0.9)
+		// 		tempo = bot.jobs.jacobi.time.toFixed(1)
+		// 	}
+
+		// 	if (classe == 'empresario') {
+		// 		pagamento = Math.round(bot.jobs.jacobi.pagamento * 1.05)
+		// 		tempo = (bot.jobs.jacobi.time * 0.95).toFixed(1)
+		// 	}
+
+		// 	embed.addField(`${bot.jobs.jacobi.id}: ${bot.jobs.jacobi.desc}`, `Duração: ${tempo/60}h\nSalário: R$ ${pagamento.toLocaleString().replace(/,/g, ".")}\nNecessário: ${bot.config.faca}${bot.config.colt45}${bot.config.tec9}${bot.config.rifle}${bot.config.escopeta}${bot.config.mp5}${bot.config.ak47}${bot.config.m4}${bot.config.sniper}${bot.config.katana}${bot.config.rpg}${bot.config.colete}${bot.config.goggles}`, true)
+		// }
+	});
+
+	return message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `jobs`", err));
 }
+exports.config = {
+	alias: ['trabalhos', 'trabs', 'ts', 'js']
+};

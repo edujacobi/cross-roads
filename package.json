@@ -1,0 +1,31 @@
+{
+  "name": "cross-roads",
+  "version": "1.0.0",
+  "description": "Cross Roads Game Discord Bot",
+  "main": "index.js",
+  "dependencies": {
+    "better-sqlite3": "^7.4.3",
+    "bufferutil": "^4.0.1",
+    "discord-buttons": "^2.4.1",
+    "discord.js": "^13.1.0",
+    "enmap": "^5.3.0",
+    "libsodium-wrappers": "^0.7.6",
+    "mathjs": "^7.6.0",
+    "node": "16.6.0",
+    "node-gyp": "^7.0.0",
+    "opusscript": "^0.0.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edujacobi/gta-discord.git"
+  },
+  "author": "Jacobi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edujacobi/gta-discord/issues"
+  },
+  "homepage": "https://github.com/edujacobi/gta-discord#readme"
+}

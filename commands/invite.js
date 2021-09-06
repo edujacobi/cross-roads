@@ -1,16 +1,21 @@
 const Discord = require("discord.js");
 
 exports.run = async (bot, message, args) => {
-	const embed = new Discord.RichEmbed()
-		.setColor(message.member.displayColor)
-		.setTitle("Convite GTA Discord")
-		.addField("<:propertyG:539497344996212736> Coloque o GTA Discord em seu server", "https://discordapp.com/oauth2/authorize?client_id=526203502318321665&permissions=8&scope=bot")
-		.addField("<:GTAD2:529879187381551104> Entre no server do GTA Discord", "http://discord.gg/sNf8avn")
-
-		.setFooter(message.author.username, message.member.user.avatarURL)
+	const embed = new Discord.MessageEmbed()
+		.setColor('GREEN')
+		.setTitle("Convites")
+		.setThumbnail('https://cdn.discordapp.com/attachments/753748867991994409/756988818602721482/CrossRoadsLogo.png')
+		.setDescription("[Adicione o Cross Roads em seu servidor!](https://discord.com/api/oauth2/authorize?client_id=526203502318321665&permissions=288832&scope=bot)")
+		// .addField("\u200b", "[Clique aqui e adicione Cross Roads em seu servidor!](https://discord.com/api/oauth2/authorize?client_id=526203502318321665&permissions=288832&scope=bot)\n\n[Clique aqui e entre também no server do Cross Roads!](https://discord.gg/sNf8avn)")
+		.setFooter(bot.user.username, bot.user.avatarURL())
 		.setTimestamp();
 
 	message.channel.send({
-		embed
-	})
+		embeds: [embed]
+	}).catch(err => console.log("Não consegui enviar mensagem `invite`", err));
+	// message.channel.send("discord.gg/sNf8avn")
+	message.channel.send("discord.gg/ruasdacruz").catch(err => console.log("Não consegui enviar mensagem `invite`", err))
 }
+exports.config = {
+	alias: ['convite', 'adicionar']
+};

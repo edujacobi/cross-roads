@@ -1,19 +1,81 @@
-const Discord = require("discord.js");
+const {
+	Client,
+	Intents
+} = require('discord.js');
+
 const {
 	promisify
 } = require("util");
 const readdir = promisify(require("fs").readdir);
 const Enmap = require("enmap");
-const bot = new Discord.Client();
+const bot = new Client({
+	intents: [
+		Intents.FLAGS.GUILD_MESSAGES,
+		Intents.FLAGS.GUILDS,
+		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+		Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+		Intents.FLAGS.DIRECT_MESSAGES
+	],
+}, {
+	allowedMentions: {
+		parse: ['users'],
+		repliedUser: false
+	},
+	makeCache: 250,
+	messageCacheLifetime: 180,
+	messageSweepInterval: 120,
+	disabledEvents: [
+		'GUILD_CREATE', 'GUILD_DELETE', 'GUILD_UPDATE', 'GUILD_MEMBER_ADD',
+		'GUILD_MEMBER_REMOVE', 'GUILD_MEMBER_UPDATE', 'GUILD_MEMBERS_CHUNK', 'GUILD_ROLE_CREATE',
+		'GUILD_ROLE_DELETE', 'GUILD_ROLE_UPDATE', 'GUILD_BAN_ADD', 'GUILD_BAN_REMOVE',
+		'GUILD_EMOJIS_UPDATE', 'GUILD_INTEGRATIONS_UPDATE', 'CHANNEL_CREATE', 'CHANNEL_DELETE',
+		'CHANNEL_UPDATE', 'CHANNEL_PINS_UPDATE', 'MESSAGE_DELETE', 'MESSAGE_UPDATE',
+		'MESSAGE_CREATE', // ?
+		'MESSAGE_REACTION_ADD', // ?
+		'MESSAGE_DELETE_BULK',
+		'MESSAGE_REACTION_REMOVE', 'MESSAGE_REACTION_REMOVE_ALL', 'USER_UPDATE', 'PRESENCE_UPDATE',
+		'TYPING_START', 'VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE', 'WEBHOOKS_UPDATE'
+	]
+});
+// const disbut = require('discord-buttons')(bot);
+
+bot.talkedRecently = new Set();
+bot.onlineNow = new Map();
 bot.config = require("./config.js");
+bot.badges = require("./badges.js");
+bot.colors = require("./colors.js");
 
 require("./modules/functions.js")(bot);
 require("./modules/messages.js")(bot);
+require("./modules/investimentos.js")(bot);
+require("./modules/locais.js")(bot);
+require("./modules/jobs.js")(bot);
+require("./modules/armas.js")(bot);
+require("./modules/bases.js")(bot);
+require("./modules/classes.js")(bot);
+require("./modules/aneis.js")(bot);
 
 bot.commands = new Enmap();
+bot.modules = new Enmap();
 bot.data = new Enmap({
 	name: "data"
 });
+
+bot.gangs = new Enmap({
+	name: "gangs"
+});
+
+bot.banco = new Enmap({
+	name: "banco"
+});
+
+bot.coroamuru = new Enmap({
+	name: "coroamuru"
+});
+
+bot.bilhete = new Enmap({
+	name: "bilhete"
+})
 
 const init = async () => {
 	const commandFiles = await readdir("./commands/");
@@ -39,7 +101,12 @@ const init = async () => {
 		}
 	});
 
-	bot.on('error', console.error);
+	bot.on('shardError', error => {
+		console.error(new Date() + '. A websocket connection encountered an error:', error);
+	});
+	bot.on('unhandledRejection', error => {
+		console.error(new Date() + '. Unhandled promise rejection:', error);
+	});
 	bot.login(bot.config.token);
 };
 

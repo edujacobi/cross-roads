@@ -1,121 +1,104 @@
 const Discord = require("discord.js");
 
-exports.run = async (bot, message, args, level) => {
+exports.run = async (bot, message, args) => {
+	if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return
+	let listaMoney = [] // total
+	let listaCapita = [] // per capita
+	let listaMembros = [] // membros
+	let listaFichas = [] // fichas
 
-	let listaNome = [];
-	let listaID = [];
-
-	let listaMoney = []; // total
-	let listaCapita = []; // per capita
-	let listaMembros = []; // membros
-	let listaRoubos = []; // roubos bem suscedidos
-
-	bot.guilds.forEach(server => listaNome.push(server.name)); // adiciona nomes dos servers na listaNome
-	bot.guilds.forEach(server => listaID.push(server.id)); // adiciona id dos servers na listaID
-
-	for (let i = 0; i < listaID.length; i++) { // pega os monis dos members e soma tudo
-		let userServer = [];
-		let moneyServer = 0;
-		let users = 0;
-		let roubosW = 0;
-
-		bot.guilds.get(listaID[i]).members.forEach(member => userServer.push(member.user.id));
-
-		if (listaID[i] == "529674666692837378" || listaID[i] == "397920631167123467") //remove da contagem o GTA discord e o Jacobi
-			continue;
-
-		else {
-			for (let j = 0; j < userServer.length; j++) {
-				if (!bot.data.indexes.includes(userServer[j])) // se não é jogador, ignora
-					continue;
-
-				else {
-					if (userServer[j] != bot.config.adminID) { // se o user não é o Jacobi
-						moneyServer += parseInt(bot.data.get(userServer[j], "moni"));
-						users++;
-						roubosW += parseInt(bot.data.get(userServer[j], "roubosW"));
-					} else
-						continue;
-				}
-			}
-
-			listaMoney[i] = {
-				server: /*listaNome[i].length > 15 ? listaNome[i].substring(0, 15) : */ listaNome[i],
-				money: (users > 1 ? moneyServer : 0)
-			}
-
-			listaCapita[i] = {
-				server: /*listaNome[i].length > 15 ? listaNome[i].substring(0, 15) : */ listaNome[i],
-				money: (users > 1 ? Math.floor(moneyServer / users) : 0)
-			}
-
-			listaMembros[i] = {
-				server: /*listaNome[i].length > 15 ? listaNome[i].substring(0, 15) : */ listaNome[i],
-				membros: users
-			}
-
-			// listaRoubos[i] = {
-			// 	server: /*listaNome[i].length > 15 ? listaNome[i].substring(0, 15) : */ listaNome[i],
-			// 	roubos: roubosW
-			// }
-		}
-	}
-
-
-	listaMoney.sort(function (a, b) { // organiza em ordem decrescente
-		return b.money - a.money;
-	});
-
-	listaCapita.sort(function (a, b) { // organiza em ordem decrescente
-		return b.money - a.money;
-	});
-
-	listaMembros.sort(function (a, b) { // organiza em ordem decrescente
-		return b.membros - a.membros;
-	});
-
-	// listaRoubos.sort(function (a, b) { // organiza em ordem decrescente
-	// 	return b.roubos - a.roubos;
-	// });
-
-
-	var topMoney = "";
-	var topCapita = "";
-	var topMembros = "";
-	//var topRoubos = "";
-
-	for (let i = 0; i < 5; ++i) { // cria string do top server
-		topMoney = topMoney + ("`" + (i + 1) + ".` **" + listaMoney[i].server + " **" + listaMoney[i].money.toLocaleString().replace(/,/g, ".") + "\n");
-		topCapita = topCapita + ("`" + (i + 1) + ".` **" + listaCapita[i].server + " **" + listaCapita[i].money.toLocaleString().replace(/,/g, ".") + "\n");
-		topMembros = topMembros + ("`" + (i + 1) + ".` **" + listaMembros[i].server + " **" + listaMembros[i].membros.toLocaleString().replace(/,/g, ".") + "\n");
-		//topRoubos = topRoubos + ("`" + (i + 1) + ".` **" + listaRoubos[i].server + " **" + listaRoubos[i].roubos.toLocaleString().replace(/,/g, ".") + "\n");
-	}
-
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 		.setTitle("Top Servidores")
-		.setColor(message.member.displayColor)
-		.addField("Valor per capita 👤", topCapita, true)
-		.addField("Valor total 👥", topMoney, true)
-		.addField("Jogadores 👨‍👩‍👧‍👦", topMembros, true)
-		//.addField("Roubos 💰", topRoubos, true)
-		.setFooter(message.author.username, message.member.user.avatarURL)
-		.setTimestamp();
+		.setColor('GREEN')
+		.setDescription("Coletando informações...")
+		.setFooter(`${bot.data.get(message.author.id, "username")} • Necessário 10 membros no servidor e 3 jogadores`, message.member.user.avatarURL())
+		.setTimestamp()
+
 	message.channel.send({
-		embed
-	});
-};
+		embeds: [embed]
+	}).then(m => {
 
-exports.conf = {
-	enabled: true,
-	guildOnly: false,
-	aliases: ["lb"],
-	permLevel: "User"
-};
+		bot.guilds.cache.forEach(server => {
+			let moneyServer = 0
+			let fichaServer = 0
+			let users = 0
 
-exports.help = {
-	name: "leaderboard",
-	category: "Minigames",
-	description: "Shows the top 10 richer players",
-	usage: "leaderboard",
-	example: "leaderboard"
-};
+			//remove da contagem o Jacobi, e só contabiliza servers com +10 users
+			if (server.memberCount >= 10) {
+				server.members.cache.forEach(member => {
+					if (bot.data.indexes.includes(member.user.id) && bot.data.has(member.user.id, "classe") && bot.data.has(member.user.id, "username")) { // se é jogador e não é o Jacobi  && member.user.id != bot.config.adminID
+						// let alvo = member.user.id
+						// bot.users.fetch(alvo).then(user => alvo = user.id)
+						moneyServer += bot.data.get(member.user.id, "moni")
+						fichaServer += bot.data.get(member.user.id, "ficha")
+						users++
+					}
+				})
+
+				if (users > 3) {
+					listaMoney.push({
+						nome: server.name,
+						money: parseInt(moneyServer)
+					})
+
+					listaCapita.push({
+						nome: server.name,
+						money: Math.round(moneyServer / users)
+					})
+
+					listaMembros.push({
+						nome: server.name,
+						membros: users
+					})
+
+					listaFichas.push({
+						nome: server.name,
+						fichas: fichaServer
+					})
+				}
+
+			}
+		})
+
+		// organiza em ordem decrescente
+		listaMoney = listaMoney.sort((a, b) => {
+			return b.money - a.money
+		}).slice(0, 10)
+
+		listaCapita = listaCapita.sort((a, b) => {
+			return b.money - a.money
+		}).slice(0, 10)
+
+		listaMembros = listaMembros.sort((a, b) => {
+			return b.membros - a.membros
+		}).slice(0, 10)
+
+		listaFichas = listaFichas.sort((a, b) => {
+			return b.fichas - a.fichas
+		}).slice(0, 10)
+
+		let topMoney = ""
+		let topCapita = ""
+		let topMembros = ""
+		let topFichas = ""
+
+		listaMoney.forEach((server, i) => topMoney += `\`${i+1}.\` **${server.nome}** R$ ${server.money.toLocaleString().replace(/,/g, ".")}\n`)
+		listaCapita.forEach((server, i) => topCapita += `\`${i+1}.\` **${server.nome}** R$ ${server.money.toLocaleString().replace(/,/g, ".")}\n`)
+		listaMembros.forEach((server, i) => topMembros += `\`${i+1}.\` **${server.nome}** ${server.membros.toLocaleString().replace(/,/g, ".")}\n`)
+		listaFichas.forEach((server, i) => topFichas += `\`${i+1}.\` **${server.nome}** ${server.fichas.toLocaleString().replace(/,/g, ".")}\n`)
+
+		const embed2 = new Discord.MessageEmbed()
+			.setTitle("Top Servidores")
+			.setColor('GREEN')
+			.addField("Valor per capita 👤", topCapita)
+			.addField("Valor total 👥", topMoney)
+			.addField("Jogadores 👨‍👩‍👧‍👦", topMembros)
+			.addField(`Fichas ${bot.config.ficha}`, topFichas)
+			.setFooter(`${bot.data.get(message.author.id, "username")} • Necessário 10 membros no servidor e 3 jogadores`, message.member.user.avatarURL())
+			.setTimestamp()
+
+		m.edit({
+			embeds: [embed2]
+		}).catch(err => console.log("Não consegui editar mensagem `topserver`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `topserver`", err))
+}

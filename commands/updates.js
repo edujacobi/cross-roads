@@ -1,20 +1,26 @@
 const Discord = require("discord.js");
 exports.run = async (bot, message, args) => {
-    const embed = new Discord.RichEmbed()
+    let server = bot.guilds.cache.get('529674666692837378')
+    let canal = server.channels.cache.get('529676748422512661')
+    let ultimoUpdate
+    let date
 
-        .setTitle(bot.config.saveGame + " Update 1.4")
-        //.setThumbnail("https://cdn.discordapp.com/attachments/453314806674358292/526265639552417802/GTD.png")
-        .setColor(message.member.displayColor)
-        .addField("Nova arma", bot.config.escopeta + " **Escopeta** adicionada", true)
-        .addField("Novo job", bot.config.bulldozer + " **Estraga-Funeral** adicionado", true)
-        .addField("Trabalho? Meu negócio é roubar!", "Roubos à lugares agora aceitam diversas armas")
-        .addField("Eu quero um aumento.", "Salários dos trabalhos **Caçador de Corno** e **Treinador de Milícias** aumentados")
-        .addField("Mestre das artes ninjas", "Galos agora podem treinar para subir de nível. `;galo info`") 
-        .addField("Mestre da programação", "Bug do Inventário abrindo e fechando sozinho corrigido. Agora você pode abrir e fechar ele quantas vezes quiser")
-		.setFooter(`${message.author.username} • Última atualização: 29/11/2019`, message.member.user.avatarURL)
-        .setTimestamp();
+    canal.messages.fetch(canal.lastMessageId).then(m => {
+        ultimoUpdate = m.content
+        date = m.createdTimestamp
 
-    message.channel.send({
-        embed
+    }).then(() => {
+        const embed = new Discord.MessageEmbed()
+            .setTitle(`${bot.badges.dev} Updates`)
+            //.setThumbnail("https://cdn.discordapp.com/attachments/453314806674358292/526265639552417802/GTD.png")
+            .setColor('GREEN')
+            .setDescription(ultimoUpdate)
+            .addField("Para ver todos os updates", "Entre no servidor oficial do Cross Roads: https://discord.gg/sNf8avn")
+            .setFooter(`${bot.user.username} • #${canal.name}`, bot.user.avatarURL())
+            .setTimestamp(date);
+
+        return message.channel.send({
+            embeds: [embed]
+        }).catch(err => console.log("Não consegui enviar mensagem `updates`", err))
     })
 }

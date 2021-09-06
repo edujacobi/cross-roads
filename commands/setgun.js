@@ -1,57 +1,66 @@
+const Discord = require("discord.js")
+
 exports.run = async (bot, message, args) => {
-	let currTime = new Date().getTime();
+	const currTime = new Date().getTime()
 
-	if (message.author.id != bot.config.adminID) return;
+	if (message.author.id != bot.config.adminID && !bot.moderators.includes(message.author.id)) return
 
-	else {
-		let member = message.mentions.members.first();
-		uData = bot.data.get(member.id);
-		let arma = args[0];
-		let horas = parseInt(args[1]) * 1000 * 60 * 60;
+	//let member = message.mentions.members.first();
+	//member ? uData = bot.data.get(member.id) : null
+	let horas = parseInt(args.shift())
+	const horasMS = horas * 1000 * 60 * 60
+	let id = args.shift()
+	let arma = args.join(" ").toLowerCase()
+	let achou = false
 
-		if (arma == 'knife')
-			uData._knife = (uData._knife > currTime ? uData._knife + horas : currTime + horas);
+	if (!arma && !id && !horas)
+		return bot.createEmbed(message, `${bot.config.emmetGun} \`;setgun <horas> <id> <arma>\``)
 
-		else if (arma == '9mm')
-			uData._9mm = (uData._9mm > currTime ? uData._9mm + horas : currTime + horas);
+	if (horas % 1 != 0)
+		return bot.createEmbed(message, `PQP, ${bot.data.get(message.author.id, "username")}, as horas são inválidas`)
 
-		else if (arma == 'tec9')
-			uData._tec9 = (uData._tec9 > currTime ? uData._tec9 + horas : currTime + horas);
+	if (id <= 0 || (id % 1 != 0) || id.toString().length != 18)
+		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}i, o ID é inválido`)
 
-		else if (arma == 'rifle')
-			uData._rifle = (uData._rifle > currTime ? uData._rifle + horas : currTime + horas);
+	if (!arma)
+		return bot.createEmbed(message, `Pelo amor de deus, ${bot.data.get(message.author.id, "username")}, escolha uma arma`)
 
-		else if (arma == 'escopeta')
-			uData._shotgun = (uData._shotgun > currTime ? uData._shotgun + horas : currTime + horas);
+	let uData = bot.data.get(id)
 
-		else if (arma == 'mp5')
-			uData._mp5 = (uData._mp5 > currTime ? uData._mp5 + horas : currTime + horas);
+	if (!uData || uData.username == undefined) return bot.createEmbed(message, `Este usuário não possui um inventário`)
 
-		else if (arma == 'ak47')
-			uData._ak47 = (uData._ak47 > currTime ? uData._ak47 + horas : currTime + horas);
+	Object.entries(bot.guns).forEach(([key, value]) => {
+		if (arma == value.desc.toLowerCase()) {
+			achou = key
+			dataBase = value.data
+		}
+	})
+	if (achou == false)
+		return bot.createEmbed(message, `Puta merda, ${bot.data.get(message.author.id, "username")}, essa arma não existe`)
 
-		else if (arma == 'm4')
-			uData._m4 = (uData._m4 > currTime ? uData._m4 + horas : currTime + horas);
+	let gun = bot.guns[achou]
+	let emoji = bot.config[gun.emote]
 
-		else if (arma == 'colete')
-			uData._colete = (uData._colete > currTime ? uData._colete + horas : currTime + horas);
+	bot.createEmbed(message, `${bot.config.emmetGun} ${uData.username} recebeu ${horas} horas de ${emoji} ${gun.desc}`)
 
-		else if (arma == 'jetpack')
-			uData._jetpack = (uData._jetpack > currTime ? uData._jetpack + horas : currTime + horas);
+	const armaRecebida = new Discord.MessageEmbed()
+		.setColor(bot.colors.darkGrey)
+		.setDescription(`**${bot.data.get(message.author.id, "username")}** te deu ${horas} horas de ${emoji} ${gun.desc} ${bot.config.emmetGun}`)
 
-		else if (arma == 'minigun')
-			uData._minigun = (uData._minigun > currTime ? uData._minigun + horas : currTime + horas);
+	bot.users.fetch(id).then(user => user.send({
+		embeds: [armaRecebida]
+	}).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
 
-		else if (arma == 'rpg')
-			uData._rpg = (uData._rpg > currTime ? uData._rpg + horas : currTime + horas);
+	Object.entries(uData).forEach(([key_udata, value_udata]) => {
+		if (key_udata == "_" + dataBase) {
+			value_udata = value_udata > currTime ? value_udata + horasMS : currTime + horasMS
+			uData[key_udata] = value_udata
+		}
+	});
 
-		else if (arma == 'goggles')
-			uData._goggles = (uData._goggles > currTime ? uData._goggles + horas : currTime + horas);
+	bot.data.set(id, uData)
+	return bot.log(message, new Discord.MessageEmbed()
+		.setDescription(`**${uData.username} recebeu ${horas} horas de ${emoji} de ${bot.data.get(message.author.id, "username")}**`)
+		.setColor(bot.colors.admin))
 
-		else 
-			return bot.createEmbed(message, "Arma inválida.")
-
-		bot.createEmbed(message, `${member.user.username} recebeu ${args[1]}h de ${arma}`);	
-		bot.data.set(member.user.id, uData);
-	}
 };

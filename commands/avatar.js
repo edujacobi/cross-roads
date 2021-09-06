@@ -1,34 +1,54 @@
 const Discord = require("discord.js");
 
 exports.run = async (bot, message, args) => {
-	let user = message.mentions.members.first();
+	let targetMention = message.mentions.members.first()
+	let targetNoMention = []
+	if (!targetNoMention[0] && args[0] && !targetMention) { // se não mencionou mas quer ver inv de outro user
 
-	if (!user && args[0]) {
-		if (/^-?[0-9]+$/.test(args[0]) && args[0].length == 18)
-			user = message.guild.members.get(args[0]);
+		let name = args.join(" ").toLowerCase()
 
-		let name = args.join(" ").toLowerCase();
+		bot.data.forEach((item, id) => {
+			if (bot.data.has(id, "username") && item.username.toLowerCase() == name)
+				targetNoMention.push(id)
 
-		message.guild.members.forEach(item => {
-			if (item.user.username.toLowerCase() == name)
-				user = item;
+			else if (id.toString() == name) {
+				targetNoMention.push(id)
+			}
+		})
 
-			else if (item.displayName.toLowerCase() == name)
-				user = item;
-		});
-
-		if (!user)
-			return bot.createEmbed(message, "Usuário não encontrado");
+		if (!targetNoMention[0])
+			return bot.createEmbed(message, "Usuário não encontrado.")
 	}
 
-	let avatar = (user ? user.user : message.author).avatarURL || (user ? user.user : message.author).defaultAvatarURL;
-	let embed = new Discord.RichEmbed()
+	let alvo
 
-		.setTitle("Avatar de " + (user ? user.user : message.author).username)
-		.setImage(avatar)
-		.setColor(message.member.displayColor)
-		.setFooter(message.author.username, message.member.user.avatarURL)
-		.setTimestamp();
+	if (targetNoMention.length > 0)
+		alvo = targetNoMention[0]
+	else
+		alvo = targetMention ? targetMention.id : message.author.id
 
-	message.channel.send(embed);
+	let uData = bot.data.get(alvo)
+	if (!uData) return bot.createEmbed(message, "Este usuário não possui um inventário")
+
+	let avatar
+
+	bot.users.fetch(alvo).then(user => {
+		alvo = user.id
+		avatar = user.avatarURL({
+			dynamic: true,
+			size: 1024
+		})
+	}).then(() => {
+		const embed = new Discord.MessageEmbed()
+
+			.setTitle(`Avatar de ${uData.username}`)
+			.setImage(avatar)
+			.setColor(message.member.displayColor)
+			.setFooter(bot.data.get(message.author.id, "username"), message.member.user.avatarURL())
+			.setTimestamp();
+
+		return message.channel.send({
+			embeds: [embed]
+		}).catch(err => console.log("Não consegui enviar mensagem `avatar`", err))
+	})
 }

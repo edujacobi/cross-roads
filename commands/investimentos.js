@@ -1,23 +1,29 @@
 const Discord = require("discord.js");
 exports.run = async (bot, message, args) => {
-	const embed = new Discord.RichEmbed()
+	let uData = bot.data.get(message.author.id)
 
-		.setTitle(bot.config.propertyG + " Investimentos")
-		.setDescription("Você receberá lucros a cada hora. Cada investimento dura 7 dias.")
-		.setThumbnail("https://cdn.discordapp.com/attachments/333060149105131521/527535932581085184/golfclubicon.png")
-		.setColor(message.member.displayColor)
+	const embed = new Discord.MessageEmbed()
+		.setTitle(`${bot.config.propertyG} Investimentos`)
+		.setDescription("Você receberá lucros a cada hora. Cada investimento dura 7 dias.\nPara receber notificações do lucro depositado, use `;investir notificar`.")
+		.setThumbnail("https://cdn.discordapp.com/attachments/719677144133009478/734264171511676969/radar_propertyG.png")
+		.setColor('GREEN')
 
-		.addField(`1: ${bot.investments.desc[0]}`, 	`${bot.investments.price[0].toLocaleString().replace(/,/g, ".")}${bot.config.coin}\nLucro/h: ${bot.investments.income[0].toLocaleString().replace(/,/g, ".")}${bot.config.coin}`, true)
-		.addField(`2: ${bot.investments.desc[1]}`, 	`${bot.investments.price[1].toLocaleString().replace(/,/g, ".")}${bot.config.coin}\nLucro/h: ${bot.investments.income[1].toLocaleString().replace(/,/g, ".")}${bot.config.coin}`, true)
-		.addField(`3: ${bot.investments.desc[2]}`, 	`${bot.investments.price[2].toLocaleString().replace(/,/g, ".")}${bot.config.coin}\nLucro/h: ${bot.investments.income[2].toLocaleString().replace(/,/g, ".")}${bot.config.coin}`, true)
-		.addField(`4: ${bot.investments.desc[3]}`, 	`${bot.investments.price[3].toLocaleString().replace(/,/g, ".")}${bot.config.coin}\nLucro/h: ${bot.investments.income[3].toLocaleString().replace(/,/g, ".")}${bot.config.coin}`, true)
-		.addField(`5: ${bot.investments.desc[4]}`, 	`${bot.investments.price[4].toLocaleString().replace(/,/g, ".")}${bot.config.coin}\nLucro/h: ${bot.investments.income[4].toLocaleString().replace(/,/g, ".")}${bot.config.coin}`, true)
-		.addField(`6: ${bot.investments.desc[5]}`, 	`${bot.investments.price[5].toLocaleString().replace(/,/g, ".")}${bot.config.coin}\nLucro/h: ${bot.investments.income[5].toLocaleString().replace(/,/g, ".")}${bot.config.coin}`, true)
-
-		.setFooter(message.author.username + " • Dinheiro: " + uData.moni.toLocaleString().replace(/,/g, "."), message.member.user.avatarURL)
+	Object.values(bot.investimentos).forEach(investimento => {
+		let preço = uData.classe == 'mafioso' ? investimento.preço : (investimento.preço + investimento.preço * bot.imposto)
+		let lucro = investimento.lucro
+		if (uData.classe == 'mafioso')
+			lucro = Math.floor(investimento.lucro * 0.9)
+		if (uData.classe == 'empresario')
+			lucro = Math.floor(investimento.lucro * 1.05)
+		embed.addField(`${investimento.id}: ${investimento.desc}`, `R$ ${preço.toLocaleString().replace(/,/g, ".")}\nLucro/h: R$ ${lucro.toLocaleString().replace(/,/g, ".")}`, true)
+	});
+	embed.setFooter(`${uData.username} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 		.setTimestamp();
 
 	message.channel.send({
-		embed
-	})
+		embeds: [embed]
+	}).catch(err => console.log("Não consegui enviar mensagem `investimentos`", err));
 }
+exports.config = {
+	alias: ['invests', 'investments', 'locais']
+};

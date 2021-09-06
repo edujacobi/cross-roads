@@ -1,46 +1,107 @@
+const Discord = require("discord.js");
 exports.run = async (bot, message, args) => {
-	let time = new Date().getTime();
-	let uData = bot.data.get(message.author.id);
 
-	if (uData.job >= 0) 
-		return bot.msgTrabalhando(message, uData);
+	// if (message.author.id != bot.config.adminID)
+	// 	return
 
-	if (uData.preso > time) 
-		return bot.msgPreso(message, uData);
+	let time = new Date().getTime()
+	let uData = bot.data.get(message.author.id)
+	let option1 = args[0]
+	const MAX = 10000
+	const MIN = 10
+	// let option2 = args[1]
 
-	if (args[1] == 'allin')
-		args[1] = uData.moni;
+	if (uData.job != null)
+		return bot.msgTrabalhando(message, uData)
 
-	if (uData.moni < 1)
-		return bot.msgSemDinheiro(message);
+	if (uData.preso > time)
+		return bot.msgPreso(message, uData)
 
-	else if (args[1] <= 0 || (args[1] % 1 != 0))
-		return bot.msgValorInvalido(message);
+	if (uData.hospitalizado > time)
+		return bot.msgHospitalizado(message, uData)
 
-	else if (args[0] == "cara" || args[0] == "coroa") {
-		//message.delete();
+	if (uData.emRoubo)
+		return bot.msgEmRoubo(message)
 
-		if (parseFloat(uData.moni) < args[1])
-			return bot.msgDinheiroMenorQueAposta(message);
+	if (uData.galoEmRinha)
+		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
-		let flip;
+	if (args[1] == 'allin') {
+		args[1] = uData.ficha
+		if (args[1] > MAX)
+			args[1] = MAX
+	}
 
-		flip = (bot.getRandom(0, 100) < 50 ? "cara" : "coroa");
+	let valor = parseInt(args[1])
 
-		if (args[0] == flip) {
-			uData.moni += parseInt(args[1]);
-			uData.betW++;
-			bot.createEmbed(message, `<:positive:572134588340633611> Você **ganhou** ${parseInt(args[1]).toLocaleString().replace(/,/g, ".")} e ficou com ` + (uData.moni.toLocaleString().replace(/,/g, ".")) + bot.config.coin);
+	if (uData.ficha < 1)
+		return bot.createEmbed(message, `Você não possui ${bot.config.ficha} fichas para apostar ${bot.config.mafiaCasino}`)
 
-		} else {
-			uData.moni -= parseInt(args[1]);
-			uData.betL++;
-			bot.createEmbed(message, `<:negative:572134589863034884> Você **perdeu** ${parseInt(args[1]).toLocaleString().replace(/,/g, ".")} e ficou com ` + (uData.moni.toLocaleString().replace(/,/g, ".")) + bot.config.coin);
-		}
+	if (valor <= 0 || (valor % 1 != 0))
+		return bot.msgValorInvalido(message)
+
+	if (valor > MAX)
+		return bot.createEmbed(message, `O valor máximo de aposta é ${bot.config.ficha} ${MAX.toLocaleString().replace(/,/g, ".")} fichas ${bot.config.mafiaCasino}`)
+
+	if (valor < MIN)
+		return bot.createEmbed(message, `O valor mínimo de aposta é ${bot.config.ficha} ${MIN.toLocaleString().replace(/,/g, ".")} fichas ${bot.config.mafiaCasino}`)
+
+	// if (option1 != 'cara' && option2 != 'cara' && option1 != 'coroa' && option1 != 'coroa')
+	// 	return bot.createEmbed(message, `Você deve escolher 2 moedas e apostar em Cara ou Coroa ${bot.config.mafiaCasino}`, ";bet <cara|coroa> <cara|coroa> <valor>")
+
+	if (option1 != 'cara' && option1 != 'coroa')
+		return bot.createEmbed(message, `Você deve apostar em Cara ou Coroa ${bot.config.mafiaCasino}`, ";bet <cara|coroa> <valor>")
+
+	if (uData.ficha < valor)
+		return bot.createEmbed(message, `Você não possui esta quantidade de ${bot.config.ficha} fichas para apostar ${bot.config.mafiaCasino}`)
+
+	if (valor * 100 > bot.banco.get('cassino'))
+		return bot.createEmbed(message, `O Cassino não tem caixa suficiente para apostar com você`, `Caixa: R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
+
+	let face1 = (Math.random() < 0.50 ? "cara" : "coroa")
+	// let face2 = (Math.random() < 0.50 ? "cara" : "coroa")
+
+	let valor_imposto = uData.classe == 'mafioso' ? 0 : Math.floor(valor * bot.imposto * 3)
+
+	if (valor >= 10) {
+		valor -= valor_imposto
+		if (message.author.id != bot.config.adminID)
+			bot.banco.set('caixa', bot.banco.get('caixa') + valor_imposto * 80)
+	}
+
+	if (face1 == option1) {
+		uData.ficha += parseInt(valor)
+		uData.cassinoGanhos += parseInt(valor) * 80
+		uData.betW++
+		bot.createEmbed(message, `Caiu **${face1}** \nVocê **ganhou** ${bot.config.ficha} ${parseInt(valor).toLocaleString().replace(/,/g, ".")} fichas ${bot.config.mafiaCasino}`, `${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`, 'GREEN')
+		bot.banco.set('cassino', bot.banco.get('cassino') - valor * 80)
+
+		bot.log(message, new Discord.MessageEmbed()
+			.setDescription(`**${uData.username} apostou em ${option1} ganhou ${parseInt(valor).toLocaleString().replace(/,/g, ".")} fichas**`)
+			.addField("Caiu", `${face1} `, true)
+			.addField("Imposto", `${valor_imposto.toLocaleString().replace(/,/g, ".")} fichas → R$ ${(valor_imposto * 80).toLocaleString().replace(/,/g, ".")}`, true)
+			.setColor('GREEN'))
 
 	} else {
-		bot.createEmbed(message, bot.config.mafiaCasino + " Você deve apostar em Cara ou Coroa");
-		return;
+		// uData.moni -= (valor + valor_imposto)
+		uData.ficha -= parseInt(valor + valor_imposto)
+		uData.cassinoPerdidos += parseInt(valor + valor_imposto) * 80
+		uData.betL++
+		bot.createEmbed(message, `Caiu **${face1}** \nVocê **perdeu** ${bot.config.ficha} ${parseInt(valor + valor_imposto).toLocaleString().replace(/,/g, ".")} fichas ${bot.config.mafiaCasino}`, `${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`, 'RED')
+		bot.banco.set('cassino', bot.banco.get('cassino') + valor * 80)
+		bot.log(message, new Discord.MessageEmbed()
+			.setDescription(`**${uData.username} apostou em ${option1} e perdeu ${parseInt(valor + valor_imposto).toLocaleString().replace(/,/g, ".")} fichas**`)
+			.addField("Caiu", `${face1}`, true)
+			.addField("Imposto", `${valor_imposto.toLocaleString().replace(/,/g, ".")} fichas → R$ ${(valor_imposto * 80).toLocaleString().replace(/,/g, ".")}`, true)
+			.setColor('RED'))
 	}
-	bot.data.set(message.author.id, uData);
+
+	uData.betJ++
+	bot.data.set(message.author.id, uData)
+
+
+
 }
+exports.config = {
+	alias: ['flip', 'b']
+};

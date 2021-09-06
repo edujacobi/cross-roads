@@ -1,18 +1,25 @@
-exports.run = (bot, message, args) => {
+exports.run = async (bot, message, args) => {
 	const Discord = require('discord.js');
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 
-		.setTitle(bot.config.qmark + " Ajuda")
-		.setColor(message.member.displayColor)
-
-		.addField("Começando a jogar", "Crie seu inventário usando `;inv`, e então, use `;presente` para receber um dinheiro inicial. Você pode usar `;daily` diariamente para receber mais!")
-		.addField("Ganhando dinheiro", "Há muitas maneiras de ganhar dinheiro no jogo. Trabalhando, investindo, roubando ou apostando.")
-		//.addField("Subindo de nível", "Quanto mais você trabalha, rouba, aposta e investe, mais experiência você acumula. (EM BREVE)")
-		.addField("Comandos", "Para ver todos os comandos, use `;comandos`")
-		.addField("Informações", "Jogadores, criador, tempo online e mais: `;stats`.")
-		.setFooter(message.author.username, message.member.user.avatarURL)
+		.setTitle(`${bot.config.qmark} Ajuda`)
+		.setDescription("*Bem vindo à Cidade da Cruz! Aqui, todos os caminhos se cruzam, sejam eles bons ou ruins. Decida seu caminho e molde seu futuro nesse jogo de RPG!*")
+		.setColor('GREEN')
+		.setThumbnail("https://media.discordapp.net/attachments/531174573463306240/854876909564461066/Interrogacao.png")
+		.addField("Jogue agora mesmo!", "Veja seu inventário usando `;inv`.\nVocê pode usar `;daily` diariamente para receber um pequeno valor e `;weekly` semanalmente para mais!")
+		.addField("Ganhe dinheiro", "Há muitas maneiras de ganhar dinheiro no jogo. Trabalhando, investindo, apostando, roubando e até vasculhando lugares.")
+		.addField("Comandos", "Para ver todos os comandos, use `;comandos`.", true)
+		.addField("Novidades", "Atualizações são publicadas toda semana! `;updates`.", true)
+		.addField("Notificações e funcionamento", "Para tudo ocorrer belezinha, certifique-se que você pode receber mensagens privadas de usuários que não estão na sua lista de amigos. Se você colocou Cross Roads no seu servidor, certifique-se que a permissão Gerenciar Mensagens está ativa!")
+		.addField("Ajude o bot a continuar online", "Adquira VIP! O VIP não torna o jogo _pay-to-win_, os benefícios são, em sua maioria, somente cosméticos!")
+		.addField("Entre no servidor oficial!", `[Saiba de eventos e atualizações!](https://discord.gg/ruasdacruz)`)
+		.setFooter(bot.user.username, bot.user.avatarURL())
 		.setTimestamp();
-	message.channel.send({
-		embed
-	})
+	return message.channel.send({
+		embeds: [embed]
+	}).catch(err => console.log("Não consegui enviar mensagem `ajuda`", err));
+};
+
+exports.config = {
+	alias: ['help']
 };

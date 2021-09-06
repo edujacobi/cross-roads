@@ -1,11 +1,17 @@
+const Discord = require("discord.js");
 module.exports = (bot) => {
+	bot.imposto = 0.05 // 5% do bet
+	bot.carregamentoCassino = -1000000
+	bot.moderators = ['846441465529630740', '666077411615572031', '697549215475433552', '145466251496390656', '843955033543540756', '606290632725626940', '555414232989040661']
 
 	bot.getRandom = (min, max) => {
-		return Math.floor(Math.random() * (max - min + 1) + min);
-	}
+		min = Math.ceil(min)
+		max = Math.floor(max)
+		return Math.floor(Math.random() * (max - min) + 1) + min
+	};
 
 	bot.shuffle = (array) => {
-		var currentIndex = array.length,
+		let currentIndex = array.length,
 			temp, rand;
 		while (0 !== currentIndex) {
 			rand = Math.floor(Math.random() * currentIndex);
@@ -15,61 +21,18 @@ module.exports = (bot) => {
 			array[rand] = temp;
 		}
 		return array;
-	}
+	};
 
-	bot.minToHour = (minutes) => {
-		return `${(minutes > 60 ? `${Math.floor(minutes / 60)} horas ${(minutes % 60 == 0 ? "" : `e ${Math.floor(minutes % 60)} minutos`)}` : `${Math.floor(minutes)} minutos`)}`
-	}
-
-	// String.prototype.toProperCase = function() {
-	//   return this.replace(/([^\W_]+[^\s-]*) */g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-	//};   
-
-	bot.jobs = {
-		desc: ["Entregador de Panfleto", "Motoboy", "Pedreiro", "Açougueiro", "Vigilante", "Segurança Particular", "Caçador de Corno",
-			"Estraga-Funeral", "Treinador de Milícia", "Mercenário", "Rei do Crime", "Espião da Ordem", "Homem-bomba", "Godfather da Mafia Jacobina"
-		],
-		coolDown: [3600000, 7200000, 10800000, 14400000, 21600000, 28800000, 3600000, 10800000, 43200000, 64800000, 86400000, 144000000, 216000000, 259200000],
-		payment: [220, 500, 800, 1500, 4000, 8000, 1800, 6000, 22000, 35000, 75000, 200000, 1000000, 15000000]
-	}
-
-	bot.investments = {
-		desc: ["Boca de Fumo", "Puteiro", "Boate", "Clube de Golfe", "Cassino", "País do Terceiro Mundo"],
-		price: [10000, 50000, 150000, 500000, 1500000, 5000000],
-		income: [100, 550, 1725, 6000, 18750, 65000]
-	}
-
-	bot.guns = {
-		desc:  ["Faca",   "9mm",  "Tec9",  "Rifle",  "Escopeta", "Mp5",  "AK-47", "M4",  "Óculos Noturno", "RPG",  "Colete",  "Minigun"],
-		data:  ["_knife", "_9mm", "_tec9", "_rifle", "_shotgun", "_mp5", "_ak47", "_m4", "_goggles",       "_rpg", "_colete", "_minigun"], // uData._rifle
-		emote: ["faca",  "_9mm", "tec9",  "rifle",  "escopeta", "mp5",  "ak47",  "m4",  "goggles",        "rpg",  "colete",  "minigun"], //bot.config.rifle
-		thumb: ["faca",  "9mm",  "tec9",  "rifle",  "escopeta", "mp5",  "ak47",  "M4",  "goggles",        "rpg",  "colete",  "minigun"],
-		atk:   [10,       20,      30, 		45, 		50, 	40, 	 50, 	  60, 	  10, 			    70, 	0,  		80],
-		def:   [5,  	  10, 	   15, 		15, 		10, 	20, 	 25, 	  35, 	  50, 				40, 	70, 		55],
-		moneyAttack: [6, 9, 12, 18, 24, 30, 36, 40, 44, 48, 0,  52],
-		moneyDef:    [3, 6, 9,  12, 15, 18, 21, 24, 27, 30, 33, 36],
-		utilidade: [
-			`**Trabalho:** ${bot.jobs.desc[3]}\n**Roubar:** Velhinha na esquina`, // Faca
-			`**Trabalho:** ${bot.jobs.desc[4]}\n**Roubar:** Mercearia do Zé`, // 9mm
-			`**Trabalho:** ${bot.jobs.desc[5]}\n**Roubar:** Posto de gasolina`, // tec9
-			`**Trabalho:** ${bot.jobs.desc[6]}\n**Roubar:** Posto de gasolina`, // rifle
-			`**Trabalho:** ${bot.jobs.desc[7]}\n**Roubar:** Posto de gasolina`, // escopeta
-			`**Trabalho:** ${bot.jobs.desc[8]}`, // mp5
-			`**Trabalho:** ${bot.jobs.desc[9]}\n**Roubar:** Banco da cidade`, // ak-47
-			`**Trabalho:** ${bot.jobs.desc[10]}\n**Roubar:** Banco da cidade`, // m4
-			`**Trabalho:** ${bot.jobs.desc[11]}\n**Roubar:** Banco da cidade`, // goggles
-			`**Trabalho:** ${bot.jobs.desc[12]}\n**Roubar:** Mafia Jacobina`, // rpg
-			``, // colete
-			`**Trabalho:** ${bot.jobs.desc[13]}\n**Roubar:** Mafia Jacobina`, // minigunn
-		]
-	}
+	bot.segToHour = (segundos) => {
+		return `${(segundos > 3600 ? `${Math.floor(segundos / 3600)} ${(segundos < 7200 ? `hora` : `horas`)}${(segundos % 3600 == 0 ? "" : ` e ${Math.floor((segundos/60) % 60)} minutos`)}` : Math.floor(segundos) < 60 ? `${Math.floor(segundos)} segundos` : `${Math.floor(segundos/60 )} minutos`)}`
+	};
 
 	bot.defaultCarteira = {
 		nome: '',
 		moni: 0,
 		ficha: 0,
 		presente: 0,
-		day: -1,
+		day: 0,
 		_knife: 0,
 		_9mm: 0,
 		_tec9: 0,
@@ -80,32 +43,412 @@ module.exports = (bot) => {
 		_m4: 0,
 		_rpg: 0,
 		_goggles: 0,
+		_sniper: 0,
 		_katana: 0,
 		_colete: 0,
+		_colete_p: 0,
 		_jetpack: 0,
 		_minigun: 0,
-		job: -1,
+		_bazuca: 0,
+		_exoesqueleto: 0,
+		_ovo: 0,
+		_ovogranada: 0,
+		_flor: 0,
+		conjuge: null,
+		job: null,
 		jobTime: 0,
+		jobNotification: 0,
 		roubo: 0,
 		preso: 0,
+		presoNotification: 0,
 		fuga: 0,
+		qtEsmolasDadas: 0,
+		qtEsmolasRecebidas: 0,
+		esmolaEntregueHoje: 0,
+		esmolaRecebidaHoje: 0,
+		betJ: 0,
 		betW: 0,
 		betL: 0,
 		roubosW: 0,
 		roubosL: 0,
+		emRoubo: false,
+		valorRoubado: 0,
 		qtFugas: 0,
+		qtRoubado: 0,
 		jobGanhos: 0,
 		lojaGastos: 0,
+		invest: null,
 		investTime: 0,
-		invest: -1,
+		investNotification: 0,
 		investGanhos: 0,
 		galo: 1,
 		galoPower: 30,
+		galoAvatar: 'https://cdn.discordapp.com/attachments/529674667414519810/530191738690732033/unknown.png',
 		galoTrain: 0,
+		galoTrainNotification: 0,
 		galoTrainTime: 0,
-		galoNome: "",
+		galoNome: "Galo",
 		galoTit: "",
-		tempoRinha: 0
+		galoEmRinha: false,
+		galoW: 0,
+		galoL: 0,
+		tempoRinha: 0,
+		espancarW: 0,
+		espancarL: 0,
+		hospitalizado: 0,
+		hospitalizadoNotification: 0,
+		morto: 0,
+		espancar: 0,
+		vasculhar: 0,
+		vasculharAchou: 0,
+		qtHospitalizado: 0,
+		hospitalGastos: 0,
+		cassinoGanhos: 0,
+		cassinoPerdidos: 0,
+		cassinoNiquel: 0,
+		prisaoGastos: 0,
+		depositoGang: 0,
+		vipTime: 0,
+		_celular: 0,
+		celularSmsBlock: false,
+		celularPego: 0,
+		celularCredito: 0,
+		dataInicio: '',
+		classeAlterada: 0,
+	};
+
+	bot.defautGang = {
+		membros: [],
+		nome: '',
+		desc: '',
+		icone: '',
+		tag: '',
+		cor: 0x0,
+		caixa: 0,
+		boneco: 0,
+		baseLevel: 0,
+		espacoMembro: 10,
+		estoque: 0,
+		golpeMissao1: {
+			concluido: false,
+			time: 0
+		},
+		golpeMissao2: {
+			concluido: false,
+			time: 0
+		},
+		golpeMissao3: {
+			concluido: false,
+			time: 0
+		},
+		golpeTime: 0,
+		golpeW: 0,
+		golpeL: 0,
+		valorRoubadoBanco: 0,
+	};
+
+	bot.investReceber = async () => {
+		const semana = 604800000 // 7 dias
+		const hora = 3600000 // 1h
+
+		let currTime = new Date().getTime()
+
+		bot.data.forEach((user, id) => {
+			if (user.invest != null && user.preso < currTime && user.hospitalizado < currTime) {
+				if (user.morto > currTime)
+					user.investLast = currTime
+
+				let horas = (user.investTime + semana) > currTime ? currTime - user.investLast : user.investTime + semana - user.investLast
+				// se investimento ainda não passou de uma semana, então horas = tempo atual - ultimo saque, senão horas = investTime + semana - investLast
+
+				let praSacar = Math.round(((horas / hora) * bot.investimentos[user.invest].lucro))
+
+				if (user.classe == 'mafioso')
+					praSacar = Math.round(praSacar * 0.9)
+
+				if (user.classe == 'empresario')
+					praSacar = Math.round(praSacar * 1.05)
+
+				if (currTime < (user.investTime + semana)) { //se o investimento ainda não completou uma semana
+					// user.investNotification += 1
+
+					if (user.investNotification)
+						bot.users.fetch(id).then(user_send => {
+							user_send.send(`Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} de seu investimento **${bot.investimentos[user.invest].desc}** ${bot.config.propertyG}`)
+								.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`));
+						});
+					user.moni += parseInt(praSacar)
+					user.investGanhos += parseInt(praSacar)
+					user.investLast = currTime
+
+
+				} else if (user.invest != null) { // se já passou uma semana
+					//linhaInvest = `Seu investimento **${bot.investimentos[user.invest].desc}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} dele ${bot.config.propertyR}`
+					let invest = bot.investimentos[user.invest].desc
+					if (user.investNotification) {
+						bot.users.fetch(id).then(user_send => {
+							user_send.send(`Seu investimento **${invest}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} dele ${bot.config.propertyR}`)
+								.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`));
+						});
+					} else {
+						bot.users.fetch(id).then(user_send => {
+							user_send.send(`Seu investimento **${invest}** acabou ${bot.config.propertyR}`)
+								.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`));
+						});
+					}
+					user.moni += parseInt(praSacar)
+					user.investGanhos += parseInt(praSacar)
+					user.investLast = 0
+					user.invest = null
+					user.investTime = 0
+
+				}
+				bot.data.set(id, user)
+			}
+		})
+
+	}
+
+	bot.informRouboCancelado = () => {
+		bot.data.forEach((user, id) => {
+			if (user.emRoubo) {
+				bot.users.fetch(id).then(user_send => {
+					user_send.send(`O Cross Roads foi reiniciado durante seu roubo e ele foi cancelado ${bot.config.roubar}`)
+						.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`));
+				});
+				bot.data.set(id, false, 'emRoubo')
+			}
+		})
+	}
+
+	bot.informRinhaCancelada = () => {
+		bot.data.forEach((user, id) => {
+			if (user.galoEmRinha) {
+				bot.users.fetch(id).then(user_send => {
+					user_send.send(`O Cross Roads foi reiniciado durante sua rinha e ela foi cancelada ${bot.config.galo}`)
+						.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`));
+				});
+				bot.data.set(id, false, 'galoEmRinha')
+			}
+		})
+	}
+
+	bot.putMoneyCassino = () => {
+		if (bot.banco.get('caixa') - bot.carregamentoCassino > 0) {
+			bot.banco.set('caixa', bot.banco.get('caixa') - bot.carregamentoCassino)
+			bot.banco.set('cassino', bot.banco.get('cassino') + bot.carregamentoCassino)
+		}
+	}
+
+	bot.getUserBadges = (userId, isInv) => {
+		let textoBadge = ''
+
+		// BADGES ------------------------------------
+		if (['332228051871989761', '592022325835202600'].includes(userId)) //DEV
+			textoBadge += bot.badges.dev
+		if (bot.moderators.includes(userId)) //MOD
+			textoBadge += bot.badges.mod
+		if (bot.data.get(userId, 'vipTime') > new Date().getTime()) // VIP
+			textoBadge += bot.badges.vip
+
+
+		// TEMPORADA 1 -------------------------------
+		if (!isInv) {
+			if (userId == '215955539274760192') //Top 1 Grana Temporada 1
+				textoBadge += bot.badges.topGrana1_s1
+			if (userId == '384811752245690368') //Top 2 Grana Temporada 1
+				textoBadge += bot.badges.topGrana2_s1
+			if (userId == '621480481975959562') //Top 3 Grana Temporada 1
+				textoBadge += bot.badges.topGrana3_s1
+
+			// TEMPORADA 2 -------------------------------
+			if (userId == '660136362514579468') //Top 1 Grana Temporada 2
+				textoBadge += bot.badges.topGrana1_s2
+			if (userId == '592022325835202600') //Top 2 Grana Temporada 2
+				textoBadge += bot.badges.topGrana2_s2
+			if (userId == '215955539274760192') //Top 3 Grana Temporada 2
+				textoBadge += bot.badges.topGrana3_s2
+			if (userId == '695078054497878028') //Top Pancada - Home Run
+				textoBadge += bot.badges.homerun_s2
+			if (userId == '636327778337423391') //Top Fugas - Fujão
+				textoBadge += bot.badges.fujao_s2
+			if (userId == '712070601845506143') //Top Win rate cassino - Sortudo
+				textoBadge += bot.badges.sortudo_s2
+
+			// TEMPORADA 3 -------------------------------
+			if (userId == '726587303476330577') //Top 1 Grana Temporada 3
+				textoBadge += bot.badges.topGrana1_s3
+			if (userId == '565928906356424705') //Top 2 Grana Temporada 3
+				textoBadge += bot.badges.topGrana2_s3
+			if (userId == '450421081120047105') //Top 3 Grana Temporada 3
+				textoBadge += bot.badges.topGrana3_s3
+			if (userId == '517013970310397974') //Top Pancada - EsmagaCrânio
+				textoBadge += bot.badges.esmagaCranio_s3
+			if (userId == '305096107954798602') //Top espancado - Morto Muito Louco
+				textoBadge += bot.badges.mortoMuitoLouco_s3
+			if (userId == '555414232989040661') //Top Fugas - Fujão
+				textoBadge += bot.badges.fujao_s3
+			if (userId == '747135934100668476') //Top Win rate cassino - Sortudo
+				textoBadge += bot.badges.sortudo_s3
+			if (userId == '517013970310397974') //Top ganhos cassino - Trader Elite
+				textoBadge += bot.badges.traderElite_s3
+			if (userId == '145466251496390656') //Top Roubos qt - Mão Boba
+				textoBadge += bot.badges.maoBoba_s3
+			if (userId == '555414232989040661') //Top Roubos vl - Bolso Largo
+				textoBadge += bot.badges.bolsoLargo_s3
+			if (userId == '487046604147392521') //Top Win rate galo - Top Galo
+				textoBadge += bot.badges.topGalo_s3
+			if (userId == '786127589122768917') //Top roubado - Alvo Ambulante
+				textoBadge += bot.badges.alvoAmbulante_s3
+			if (userId == '731765213237346357') //Top esmola - Filantropo
+				textoBadge += bot.badges.filantropo_s3
+			if (userId == '517013970310397974') //Top investidor - Investidor
+				textoBadge += bot.badges.investidor_s3
+			if (userId == '517013970310397974') //Top trabalhador - Workaholic
+				textoBadge += bot.badges.workaholic_s3
+			if (userId == '533848042387013648') //Top gastador - Patricinha
+				textoBadge += bot.badges.patricinha_s3
+			if (userId == '555414232989040661') //Top suborno - Deputado
+				textoBadge += bot.badges.deputado_s3
+			if (userId == '675378704469196800') //Top hospital doente - Hipocondriaco
+				textoBadge += bot.badges.hipocondriaco_s3
+		}
+
+		// TEMPORADA 4 -------------------------------
+		if (userId == '479611442824216576') //Top 1 Grana Temporada 4
+			textoBadge += bot.badges.topGrana1_s4
+		if (userId == '773017599121686570') //Top 2 Grana Temporada 4
+			textoBadge += bot.badges.topGrana2_s4
+		if (userId == '761236646116982844') //Top 3 Grana Temporada 4
+			textoBadge += bot.badges.topGrana3_s4
+		if (userId == '516023056095772674') //Top Pancada - EsmagaCrânio
+			textoBadge += bot.badges.esmagaCranio_s4
+		if (userId == '698361824340344965') //Top Fugas - Fujão
+			textoBadge += bot.badges.fujao_s4
+		if (userId == '406554359862788100') //Top Win rate cassino - Sortudo
+			textoBadge += bot.badges.sortudo_s4
+		if (userId == '145466251496390656') //Top ganhos cassino - Trader Elite
+			textoBadge += bot.badges.traderElite_s4
+		if (userId == '698361824340344965') //Top Roubos qt - Mão Boba
+			textoBadge += bot.badges.maoBoba_s4
+		if (userId == '698361824340344965') //Top Roubos vl - Bolso Largo
+			textoBadge += bot.badges.bolsoLargo_s4
+		if (userId == '667909521682989056') //Top Win rate galo - Top Galo
+			textoBadge += bot.badges.topGalo_s4
+		if (userId == '490281882697728010') //Top esmola - Filantropo
+			textoBadge += bot.badges.filantropo_s4
+		if (userId == '761236646116982844') //Top investidor - Investidor
+			textoBadge += bot.badges.investidor_s4
+		if (userId == '724639028636287049') //Top trabalhador - Workaholic
+			textoBadge += bot.badges.workaholic_s4
+		if (userId == '555414232989040661') //Top gastador - Patricinha
+			textoBadge += bot.badges.patricinha_s4
+		if (userId == '698361824340344965') //Top suborno - Deputado
+			textoBadge += bot.badges.deputado_s4
+		if (userId == '145466251496390656') //Top hospital doente - Hipocondriaco
+			textoBadge += bot.badges.hipocondriaco_s4
+		if (userId == '698361824340344965') //Top vasculhamentos - Xeroque Holmes
+			textoBadge += bot.badges.xeroqueHolmes_s4
+
+		// OUTROS ------------------------------------
+
+		if (['493121335749246989', '843955033543540756', '517013970310397974', '390655016307916812'].includes(userId))
+			textoBadge += bot.badges.evento_natal_2020
+
+		if (bot.data.has(userId, 'badgePascoa2020_dourado'))
+			textoBadge += bot.badges.ovos_dourados
+
+		if (['740753560706220153', '145466251496390656', '352125425901895687', '859916007853785128', '400425520182853647'].includes(userId))
+			textoBadge += bot.badges.coroamuruDerrotei
+
+		if (['508730960469164047', '761236646116982844', '338191478637592577', '654365946219200512', '565928906356424705', '636327778337423391', '650893454519435264', '592022325835202600', '215955539274760192', '405930523622375424', '316962994737119232', '274726815476744192', '332228051871989761', '335407447181230080', '462252828832956416', '843955033543540756', '697549215475433552', '493121335749246989', '517013970310397974', '555414232989040661', '145466251496390656', '846441465529630740', '516023056095772674'].includes(userId))
+			textoBadge += bot.badges.cataBug
+
+		if (['460196598539092025', '660136362514579468', '650893454519435264', '332228051871989761', '555414232989040661', '667107441149870090', '732499761013325840', '593444673297580042', '727924880380526592', '562709955661135922'].includes(userId))
+			textoBadge += bot.badges.bilionario
+
+		return textoBadge
+	}
+
+	bot.sortearBilhete = () => {
+		let hoje = new Date().getDay()
+		let hora = new Date().getHours()
+		let diaUltimoSorteio = bot.bilhete.get('diaUltimoSorteio')
+
+		if (hora >= 18 && hoje != diaUltimoSorteio) {
+			let total = Math.round(bot.bilhete.get('acumulado') / 3 * 2)
+			let cassino = Math.round(bot.bilhete.get('acumulado') / 3)
+			let participantes = []
+
+			bot.bilhete.forEach((user, id) => {
+				if (id == parseInt(id))
+					participantes.push(id)
+			})
+
+			if (participantes.length == 0)
+				return
+
+			// let numeroVencedor = bot.getRandom(0, participantes.length)
+			bot.shuffle(participantes)
+			let numeroVencedor = participantes.shift()
+
+			let ganhador = {
+				numero: bot.bilhete.get(numeroVencedor, 'numero'),
+				id: numeroVencedor,
+				premio: total
+			}
+
+			let uData = bot.data.get(numeroVencedor)
+			uData.moni += total
+			uData.cassinoGanhos += total
+			bot.data.set(numeroVencedor, uData)
+
+			let dias = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado']
+
+			const embedLose = new Discord.MessageEmbed()
+				.setTitle(`🎟️ Bilhete premiado`)
+				.setColor(bot.colors.darkGrey)
+				.setDescription(`O vencedor do sorteio de ${dias[hoje]} é **${uData.username}**, que levou para casa R$ ${total.toLocaleString().replace(/,/g, ".")}!`)
+				.setFooter(`Bilhete vencedor: #${bot.bilhete.get(numeroVencedor, 'numero')}`)
+
+			participantes.forEach(id => {
+				bot.users.fetch(id).then(user =>
+					user.send({
+						embeds: [embedLose]
+					}).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`))
+				)
+			})
+
+
+			const embedWin = new Discord.MessageEmbed()
+				.setTitle(`🎟️ Bilhete premiado`)
+				.setColor('GREEN')
+				.setDescription(`Você venceu o sorteio de ${dias[hoje]} e ganhou R$ ${total.toLocaleString().replace(/,/g, ".")}!`)
+				.setFooter(`Bilhete vencedor: #${bot.bilhete.get(numeroVencedor, 'numero')}`)
+
+			bot.users.fetch(numeroVencedor).then(user =>
+				user.send({
+					embeds: [embedWin]
+				}).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${numeroVencedor})`))
+			)
+
+			const log = new Discord.MessageEmbed()
+				.setDescription(`🎟️ **${uData.username} venceu o sorteio de ${dias[hoje]}**`)
+				.addField("Prêmio", `R$ ${total.toLocaleString().replace(/,/g, ".")}`, true)
+				.addField("Participantes", (participantes.length + 2).toString(), true)
+				.addField("Bilhete vencedor", `#${bot.bilhete.get(numeroVencedor, 'numero')}`, true)
+				.setColor(bot.colors.darkGrey)
+
+			bot.banco.set('cassino', bot.banco.get('cassino') + cassino)
+			bot.bilhete.clear()
+			bot.bilhete.set('diaUltimoSorteio', hoje)
+			bot.bilhete.set('lastWinner', ganhador)
+			bot.bilhete.set('acumulado', 0)
+
+			return bot.channels.cache.get('848232046387396628').send({
+				embeds: [log]
+			})
+		}
 	}
 
 	bot.clean = async (bot, text) => {
@@ -154,4 +497,15 @@ module.exports = (bot) => {
 		delete require.cache[require.resolve(`../commands/${commandName}.js`)];
 		return false;
 	};
+
+	bot.log = async (message, logMessage) => {
+		if (!logMessage || !message) return
+		logMessage
+			.setAuthor(`${bot.data.get(message.author.id, "username")} (${message.author.id})`, message.author.avatarURL())
+			.setTimestamp()
+			.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
+		bot.channels.cache.get('848232046387396628').send({
+			embeds: [logMessage]
+		})
+	}
 }
