@@ -1,7 +1,7 @@
 const config = {
 
 	
-	"token": "NTI2MjAzNTAyMzE4MzIxNjY1.Xt_rSw.L_jm-bZ7tg-VQ9Q3s9P0NNy0SHM",
+	"token": "my-token",
 	"prefix": ";",
 	"adminID": "332228051871989761",
 	
