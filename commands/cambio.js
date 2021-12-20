@@ -25,10 +25,10 @@ exports.run = async (bot, message, args) => {
 	// if (uData.job != null)
 	// 	return bot.msgTrabalhando(message, uData)
 
-	if (uData.emRoubo)
-		return bot.msgEmRoubo(message)
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
 
-	if (uData.galoEmRinha)
+	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 	if (option == 'allin' || option == 'all' || option == 'tudo')
@@ -65,7 +65,7 @@ exports.run = async (bot, message, args) => {
 		})
 		.then(msg => {
 			msg.react(aceitar)
-				.then(() => msg.react(negar)).catch(err => console.log("Não consegui reagir mensagem `cambio`", err))
+				.then(() => msg.react(negar)).catch(err => console.log("Não consegui reagir mensagem `cambio`"))
 				.then(r => {
 
 					const filter = (reaction, user) => [aceitar, negar].includes(reaction.emoji.id) && user.id == message.author.id
@@ -77,15 +77,20 @@ exports.run = async (bot, message, args) => {
 					})
 
 					cambioReaction.on('collect', r => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cambio`", err))
+						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cambio`"))
 
 						if (r.emoji.id === aceitar) {
 							uData = bot.data.get(message.author.id)
 
-							if (uData.emRoubo)
-								return bot.msgEmRoubo(message)
+							if (bot.isUserEmRouboOuEspancamento(message, uData))
+								return
 
-							if (uData.galoEmRinha)
+							if (bot.isPlayerMorto(uData)) return;
+
+							if (bot.isPlayerViajando(uData))
+								return bot.msgPlayerViajando(message);
+
+							if (bot.isGaloEmRinha(message.author.id))
 								return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 							if (uData.ficha < 1)
@@ -109,7 +114,7 @@ exports.run = async (bot, message, args) => {
 
 							return msg.edit({
 								embeds: [embed]
-							}).catch(err => console.log("Não consegui editar mensagem `cambio`", err));
+							}).catch(err => console.log("Não consegui editar mensagem `cambio`"));
 
 						} else if (r.emoji.id === negar) {
 							embed.setDescription(`Câmbio recusado`)
@@ -118,15 +123,15 @@ exports.run = async (bot, message, args) => {
 
 							return msg.edit({
 								embeds: [embed]
-							}).catch(err => console.log("Não consegui editar mensagem `cambio`", err));
+							}).catch(err => console.log("Não consegui editar mensagem `cambio`"));
 						}
 					})
 
 					cambioReaction.on('end', async response => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cambio`", err))
+						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cambio`"))
 					})
 				})
-		}).catch(err => console.log("Não consegui enviar mensagem `cambio`", err))
+		}).catch(err => console.log("Não consegui enviar mensagem `cambio`"))
 };
 exports.config = {
 	alias: ['c', 'exchange']

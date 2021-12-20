@@ -21,7 +21,7 @@ exports.run = async (bot, message, args) => {
         .setFooter(`${bot.data.get(message.author.id, "username")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
         .setTimestamp();
 
-    message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `cars`", err))
+    message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `cars`"))
 }
 exports.config = {
 	alias: ['carro', 'carros', 'concessionaria']

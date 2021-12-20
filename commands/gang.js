@@ -1,4 +1,6 @@
 const Discord = require("discord.js");
+const Piii = require("piii")
+const piiiFilters = require("piii-filters")
 
 exports.run = async (bot, message, args) => {
 
@@ -12,6 +14,19 @@ exports.run = async (bot, message, args) => {
 				return bot.config.gang2
 			case 3:
 				return bot.config.gang3
+			case 4:
+				return bot.config.gang4
+			case 5:
+				return bot.config.gang5
+			case 6:
+				return bot.config.gang6
+			case 7:
+				return bot.config.gang7
+			case 8:
+				return bot.config.gang8
+			case 9:
+				return bot.config.gang9
+
 		}
 	}
 
@@ -41,17 +56,19 @@ exports.run = async (bot, message, args) => {
 
 		let nome = args.join(" ").replace(option, "")
 
+
+
 		if (nome.length < 4)
 			return bot.createEmbed(message, `Defina um nome maior. Limite de caracteres: 4 ${bot.config.gang}`, null, bot.colors.darkGrey)
 
 		if (nome.length > 20)
 			return bot.createEmbed(message, `Defina um nome menor. Limite de caracteres: 20 ${bot.config.gang}`, null, bot.colors.darkGrey)
 
-		if (args[1] == "criar" || args[1] == "info" || args[1] == "descricao" || args[1] == "nome" || args[1] == "cor" || args[1] == "imagem" || args[1] == "sair" || args[1] == "transferir" || args[1] == "convidar" || args[1] == "base" || args[1] == "comunicar" || args[1] == 'vice' || args[1] == 'importar' || args[1] == 'exportar' || args[1] == 'golpe' || args[1] == 'tag' || args[1] == 'icone' || args[1] == 'boneco')
+		if (['criar', 'info', 'descricao', 'nome', 'cor', 'imagem', 'sair', 'transferir', 'convidar', 'base', 'comunicar', 'vice', 'importar', 'exportar', 'golpe', 'tag', 'icone', 'boneco'].includes(args[1]))
 			return bot.createEmbed(message, `Defina outro nome. ${bot.config.gang}`, null, bot.colors.darkGrey)
 
 		let achou = false
-		bot.gangs.forEach((gang, id) => {
+		bot.gangs.forEach(gang => {
 			if (gang != '') {
 				if (nome.toLowerCase() == " " + gang.nome.toLowerCase())
 					achou = true
@@ -59,6 +76,11 @@ exports.run = async (bot, message, args) => {
 
 		})
 		if (achou) return bot.createEmbed(message, `Este nome de gangue já está em uso. ${bot.config.gang}`, null, bot.colors.darkGrey)
+
+		let regex = /^[a-zA-Z0-9 !$.,%^&()+=/\\]{4,20}$/ugm
+		if (!regex.test(nome))
+			return bot.createEmbed(message, 'Escolha outro nome', `Este nome é inválido`, null, uGang.cor)
+
 
 		bot.gangs.ensure(bot.gangs.size, bot.defautGang)
 
@@ -129,7 +151,7 @@ exports.run = async (bot, message, args) => {
 		option = args[0]
 		let nome = args.join(" ").replace(option, "")
 
-		if (args[1] == "criar" || args[1] == "info" || args[1] == "descricao" || args[1] == "nome" || args[1] == "cor" || args[1] == "imagem" || args[1] == "sair" || args[1] == "transferir" || args[1] == "convidar" || args[1] == "base" || args[1] == "comunicar" || args[1] == 'vice' || args[1] == 'importar' || args[1] == 'exportar' || args[1] == 'golpe' || args[1] == 'tag')
+		if (['criar', 'info', 'descricao', 'nome', 'cor', 'imagem', 'sair', 'transferir', 'convidar', 'base', 'comunicar', 'vice', 'importar', 'exportar', 'golpe', 'tag', 'icone', 'boneco'].includes(args[1]))
 			return bot.createEmbed(message, `Defina outro nome ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		let achou = false
@@ -149,8 +171,6 @@ exports.run = async (bot, message, args) => {
 		let old_nome = uGang.nome
 		uGang.nome = nome.substring(1, nome.length)
 
-
-
 		if (nome.length < 4)
 			return bot.createEmbed(message, `Defina um nome maior. Limite de caracteres: 4 ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -160,8 +180,6 @@ exports.run = async (bot, message, args) => {
 		bot.gangs.set(uData.gangID, uGang)
 
 		return bot.createEmbed(message, `A gangue **${old_nome}** agora é **${uGang.nome}**! ${getIcone(uGang.boneco)}`), null, uGang.cor
-
-
 
 	} else if (option == 'cor') { //lider
 		let uData = bot.data.get(message.author.id)
@@ -240,12 +258,10 @@ exports.run = async (bot, message, args) => {
 		if (tData.depositoGang > currTime)
 			return bot.createEmbed(message, `${tData.username} só poderá entrar em uma nova gangue em ${bot.segToHour((tData.depositoGang - currTime) / 1000)} ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		// if (tData.galoEmRinha)
-		// 	return bot.createEmbed(message, `O galo de **${tData.username}** está em uma rinha e ele não pode fazer isto ${bot.config.galo}`)
 
 		bot.createEmbed(message, `**${uData.username}** convidou **${tData.username}** para fazer parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}\nO custo para entrar nesta gangue é R$ ${(custo_base + (50000 * uGang.baseLevel)).toLocaleString().replace(/,/g, ".")}\nAceitar convite?`, null, uGang.cor)
 			.then(msg => {
-				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(r => {
+				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(r => {
 						const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == target.id
 
 						const confirm = msg.createReactionCollector({
@@ -256,14 +272,14 @@ exports.run = async (bot, message, args) => {
 						})
 
 						confirm.on('collect', r => {
-							if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+							if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 								.then(m => {
 									tData = bot.data.get(target.id)
 									uGang = bot.gangs.get(uData.gangID)
 									if (tData.gangID != null) return bot.createEmbed(message, `Este jogador já está em uma gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 									if (tData.moni < custo_base + (50000 * uGang.baseLevel))
 										return bot.createEmbed(message, `**${tData.username}** não tem dinheiro suficiente para entrar na gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
-									if (tData.galoEmRinha)
+									if (bot.isGaloEmRinha(target.id))
 										return bot.createEmbed(message, `O galo de **${tData.username}** está em uma rinha e ele não pode fazer isto ${getIcone(uGang.boneco)}`, null, bot.colors.white)
 
 									let currTime = new Date().getTime()
@@ -288,7 +304,7 @@ exports.run = async (bot, message, args) => {
 											.setFooter(uData.username, message.member.user.avatarURL())
 											.setTimestamp()
 										]
-									}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+									}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 								})
 						})
 
@@ -304,7 +320,7 @@ exports.run = async (bot, message, args) => {
 								.setFooter(uData.username, message.member.user.avatarURL())
 								.setTimestamp()
 							]
-						}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+						}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 
 					})
 			})
@@ -335,7 +351,7 @@ exports.run = async (bot, message, args) => {
 
 					uGang.membros.forEach(membro => {
 						if (membro.id != message.author.id)
-							bot.users.fetch(membro.id).then(user => user.send(`**${uData.username}** saiu da gangue **${uGang.nome}**. **${bot.data.get(id, "username")}** foi definido como novo líder ${getIcone(uGang.boneco)}`)
+							bot.users.fetch(membro.id).then(user => user.send(`**${uData.username}** saiu da gangue **${uGang.nome}**. **${bot.data.get(membro.id, "username")}** foi definido como novo líder ${getIcone(uGang.boneco)}`)
 								.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${membro.id})`)))
 					})
 
@@ -456,8 +472,8 @@ exports.run = async (bot, message, args) => {
 		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+			return
 
 		if (!target)
 			return bot.createEmbed(message, `Insera um usuário para transferir a posse ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -476,13 +492,13 @@ exports.run = async (bot, message, args) => {
 		if (tData.preso > currTime)
 			return bot.msgPreso(message, tData, tData.username)
 
-		if (tData.emRoubo)
-			return bot.msgEmRoubo(message, tData.username)
+		if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+			return
 
 		//return bot.createEmbed(message, `Você transferiu a posse da gangue **${uGang.nome}** para **${tData.username}**! ${bot.config.gang}`)
 		bot.createEmbed(message, `Transferir a posse da gangue **${uGang.nome}** para **${tData.username}**? ${getIcone(uGang.boneco)}`, null, uGang.cor)
 			.then(msg => {
-				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(r => {
+				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(r => {
 					const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id
 
 					const confirm = msg.createReactionCollector({
@@ -493,7 +509,7 @@ exports.run = async (bot, message, args) => {
 					})
 
 					confirm.on('collect', r => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 							.then(m => {
 								let uData = bot.data.get(message.author.id)
 								let uGang = bot.gangs.get(uData.gangID)
@@ -501,14 +517,14 @@ exports.run = async (bot, message, args) => {
 								if (uData.preso > currTime)
 									return bot.msgPreso(message, uData)
 
-								if (uData.emRoubo)
-									return bot.msgEmRoubo(message)
+								if (bot.isUserEmRouboOuEspancamento(message, uData))
+									return
 
 								if (tData.preso > currTime)
 									return bot.msgPreso(message, tData)
 
-								if (tData.emRoubo)
-									return bot.msgEmRoubo(message, tData.username)
+								if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+									return
 
 								if (tData.gangID != uData.gangID)
 									return bot.createEmbed(message, `**${tData.username}** não faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`)
@@ -533,7 +549,7 @@ exports.run = async (bot, message, args) => {
 										.setColor(uGang.cor)
 										.setTimestamp()
 									]
-								}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+								}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 							})
 					})
 				})
@@ -575,7 +591,7 @@ exports.run = async (bot, message, args) => {
 		if (target.id == message.author.id)
 			return bot.createEmbed(message, `Você não pode ser o líder e o vice-líder. Use \`;gangue transferir\` para tranferir a posse ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		if (uGang.membros.find(user => user.cargo == 'lider').id == target.id)
+		if (uGang.membros.find(user => user.cargo == 'vice') && uGang.membros.find(user => user.cargo == 'vice').id == target.id)
 			return bot.createEmbed(message, `Este usuário já é o vice-líder da gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		let tData = bot.data.get(target.id)
@@ -586,13 +602,12 @@ exports.run = async (bot, message, args) => {
 		if (uData.gangID != tData.gangID)
 			return bot.createEmbed(message, `**${tData.username}** não faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		let achou = false
-		for (let i = 0; i < uGang.membros.length; i++) {
-			if (uGang.membros[i].cargo == 'vice')
-				achou = i
-		}
-		if (achou)
-			uGang.membros[achou].cargo = 'membro'
+		// for (let i = 0; i < uGang.membros.length; i++) {
+		// 	if (uGang.membros[i].cargo == 'vice')
+		// 		uGang.membros[i].cargo = 'membro'
+		// }
+		if (uGang.membros.find(user => user.cargo == 'vice'))
+			uGang.membros.find(user => user.cargo == 'vice').cargo = 'membro'
 
 		uGang.membros[uGang.membros.findIndex(user => user.id == target.id)].cargo = 'vice'
 
@@ -620,10 +635,10 @@ exports.run = async (bot, message, args) => {
 		if (uData.depositoGang > currTime)
 			return bot.createEmbed(message, `Você poderá depositar novamente em ${bot.segToHour((uData.depositoGang - currTime) / 1000)} ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+			return
 
-		if (uData.galoEmRinha)
+		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${getIcone(uGang.boneco)}`, null, bot.colors.white)
 
 		if (!args[1])
@@ -651,7 +666,7 @@ exports.run = async (bot, message, args) => {
 
 		bot.createEmbed(message, `Depositar **R$ ${parseInt(valor).toLocaleString().replace(/,/g, ".")}** no caixa da gangue **${uGang.nome}**?\nVocê pode depositar no máximo R$ ${valor_max_gang.toLocaleString().replace(/,/g, ".")} por dia`, null, uGang.cor)
 			.then(msg => {
-				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(r => {
+				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(r => {
 					const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id
 
 					const confirm = msg.createReactionCollector({
@@ -662,7 +677,7 @@ exports.run = async (bot, message, args) => {
 					})
 
 					confirm.on('collect', r => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 							.then(m => {
 								let uData = bot.data.get(message.author.id)
 								let uGang = bot.gangs.get(uData.gangID)
@@ -673,11 +688,12 @@ exports.run = async (bot, message, args) => {
 									return bot.msgSemDinheiro(message)
 								if (uData.moni < parseInt(valor))
 									return bot.msgDinheiroMenorQueAposta(message)
-								if (uData.emRoubo)
-									return bot.msgEmRoubo(message)
-								if (uData.galoEmRinha)
+								if (bot.isUserEmRouboOuEspancamento(message, uData))
+									return
+								if (bot.isGaloEmRinha(message.author.id))
 									return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
-								let tempo_deposito = (24 - 1 * uGang.baseLevel) * 60 * 60 * 1000
+
+								let tempo_deposito = (22 - 1 * uGang.baseLevel) * 60 * 60 * 1000
 								uData.depositoGang = currTime + tempo_deposito
 								uData.moni -= parseInt(valor)
 								uGang.caixa += parseInt(valor)
@@ -709,7 +725,7 @@ exports.run = async (bot, message, args) => {
 										.setFooter(`${uData.username} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 										.setTimestamp()
 									]
-								}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+								}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 							})
 					})
 				})
@@ -770,7 +786,7 @@ exports.run = async (bot, message, args) => {
 				.setTimestamp();
 			message.channel.send({
 				embeds: [embed]
-			}).catch(err => console.log("Não consegui enviar mensagem `gg base`", err));
+			}).catch(err => console.log("Não consegui enviar mensagem `gg base`"));
 
 		} else if ((!args[1] && uGang != null) || args[1] && args[1] != 'info' && args[1] != 'comprar' && args[1] != 'upgrade') {
 
@@ -848,7 +864,7 @@ exports.run = async (bot, message, args) => {
 				.setTimestamp();
 			message.channel.send({
 				embeds: [embed]
-			}).catch(err => console.log("Não consegui enviar mensagem `gg base`", err));
+			}).catch(err => console.log("Não consegui enviar mensagem `gg base`"));
 
 		} else {
 			if (args[1] == 'comprar') {
@@ -889,7 +905,7 @@ exports.run = async (bot, message, args) => {
 				if (!uGang)
 					return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
 
-				if (uGang.membros.find(user => user.cargo == 'lider').id != message.author.id && uGang.membros.find(user => user.cargo == 'vice').id != message.author.id)
+				if (!(uGang.membros.find(user => user.cargo == 'lider').id == message.author.id || (uGang.membros.find(user => user.cargo == 'vice') && uGang.membros.find(user => user.cargo == 'vice').id == message.author.id)))
 					return bot.createEmbed(message, `Somente o líder e vice-líder pode administrar a base da gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 				if (uData.preso > currTime)
@@ -908,7 +924,7 @@ exports.run = async (bot, message, args) => {
 						embeds: [new Discord.MessageEmbed().setDescription(`${getIcone(uGang.boneco)} **${bot.bases[uGang.base].desc}** de **${uGang.nome}**\n\nBenefícios do próximo nível (${uGang.baseLevel + 1}):\n${prox_beneficios}\nCusto para fazer upgrade: R$ ${custo.toLocaleString().replace(/,/g, ".")}\nConfirmar?`).setColor(uGang.cor).setFooter(`${uGang.nome} • Caixa: R$ ${uGang.caixa.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL()).setTimestamp()]
 					})
 					.then(msg => {
-						msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(r => {
+						msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(r => {
 							const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id
 
 							const confirm = msg.createReactionCollector({
@@ -919,7 +935,7 @@ exports.run = async (bot, message, args) => {
 							})
 
 							confirm.on('collect', r => {
-								if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+								if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 									.then(m => {
 										uGang = bot.gangs.get(uData.gangID)
 										if (uGang.carregamentoAtivo)
@@ -944,11 +960,11 @@ exports.run = async (bot, message, args) => {
 												.setFooter(`${uGang.nome} • Caixa: R$ ${uGang.caixa.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 												.setTimestamp()
 											]
-										}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+										}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 									})
 							})
 						})
-					}).catch(err => console.log("Não consegui enviar mensagem `gg base`", err))
+					}).catch(err => console.log("Não consegui enviar mensagem `gg base`"))
 			}
 		}
 
@@ -1021,6 +1037,12 @@ exports.run = async (bot, message, args) => {
 			return bot.createEmbed(message, `Faltam ${bot.segToHour((uGang.carregamento - currTime) / 1000)} até o carregamento chegar ${bot.config.carregamento}`, null, uGang.cor)
 
 		if (uGang.carregamento < currTime && uGang.carregamentoAtivo) {
+
+			if (uData.preso > currTime)
+				return bot.msgPreso(message, uData)
+			if (uData.hospitalizado > currTime)
+				return bot.msgHospitalizado(message, uData)
+				
 			let chance = bot.getRandom(0, 100)
 
 			let chanceCarregamento = 35 + uGang.baseLevel * 2
@@ -1031,23 +1053,37 @@ exports.run = async (bot, message, args) => {
 				uGang.estoque += 1
 				uGang.carregamentoAtivo = false
 				bot.gangs.set(uData.gangID, uGang)
+
+				uGang.membros.forEach(membro => {
+					bot.users.fetch(membro.id).then(user => {
+						user.send(`O carregamento chegou em segurança no **${bot.bases[uGang.base].desc}** da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`)
+							.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${membro.id})`))
+					})
+				})
+
 				return bot.createEmbed(message, `O carregamento chegou em segurança no **${bot.bases[uGang.base].desc}** da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 			} else {
 				uGang.carregamentoAtivo = false
 				bot.gangs.set(uData.gangID, uGang)
 
-				let texto = 'Seu carregamento foi roubado!'
-				if (chance > 50)
-					texto = 'O motorista parou na estrada para comer um travesti e foi sequestrado. Sua carga foi perdida.'
-				if (chance > 60)
-					texto = 'Cadê o caminhão? O motorista deve ter se perdido no caminho das curvas da sua mãe.'
-				if (chance > 70)
-					texto = 'O caminhão chegou, mas carregado de frutas? Alguém sabotou o carregamento!'
-				if (chance > 80)
-					texto = 'O motorista foi atacado por uma gangue de palhaços em fuscas rosas que levaram sua carga para a Terra do Nunca.'
-				if (chance > 90)
-					texto = 'O caminhão ficou parado em Curitiba, e a Polícia Federal apreendeu o carregamento.'
+				let textos = [
+					'Seu carregamento foi roubado!',
+					'O motorista parou na estrada para comer um travesti e foi sequestrado. Sua carga foi perdida.',
+					'Cadê o caminhão? O motorista deve ter se perdido no caminho das curvas da sua mãe.',
+					'O caminhão chegou, mas carregado de frutas? Alguém sabotou o carregamento!',
+					'O motorista foi atacado por uma gangue de palhaços em fuscas rosas que levaram sua carga para a Terra do Nunca.',
+					'O caminhão ficou parado em Curitiba e a Polícia Federal apreendeu o carregamento.',
+					'O caminhão não está aqui. O motorista ligou e disse que já está em outro país.'
+				]
+				let texto = bot.shuffle(textos)[0]
+
+				uGang.membros.forEach(membro => {
+					bot.users.fetch(membro.id).then(user => {
+						user.send(`${texto} Tenha mais sorte da próxima vez ${getIcone(uGang.boneco)}`)
+							.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${membro.id})`))
+					})
+				})
 
 				return bot.createEmbed(message, `${texto} Tenha mais sorte da próxima vez ${getIcone(uGang.boneco)}`, null, uGang.cor)
 			}
@@ -1058,7 +1094,7 @@ exports.run = async (bot, message, args) => {
 				embeds: [new Discord.MessageEmbed().setDescription(`Importar carregamentos para a base **${bot.bases[uGang.base].desc}** de **${uGang.nome}** ${getIcone(uGang.boneco)}\n\nCusto de importação: R$ ${custo.toLocaleString().replace(/,/g, ".")}\nTempo de espera: ${(uGang.base == 'aeroporto' ? 23 : 26) - uGang.baseLevel*2} horas\nConfirmar?`).setColor(uGang.cor).setFooter(`${uGang.nome} • Caixa: R$ ${uGang.caixa.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL()).setTimestamp()]
 			})
 			.then(msg => {
-				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(r => {
+				msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(r => {
 					const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id
 
 					const confirm = msg.createReactionCollector({
@@ -1069,7 +1105,7 @@ exports.run = async (bot, message, args) => {
 					})
 
 					confirm.on('collect', r => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 							.then(m => {
 								uGang = bot.gangs.get(uData.gangID)
 								if (uData.preso > currTime)
@@ -1082,7 +1118,7 @@ exports.run = async (bot, message, args) => {
 									return bot.createEmbed(message, `Sua gangue **${uGang.nome}** não possui dinheiro suficiente em caixa para fazer isto ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 
-								let multiplicadorEventoCarregamento = 0.5
+								let multiplicadorEventoCarregamento = 1
 								uGang.caixa -= custo
 								uGang.carregamento = currTime + (((uGang.base == 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2) * 60 * 60 * 1000 * multiplicadorEventoCarregamento) //currTime + (((uGang.base == 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2) * 60 * 60 * 1000)
 								uGang.carregamentoAtivo = true
@@ -1102,12 +1138,12 @@ exports.run = async (bot, message, args) => {
 										.setFooter(`${uGang.nome} • Caixa: R$ ${uGang.caixa.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 										.setTimestamp()
 									]
-								}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+								}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 							})
 					})
 
 				})
-			}).catch(err => console.log("Não consegui enviar mensagem `gg importar`", err))
+			}).catch(err => console.log("Não consegui enviar mensagem `gg importar`"))
 
 	} else if (option == 'exportar' || option == 'e' || option == 'exp') { //lider e vice
 		let uData = bot.data.get(message.author.id)
@@ -1134,7 +1170,9 @@ exports.run = async (bot, message, args) => {
 
 		uGang.estoque -= 1
 
-		let venda = bot.getRandom(2000000 * uGang.baseLevel, 2750000 * uGang.baseLevel)
+		let multiplicador_evento_carregamento = 1
+
+		let venda = bot.getRandom(2000000 * uGang.baseLevel * multiplicador_evento_carregamento, 3000000 * uGang.baseLevel * multiplicador_evento_carregamento)
 
 		let adicionalCaixa = 1
 
@@ -1168,10 +1206,11 @@ exports.run = async (bot, message, args) => {
 
 		if (!(uGang.membros.find(user => user.cargo == 'lider').id == message.author.id || (uGang.membros.find(user => user.cargo == 'vice') && uGang.membros.find(user => user.cargo == 'vice').id == message.author.id)))
 			return bot.createEmbed(message, `Somente os líderes podem orquestrar um golpe para a gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
-
 		// return bot.createEmbed(message, `"Seguinte, **${uGang.nome}**, o prefeito aumentou a segurança do ${bot.config.cash} Banco devido aos recentes ataques. Vamos esperar a poeira baixar para atacar." ${bot.config.thetruth}`, null, uGang.cor)
 		if ((day != 1 && day != 3 && day != 5) && (message.author.id != bot.config.adminID))
 			return bot.createEmbed(message, `"**${uGang.nome}**, hein? Vamos fazer uma baguncinha? Venha me ver Segunda, Quarta ou Sexta." ${bot.config.thetruth}`, null, uGang.cor)
+		if (uGang.baseLevel == 0)
+			return bot.createEmbed(message, `Sua gangue não pode realizar um golpe sem uma base`, null, uGang.cor)
 
 		let bonus = 0
 		if (uGang.golpeMissao1.concluido)
@@ -1204,7 +1243,7 @@ exports.run = async (bot, message, args) => {
 					.then(() => msg.react('🚗'))
 					.then(() => msg.react('💻'))
 					.then(() => msg.react(bancoEmoji))
-					.catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+					.catch(err => console.log("Não consegui reagir mensagem `gang`"))
 					.then(r => {
 						const filter = (reaction, user) => (['📁', '🚗', '💻'].includes(reaction.emoji.name) || reaction.emoji.id === bancoEmoji) && user.id == message.author.id
 
@@ -1216,7 +1255,7 @@ exports.run = async (bot, message, args) => {
 						})
 
 						collector.on('collect', r => {
-							if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+							if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 							uData = bot.data.get(message.author.id)
 							uGang = bot.gangs.get(uData.gangID)
 							currTime = new Date().getTime()
@@ -1230,10 +1269,10 @@ exports.run = async (bot, message, args) => {
 							if (uData.roubo > currTime)
 								return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((uData.roubo - currTime) / 1000))} ${bot.config.police}`, null, bot.colors.policia)
 
-							if (uData.emRoubo)
-								return bot.msgEmRoubo(message)
+							if (bot.isUserEmRouboOuEspancamento(message, uData))
+								return
 
-							if (uData.galoEmRinha)
+							if (bot.isGaloEmRinha(message.author.id))
 								return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 							if (uData.job != null)
@@ -1254,7 +1293,14 @@ exports.run = async (bot, message, args) => {
 
 								let chance = 10
 								let players = []
-								bot.data.set(message.author.id, true, 'emRoubo')
+
+								uData.emRoubo = {
+									tempo: currTime + 91000,
+									user: '📁 Planta do Banco',
+									isAlvo: false
+								}
+
+								bot.data.set(message.author.id, uData)
 								//let players_negados = []
 								players.push(message.author.id)
 
@@ -1271,7 +1317,7 @@ exports.run = async (bot, message, args) => {
 								message.channel.send({
 									embeds: [embed_robb]
 								}).then(msg => {
-									msg.react('📁').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(m => {
+									msg.react('📁').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(m => {
 
 										const filter = (reaction, user) => reaction.emoji.name === '📁' && user.id != bot.user.id && !players.includes(user.id)
 
@@ -1282,37 +1328,39 @@ exports.run = async (bot, message, args) => {
 										});
 
 										collector.on('collect', r => {
-											newplayer = r.users.cache.last()
-											jogador = bot.data.get(newplayer.id)
+											let newplayer = r.users.cache.last()
+											let jogador = bot.data.get(newplayer.id)
 											currTime = new Date().getTime()
 
-											if (players.length <= uGang.espacoMembro) { // !players_negados.includes(newplayer.id)
+											if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) { // !players_negados.includes(newplayer.id)
 												if (jogador.preso > currTime) {
 													bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-													//players_negados.push(newplayer.id)
 
 												} else if (jogador.hospitalizado > currTime) {
 													bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-													//players_negados.push(newplayer.id)
 
 												} else if (jogador.gangID != uData.gangID) {
 													bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, bot.colors.background)
-													//players_negados.push(newplayer.id)
 
 												} else if (jogador.roubo > currTime) {
 													bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-													//players_negados.push(newplayer.id)
 
 												} else if (jogador.job != null) {
 													bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
-													//players_negados.push(newplayer.id)
-												} else if (jogador.emRoubo) {
-													bot.createEmbed(message, `**${jogador.username}**, você está em um roubo e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.background)
 
-												} else if (jogador.galoEmRinha)
+												} else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
+													bot.isUserEmRouboOuEspancamento(message, jogador)
+
+												else if (bot.isGaloEmRinha(newplayer.id))
 													bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
+
 												else {
-													bot.data.set(newplayer.id, true, 'emRoubo')
+													jogador.emRoubo = {
+														tempo: currTime + 91000,
+														user: '📁 Planta do Banco',
+														isAlvo: false
+													}
+													bot.data.set(newplayer.id, jogador)
 													players.push(newplayer.id)
 													if (players.length == uGang.espacoMembro)
 														collector.stop()
@@ -1335,7 +1383,7 @@ exports.run = async (bot, message, args) => {
 
 													r.message.edit({
 														embeds: [newEmbed]
-													}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+													}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 												}
 											}
 										})
@@ -1360,7 +1408,7 @@ exports.run = async (bot, message, args) => {
 															let userD = bot.data.get(membro)
 															userD.roubo = currTime + ((userD.classe == 'ladrao' ? Math.round(1.1 * 2700000) : (uData.classe == 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 															userD.roubosW++
-															userD.emRoubo = false
+															userD.emRoubo.tempo = 0
 															setTimeout(() => {
 																bot.users.fetch(membro).then(user => {
 																	user.send(`Você já pode roubar novamente! ${bot.config.roubar}`)
@@ -1378,7 +1426,7 @@ exports.run = async (bot, message, args) => {
 															.setColor(uGang.cor)
 														return message_robb.edit({
 															embeds: [embed_robb_final]
-														}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+														}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 
 													} else {
 														let tempo_preso = bot.getRandom(14400000, 18000000) //4h a 5h
@@ -1388,7 +1436,7 @@ exports.run = async (bot, message, args) => {
 															let userD = bot.data.get(membro)
 															userD.preso = currTime + (userD.classe == 'ladrao' ? Math.floor(tempo_preso * 1.1) : tempo_preso);
 															userD.roubosL++
-															userD.emRoubo = false
+															userD.emRoubo.tempo = 0
 															bot.data.set(membro, userD)
 															setTimeout(() => {
 																bot.users.fetch(membro).then(user => {
@@ -1414,14 +1462,14 @@ exports.run = async (bot, message, args) => {
 															.setColor(uGang.cor)
 														return message_robb.edit({
 															embeds: [embed_robb_final]
-														}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+														}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 													}
 												}, 30000)
-											}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+											}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
 
 										})
 									})
-								}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+								}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
 
 							} else if (r.emoji.name === '🚗') {
 								if (uGang.golpeMissao2.concluido)
@@ -1449,7 +1497,13 @@ exports.run = async (bot, message, args) => {
 
 								let chance = 15
 								let players = []
-								bot.data.set(message.author.id, true, 'emRoubo')
+
+								uData.emRoubo = {
+									tempo: currTime + 90000,
+									user: '💻 Sistema de Câmeras',
+									isAlvo: false
+								}
+								bot.data.set(message.author.id, uData)
 								//let players_negados = []
 								players.push(message.author.id)
 
@@ -1466,7 +1520,7 @@ exports.run = async (bot, message, args) => {
 								message.channel.send({
 									embeds: [embed_hack]
 								}).then(msg => {
-									msg.react('💻').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(m => {
+									msg.react('💻').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(m => {
 
 										const filter = (reaction, user) => reaction.emoji.name === '💻' && user.id != bot.user.id && !players.includes(user.id)
 
@@ -1477,11 +1531,11 @@ exports.run = async (bot, message, args) => {
 										});
 
 										collector.on('collect', r => {
-											newplayer = r.users.cache.last()
-											jogador = bot.data.get(newplayer.id)
+											let newplayer = r.users.cache.last()
+											let jogador = bot.data.get(newplayer.id)
 											currTime = new Date().getTime()
 
-											if (players.length <= uGang.espacoMembro) {
+											if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) {
 												if (jogador.preso > currTime)
 													bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 
@@ -1497,13 +1551,18 @@ exports.run = async (bot, message, args) => {
 												else if (jogador.job != null)
 													bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
 
-												else if (jogador.emRoubo)
-													bot.createEmbed(message, `**${jogador.username}**, você está em um roubo e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.background)
+												else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
+													bot.isUserEmRouboOuEspancamento(message, jogador)
 
-												else if (jogador.galoEmRinha)
+												else if (bot.isGaloEmRinha(newplayer.id))
 													bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 												else {
-													bot.data.set(newplayer.id, true, 'emRoubo')
+													jogador.emRoubo = {
+														tempo: currTime + 91000,
+														user: '💻 Sistema de Câmeras',
+														isAlvo: false
+													}
+													bot.data.set(newplayer.id, jogador)
 													players.push(newplayer.id)
 													if (players.length == uGang.espacoMembro)
 														collector.stop()
@@ -1526,7 +1585,7 @@ exports.run = async (bot, message, args) => {
 
 													r.message.edit({
 														embeds: [newEmbed]
-													}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+													}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 												}
 											}
 										})
@@ -1550,7 +1609,7 @@ exports.run = async (bot, message, args) => {
 														players.forEach(membro => {
 															let userD = bot.data.get(membro);
 															userD.roubo = currTime + ((userD.classe == 'ladrao' ? Math.round(1.1 * 2700000) : (uData.classe == 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
-															userD.emRoubo = false
+															userD.emRoubo.tempo = 0
 															setTimeout(() => {
 																bot.users.fetch(membro).then(user =>
 																	user.send(`Você já pode roubar novamente! ${bot.config.roubar}`)
@@ -1585,7 +1644,7 @@ exports.run = async (bot, message, args) => {
 															let userD = bot.data.get(membro);
 															userD.preso = currTime + (userD.classe == 'ladrao' ? Math.floor(tempo_preso * 1.1) : tempo_preso);
 															userD.roubosW++;
-															userD.emRoubo = false
+															userD.emRoubo.tempo = 0
 															bot.data.set(membro, userD);
 															setTimeout(() => {
 																bot.users.fetch(membro).then(user => {
@@ -1606,10 +1665,11 @@ exports.run = async (bot, message, args) => {
 														});
 													}
 												}, 30000)
-											}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+											}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
 										})
 									})
-								}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+								}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
+
 							} else if (r.emoji.id == bancoEmoji) {
 								if (uGang.golpeTime > currTime)
 									return bot.createEmbed(message, `Sua gangue deve esperar mais ${bot.segToHour((uGang.golpeTime - currTime) / 1000)} para tentar roubar novamente o ${bot.config.cash} **Banco** ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -1617,11 +1677,13 @@ exports.run = async (bot, message, args) => {
 								let atkPower = 0
 								Object.entries(uData).forEach(([key, value]) => {
 									Object.values(bot.guns).forEach(arma => {
-										if (value > currTime && arma.atk > atkPower && (key == "_" + arma.data || (key == "_9mm" && arma.data == "colt45")))
+										if (value > currTime && arma.atk > atkPower && key == "_" + arma.data)
 											atkPower = arma.atk
 									})
 								})
-								if (uData.classe == 'assassino')
+								if (uData.classe == 'mendigo')
+									atkPower *= 0.9
+								else if (uData.classe == 'assassino')
 									atkPower *= 1.1
 								let chance = uGang.base == 'motoclube' ? atkPower / 40 : atkPower / 50
 								if (uGang.golpeMissao1.concluido)
@@ -1632,7 +1694,13 @@ exports.run = async (bot, message, args) => {
 									chance += 5
 
 								let players = []
-								bot.data.set(message.author.id, true, 'emRoubo')
+
+								uData.emRoubo = {
+									tempo: currTime + 136000,
+									user: `${bot.config.cash} BANCO`,
+									isAlvo: false
+								}
+								bot.data.set(message.author.id, uData)
 								//let players_negados = []
 								players.push(message.author.id)
 
@@ -1649,7 +1717,7 @@ exports.run = async (bot, message, args) => {
 								message.channel.send({
 									embeds: [embed_bank]
 								}).then(msg => {
-									msg.react(bancoEmoji).catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(m => {
+									msg.react(bancoEmoji).catch(err => console.log("Não consegui reagir mensagem `gang`")).then(m => {
 
 										const filter = (reaction, user) => reaction.emoji.id === bancoEmoji && user.id != bot.user.id && !players.includes(user.id)
 
@@ -1660,11 +1728,11 @@ exports.run = async (bot, message, args) => {
 										});
 
 										collector.on('collect', r => {
-											newplayer = r.users.cache.last()
-											jogador = bot.data.get(newplayer.id)
+											let newplayer = r.users.cache.last()
+											let jogador = bot.data.get(newplayer.id)
 											currTime = new Date().getTime()
 
-											if (players.length <= uGang.espacoMembro) {
+											if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) {
 												if (jogador.preso > currTime)
 													bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 
@@ -1680,13 +1748,18 @@ exports.run = async (bot, message, args) => {
 												else if (jogador.job != null)
 													bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
 
-												else if (jogador.emRoubo)
-													bot.createEmbed(message, `**${jogador.username}**, você está em um roubo e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.background)
+												else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
+													bot.isUserEmRouboOuEspancamento(message, jogador)
 
-												else if (jogador.galoEmRinha)
+												else if (bot.isGaloEmRinha(newplayer.id))
 													bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 												else {
-													bot.data.set(newplayer.id, true, 'emRoubo')
+													jogador.emRoubo = {
+														tempo: currTime + 136000,
+														user: `${bot.config.cash} BANCO`,
+														isAlvo: false
+													}
+													bot.data.set(newplayer.id, jogador)
 													players.push(newplayer.id)
 													if (players.length == uGang.espacoMembro)
 														collector.stop()
@@ -1699,12 +1772,14 @@ exports.run = async (bot, message, args) => {
 													let atkPower = 0
 													Object.entries(jogador).forEach(([key, value]) => {
 														Object.values(bot.guns).forEach(arma => {
-															if (value > currTime && arma.atk > atkPower && (key == "_" + arma.data || (key == "_9mm" && arma.data == "colt45"))) {
+															if (value > currTime && arma.atk > atkPower && key == "_" + arma.data) {
 																atkPower = arma.atk
 															}
 														})
 													})
-													if (jogador.classe == 'assassino')
+													if (jogador.classe == 'mendigo')
+														atkPower *= 0.9
+													else if (jogador.classe == 'assassino')
 														atkPower *= 1.1
 													chance += uGang.base == 'motoclube' ? atkPower / 40 : atkPower / 50
 
@@ -1719,7 +1794,7 @@ exports.run = async (bot, message, args) => {
 
 													r.message.edit({
 														embeds: [newEmbed]
-													}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+													}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 												}
 											}
 										})
@@ -1751,7 +1826,7 @@ exports.run = async (bot, message, args) => {
 															let userD = bot.data.get(membro)
 															userD.roubo = currTime + ((userD.classe == 'ladrao' ? Math.round(1.1 * 2700000) : (uData.classe == 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 															userD.moni += userD.classe == 'ladrao' ? Math.floor(parte * 1.1) : parte
-															userD.emRoubo = false
+															userD.emRoubo.tempo = 0
 															setTimeout(() => {
 																bot.users.fetch(membro).then(user => user.send(`Você já pode roubar novamente! ${bot.config.roubar}`)
 																	.catch(err => message.reply(`você já pode roubar novamente! ${bot.config.roubar}`)
@@ -1771,22 +1846,24 @@ exports.run = async (bot, message, args) => {
 														uGang.caixa += parte * 1
 														uGang.golpeW++
 														bot.gangs.set(uData.gangID, uGang);
+
 														const embed_bank_final = new Discord.MessageEmbed()
 															//.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770078593975320596/radar_cash.png`)
 															.setDescription(`BOA CARALHOOOOO!!!!\n\nSua gangue **${uGang.nome}** conseguiu com sucesso roubar R$ ${valor_roubado.toLocaleString().replace(/,/g, ".")} do ${bot.config.cash} **Banco**! ${getIcone(uGang.boneco)}\nCada membro recebeu R$ ${parte.toLocaleString().replace(/,/g, ".")}. Foram depositados R$ ${(parte * 1).toLocaleString().replace(/,/g, ".")} no caixa da gangue.`)
 															.setFooter(uGang.nome, uGang.icone)
 															.setColor(uGang.cor)
+
 														return message_bank.edit({
 															embeds: [embed_bank_final]
-														}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+														}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 
 													} else {
 														let tempo_preso = bot.getRandom(28800000, 36000000) //8h a 10h
 														players.forEach(membro => {
 															let userD = bot.data.get(membro)
 															userD.preso = currTime + (userD.classe == 'ladrao' ? Math.floor(tempo_preso * 1.1) : tempo_preso)
-															userD.roubosW++
-															userD.emRoubo = false
+															userD.roubosL++
+															userD.emRoubo.tempo = 0
 															bot.data.set(membro, userD)
 															setTimeout(() => {
 																bot.users.fetch(membro).then(user => user.send(`Você está livre! ${bot.config.police}`)
@@ -1797,24 +1874,26 @@ exports.run = async (bot, message, args) => {
 														})
 														uGang.golpeL++
 														bot.gangs.set(uData.gangID, uGang)
+
 														const embed_bank_final = new Discord.MessageEmbed()
 															//.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770078593975320596/radar_cash.png`)
 															.setDescription(`INÚTEIS!\n\nSua gangue **${uGang.nome}** falhou em roubar o ${bot.config.cash} **Banco**, e todos os membros presentes ficarão presos por ${bot.segToHour(tempo_preso / 1000)} ${bot.config.police}`)
 															.setFooter(uGang.nome, uGang.icone)
 															.setColor(uGang.cor)
+
 														return message_bank.edit({
 															embeds: [embed_bank_final]
-														}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
+														}).catch(err => console.log("Não consegui editar mensagem `gang`"))
 													}
 												}, 45000)
-											}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+											}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
 										})
 									})
-								}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+								}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
 							}
 						})
 					})
-			}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`", err))
+			}).catch(err => console.log("Não consegui enviar mensagem `gg golpe`"))
 
 
 	} else if (option == 'tag') { //lider
@@ -1888,13 +1967,12 @@ exports.run = async (bot, message, args) => {
 			embeds: [embed]
 		}).then(msg => {
 
-			msg.react('754773626141540423')
-				.then(msg.react('758817092341334017'))
-				.then(msg.react('758817092119035935'))
-				.then(msg.react('758817092023091243'))
-				.catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+			let bonecos = ['754773626141540423', '758817092341334017', '758817092119035935', '758817092023091243',
+				'890729902402318416', '890729902150664242', '890729902331006977', '890729901722845215', '890729902159044619', '890733727284625409'
+			]
+			bonecos.forEach(emoji => msg.react(emoji).catch(err => console.log("Não consegui reagir mensagem `gang` reação " + emoji)))
 
-			const filter = (reaction, user) => ['754773626141540423', '758817092341334017', '758817092119035935', '758817092023091243'].includes(reaction.emoji.id) && user.id === message.author.id
+			const filter = (reaction, user) => bonecos.includes(reaction.emoji.id) && user.id === message.author.id
 
 			const collector = msg.createReactionCollector({
 				filter,
@@ -1904,14 +1982,8 @@ exports.run = async (bot, message, args) => {
 			collector.on('collect', reaction => {
 				if (msg) msg.reactions.removeAll().then(async () => {
 
-					if (reaction.emoji.id === '754773626141540423')
-						uGang.boneco = 0
-					else if (reaction.emoji.id === '758817092341334017')
-						uGang.boneco = 1
-					else if (reaction.emoji.id === '758817092119035935')
-						uGang.boneco = 2
-					else if (reaction.emoji.id === '758817092023091243')
-						uGang.boneco = 3
+					if (bonecos.includes(reaction.emoji.id))
+						uGang.boneco = bonecos.indexOf(reaction.emoji.id)
 
 					bot.gangs.set(uData.gangID, uGang)
 
@@ -1921,15 +1993,18 @@ exports.run = async (bot, message, args) => {
 						.setColor(uGang.cor)
 						.setFooter(uData.username, message.member.user.avatarURL())
 						.setTimestamp();
+
 					return msg.edit({
 						embeds: [embedEd]
-					}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
-				}).catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+					}).catch(err => console.log("Não consegui editar mensagem `gang`"))
+				}).catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
+
 			})
 			collector.on('end', reaction => {
-				if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+				if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 			})
-		}).catch(err => console.log("Não consegui enviar mensagem `gg icone`", err))
+
+		}).catch(err => console.log("Não consegui enviar mensagem `gg icone`"))
 
 	} else {
 		let uData = bot.data.get(message.author.id)
@@ -1967,7 +2042,7 @@ exports.run = async (bot, message, args) => {
 				.setTimestamp();
 			message.channel.send({
 				embeds: [embed]
-			}).catch(err => console.log("Não consegui enviar mensagem `gg info`", err));
+			}).catch(err => console.log("Não consegui enviar mensagem `gg info`"));
 
 		} else {
 			let uGang
@@ -2016,7 +2091,8 @@ exports.run = async (bot, message, args) => {
 			// })
 			// topDeposito = top.sort((a, b) => b.deposito - a.deposito)
 
-			let lider, vice
+			let lider
+			let vice = []
 			let membros = []
 			uGang.membros.forEach(membro => {
 				if (membro.cargo == 'lider')
@@ -2025,10 +2101,10 @@ exports.run = async (bot, message, args) => {
 						depositado: membro.depositado
 					}
 				else if (membro.cargo == 'vice')
-					vice = {
+					vice.push({
 						id: membro.id,
 						depositado: membro.depositado
-					}
+					})
 				else
 					membros.push({
 						id: membro.id,
@@ -2039,23 +2115,28 @@ exports.run = async (bot, message, args) => {
 			let lista_membros = `♦️ **${bot.data.get(lider.id, "username")}**\n`
 			let lista_membros_ID = `♦️ **${lider.id}**\n`
 			let lista_membros_deposits = `♦️ **${bot.data.get(lider.id, "username")}** R$ ${lider.depositado.toLocaleString().replace(/,/g, ".")}\n`
+			let lista_membros_deposits2 = ''
 
-			if (vice) {
-				lista_membros += `:small_orange_diamond: ${bot.data.get(vice.id, "username")}\n`
-				lista_membros_ID += `:small_orange_diamond: ${vice.id}\n`
-				lista_membros_deposits += `:small_orange_diamond: **${bot.data.get(vice.id, "username")}** R$ ${vice.depositado.toLocaleString().replace(/,/g, ".")}\n`
+			for (let i = 0; i < vice.length; i++) {
+				lista_membros += `:small_orange_diamond: ${bot.data.get(vice[i].id, "username")}\n`
+				lista_membros_ID += `:small_orange_diamond: ${vice[i].id}\n`
+				lista_membros_deposits += `:small_orange_diamond: **${bot.data.get(vice[i].id, "username")}** R$ ${vice[i].depositado.toLocaleString().replace(/,/g, ".")}\n`
 			}
 			for (let i = 0; i < membros.length; i++) {
 				// membros.forEach(membro => {
 				lista_membros += `:white_small_square: ${bot.data.get(membros[i].id, "username")}\n`
 				lista_membros_ID += `:white_small_square: ${membros[i].id}\n`
-				lista_membros_deposits += `:white_small_square: **${bot.data.get(membros[i].id, "username")}** R$ ${membros[i].depositado.toLocaleString().replace(/,/g, ".")}\n`
+				if (lista_membros_deposits.length < 512)
+					lista_membros_deposits += `:white_small_square: **${bot.data.get(membros[i].id, "username")}** R$ ${membros[i].depositado.toLocaleString().replace(/,/g, ".")}\n`
+				else
+					lista_membros_deposits2 += `:white_small_square: **${bot.data.get(membros[i].id, "username")}** R$ ${membros[i].depositado.toLocaleString().replace(/,/g, ".")}\n`
+
 			}
 
 			let nome_base = uGang.base == null ? "Não possui" : bot.bases[uGang.base].desc
 
 			const embedWithoutID = new Discord.MessageEmbed()
-				.setTitle(`${getIcone(uGang.boneco)} Gangue ${uGang.tag != '' ? `[${uGang.tag}] ` : ``}${uGang.nome} ${uID == '1' ? bot.badges.topGangue_s4 : ''}`)
+				.setTitle(`${getIcone(uGang.boneco)} Gangue ${uGang.tag != '' ? `[${uGang.tag}] ` : ``}${uGang.nome} ${uID == '100' ? bot.badges.topGangue_s4 : ''}`)
 				.setColor(uGang.cor)
 				.setDescription(uGang.desc)
 				.setThumbnail(uGang.icone)
@@ -2066,7 +2147,7 @@ exports.run = async (bot, message, args) => {
 				.setTimestamp();
 
 			const embedWithID = new Discord.MessageEmbed()
-				.setTitle(`${getIcone(uGang.boneco)} Gangue ${uGang.tag != '' ? `[${uGang.tag}] ` : ``}${uGang.nome} ${uID == '1' ? bot.badges.topGangue_s4 : ''}`)
+				.setTitle(`${getIcone(uGang.boneco)} Gangue ${uGang.tag != '' ? `[${uGang.tag}] ` : ``}${uGang.nome} ${uID == '100' ? bot.badges.topGangue_s4 : ''}`)
 				.setColor(uGang.cor)
 				.setDescription(uGang.desc)
 				.setThumbnail(uGang.icone)
@@ -2077,22 +2158,25 @@ exports.run = async (bot, message, args) => {
 				.setTimestamp();
 
 			const embedWithDeposits = new Discord.MessageEmbed()
-				.setTitle(`${getIcone(uGang.boneco)} Gangue ${uGang.tag != '' ? `[${uGang.tag}] ` : ``}${uGang.nome} ${uID == '1' ? bot.badges.topGangue_s4 : ''}`)
+				.setTitle(`${getIcone(uGang.boneco)} Gangue ${uGang.tag != '' ? `[${uGang.tag}] ` : ``}${uGang.nome} ${uID == '100' ? bot.badges.topGangue_s4 : ''}`)
 				.setColor(uGang.cor)
 				.setDescription(uGang.desc)
 				.setThumbnail(uGang.icone)
-				.addField(`Depósito dos Membros`, lista_membros_deposits)
+				.addField(`Depósito dos Membros`, lista_membros_deposits, true)
 				.setFooter(`${uData.username}${message.author.id === bot.config.adminID ? ` • ID: ${uID}` : ''}`, message.member.user.avatarURL())
 				.setTimestamp();
+
+			if (lista_membros_deposits2 !== '')
+				embedWithDeposits.addField(`Depósito dos Membros`, lista_membros_deposits2, true)
 
 			message.channel.send({
 				embeds: [embedWithoutID]
 			}).then(msg => { // troca de página
-				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `gang`", err)).then(r => {
+				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `gang`")).then(r => {
 					let grana = '539572031436619777'
 
 					if (uData.gangID == uID)
-						msg.react(grana).catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+						msg.react(grana).catch(err => console.log("Não consegui reagir mensagem `gang`"))
 
 					const filter = (reaction, user) => (['🔡', '🆔'].includes(reaction.emoji.name) || reaction.emoji.id === grana) && user.id == message.author.id
 					const collector = msg.createReactionCollector({
@@ -2105,30 +2189,31 @@ exports.run = async (bot, message, args) => {
 							if (r.emoji.name === '🔡') {
 								msg.edit({
 									embeds: [embedWithoutID]
-								}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
-								msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+								}).catch(err => console.log("Não consegui editar mensagem `gang`"))
+								msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `gang`"))
 								if (uData.gangID == uID)
-									msg.react(grana).catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+									msg.react(grana).catch(err => console.log("Não consegui reagir mensagem `gang`"))
 
 							} else if (r.emoji.name === '🆔') {
 								msg.edit({
 									embeds: [embedWithID]
-								}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
-								msg.react('🔡').catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+								}).catch(err => console.log("Não consegui editar mensagem `gang`"))
+								msg.react('🔡').catch(err => console.log("Não consegui reagir mensagem `gang`"))
 								if (uData.gangID == uID)
-									msg.react(grana).catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+									msg.react(grana).catch(err => console.log("Não consegui reagir mensagem `gang`"))
 
 							} else if (r.emoji.id === grana) {
 								msg.edit({
 									embeds: [embedWithDeposits]
-								}).catch(err => console.log("Não consegui editar mensagem `gang`", err))
-								msg.react('🔡').catch(err => console.log("Não consegui reagir mensagem `gang`", err))
-								msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `gang`", err))
+								})
+								// .catch(err => console.log("Não consegui editar mensagem `gang`"))
+								msg.react('🔡').catch(err => console.log("Não consegui reagir mensagem `gang`"))
+								msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `gang`"))
 							}
-						}).catch(err => console.log("Não consegui remover as reações mensagem `gang`", err))
+						}).catch(err => console.log("Não consegui remover as reações mensagem `gang`"))
 					})
 				})
-			}).catch(err => console.log("Não consegui enviar mensagem `gg view`", err))
+			}).catch(err => console.log("Não consegui enviar mensagem `gg view`"))
 		}
 
 	}

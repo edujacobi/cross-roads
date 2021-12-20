@@ -33,7 +33,7 @@ exports.run = async (bot, message, args) => {
 
 	bot.createEmbed(message, `Confirmar troca das contas ${uData1.username} e ${uData2.username}?`, null, bot.colors.admin)
 		.then(msg => {
-			msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `trocarconta`", err)).then(r => {
+			msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `trocarconta`")).then(r => {
 				const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id 
 				const confirm = msg.createReactionCollector({
 					filter,

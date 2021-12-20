@@ -21,7 +21,7 @@ exports.run = async (bot, message, args) => {
 
 		return message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `evento`", err))
+		}).catch(err => console.log("Não consegui enviar mensagem `evento`"))
 	})
 }
 exports.config = {

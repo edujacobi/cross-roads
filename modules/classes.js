@@ -41,6 +41,14 @@ module.exports = (bot) => {
 			buff: "+10% ATK",
 			debuff: "-10% DEF"
 		},
+		mendigo: {
+			desc: "Mendigo",
+			cor: 0xffe100,
+			emote: '895087129988833391',
+			imagem: "https://media.discordapp.net/attachments/895062707684929588/895063026137448528/Classe_Mendigo.png",
+			buff: "-50% tempo para receber esmolas e +12% chance de achar itens vasculhando",
+			debuff: "-10% ATK"
+		},
 
 	}
 }

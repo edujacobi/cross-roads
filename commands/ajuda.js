@@ -17,7 +17,7 @@ exports.run = async (bot, message, args) => {
 		.setTimestamp();
 	return message.channel.send({
 		embeds: [embed]
-	}).catch(err => console.log("Não consegui enviar mensagem `ajuda`", err));
+	}).catch(err => console.log("Não consegui enviar mensagem `ajuda`"));
 };
 
 exports.config = {

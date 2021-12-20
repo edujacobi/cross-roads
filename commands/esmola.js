@@ -42,10 +42,10 @@ exports.run = async (bot, message, args) => {
 	}
 	let uData = bot.data.get(message.author.id)
 
-	if (uData.emRoubo)
-		return bot.msgEmRoubo(message)
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
 
-	if (uData.galoEmRinha)
+	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 	let esmola = uData.vipTime > currTime ? 75 : 50
@@ -67,19 +67,29 @@ exports.run = async (bot, message, args) => {
 
 	if (uData.moni < esmola)
 		return bot.createEmbed(message, `Você não tem dinheiro suficiente para dar esmola ${bot.config.coin}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`)
+	
+	if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+		return
 
-	if (currTime > uData.esmolaEntregueHoje + hora) {
-		if (currTime > tData.esmolaRecebidaHoje + hora) {
-			if (message.author.id != bot.config.adminID) //Jacobi
-				uData.esmolaEntregueHoje = currTime
-			if (alvo != '526203502318321665') //Bot
-				tData.esmolaRecebidaHoje = currTime
+	if (uData.esmolaEntregueHoje < currTime) {
+		if (tData.esmolaRecebidaHoje < currTime) {
+
+			uData.esmolaEntregueHoje = currTime + hora
+
+			tData.esmolaRecebidaHoje = tData.classe == 'mendigo' ? tData.esmolaRecebidaHoje = currTime + (hora / 2) : tData.esmolaRecebidaHoje = currTime + hora
 
 			uData.qtEsmolasDadas += esmola
 			tData.qtEsmolasRecebidas += esmola
 
 			uData.moni -= esmola
 			tData.moni += esmola
+
+			if (message.author.id == bot.config.adminID) //Jacobi
+				uData.esmolaEntregueHoje = currTime
+
+			if (alvo == '526203502318321665') //Bot
+				tData.esmolaRecebidaHoje = currTime
+
 			bot.data.set(message.author.id, uData)
 			bot.data.set(alvo, tData)
 
@@ -94,10 +104,10 @@ exports.run = async (bot, message, args) => {
 			return bot.createEmbed(message, `Você doou **R$ ${esmola}** para ${tData.username} ${bot.config.coin}`, `${alvo == bot.user.id ? "Obrigado! • " : ""}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
 
 		} else
-			return bot.createEmbed(message, `${tData.username} deve esperar ${bot.segToHour((tData.esmolaRecebidaHoje - currTime + hora) / 1000)} para receber uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
+			return bot.createEmbed(message, `${tData.username} deve esperar ${bot.segToHour((tData.esmolaRecebidaHoje - currTime) / 1000)} para receber uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
 
 	} else
-		return bot.createEmbed(message, `Você deve esperar ${bot.segToHour((uData.esmolaEntregueHoje - currTime + hora) / 1000)} para entregar uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
+		return bot.createEmbed(message, `Você deve esperar ${bot.segToHour((uData.esmolaEntregueHoje - currTime) / 1000)} para entregar uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
 }
 exports.config = {
 	alias: ['doar', 'esm', 'alms']

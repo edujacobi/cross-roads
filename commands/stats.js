@@ -6,7 +6,7 @@ exports.run = async (bot, message, args) => {
 	let count_online = 0
 
 	for (let [key, value] of bot.onlineNow) {
-		if (value > new Date().getTime() - 1200000) // 3600000
+		if (value > new Date().getTime() - 600000) // 3600000
 			count_online += 1
 	}
 
@@ -29,7 +29,7 @@ exports.run = async (bot, message, args) => {
 			.setThumbnail(bot.user.avatarURL())
 			.setColor('GREEN')
 			.addField("Tempo online", bot.segToHour(Math.floor(bot.uptime / 1000)), true)
-			.addField("Temporada 5", minToMonths((new Date() - new Date(2021, 5, 21)) / 1000 / 60), true)
+			.addField("Temporada 6", minToMonths((new Date() - new Date(2021, 9, 11)) / 1000 / 60), true)
 			//.addField("Usuários", bot.users.cache.size, true)
 			.addField("Jogadores", bot.data.indexes.length.toString(), true)
 			//.addField("Servidores", bot.guilds.cache.size, true)
@@ -42,14 +42,6 @@ exports.run = async (bot, message, args) => {
 
 		message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `stats`", err));
+		}).catch(err => console.log("Não consegui enviar mensagem `stats`"));
 	})
-};
-
-exports.help = {
-	name: "stats",
-	category: "Miscelaneous",
-	description: "Gives some useful bot statistics",
-	usage: "stats",
-	example: "stats"
 };

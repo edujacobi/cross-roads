@@ -25,7 +25,7 @@ exports.run = async (bot, message, args) => {
 			.setTimestamp();
 		return message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `movo`", err))
+		}).catch(err => console.log("Não consegui enviar mensagem `movo`"))
 
 	} else {
 		// if (message.author.id != bot.config.adminID)
@@ -45,10 +45,10 @@ exports.run = async (bot, message, args) => {
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+			return
 
-		if (uData.galoEmRinha)
+		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		uData._ovo -= prices[option - 1]

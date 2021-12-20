@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 
 exports.run = async (bot, message, args) => {
+	return message.reply("Comando desativado")
 	let targetMention = message.mentions.members.first()
 	let targetNoMention = []
 	if (!targetNoMention[0] && args[0] && !targetMention) { // se não mencionou mas quer ver inv de outro user
@@ -49,6 +50,6 @@ exports.run = async (bot, message, args) => {
 
 		return message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `avatar`", err))
+		}).catch(err => console.log("Não consegui enviar mensagem `avatar`"))
 	})
 }

@@ -48,6 +48,22 @@ module.exports = (bot) => {
 			min: 50000,
 			max: 90000,
 			necessario: ["katana", "rpg"]
-		}
+		},
+		deposito: {
+			id: 7,
+			desc: "Depósito do Exército",
+			sucesso: 33,
+			min: 250000,
+			max: 750000,
+			necessario: "minigun"
+		},
+		palacio: {
+			id: 8,
+			desc: "Palácio do Jacobi",
+			sucesso: 26,
+			min: 1000000,
+			max: 2500000,
+			necessario: "bazuca"
+		},
 	}
 }

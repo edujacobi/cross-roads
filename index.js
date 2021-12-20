@@ -1,12 +1,16 @@
 const {
 	Client,
-	Intents
+	Intents,
+	Options
 } = require('discord.js');
 
 const {
 	promisify
 } = require("util");
 const readdir = promisify(require("fs").readdir);
+const {
+	readdirSync
+} = require("fs");
 const Enmap = require("enmap");
 const bot = new Client({
 	intents: [
@@ -21,23 +25,21 @@ const bot = new Client({
 		parse: ['users'],
 		repliedUser: false
 	},
-	makeCache: 250,
-	messageCacheLifetime: 180,
-	messageSweepInterval: 120,
+	makeCache: 120,
 	disabledEvents: [
-		'GUILD_CREATE', 'GUILD_DELETE', 'GUILD_UPDATE', 'GUILD_MEMBER_ADD',
+		'GUILD_DELETE', 'GUILD_UPDATE', 'GUILD_MEMBER_ADD',
 		'GUILD_MEMBER_REMOVE', 'GUILD_MEMBER_UPDATE', 'GUILD_MEMBERS_CHUNK', 'GUILD_ROLE_CREATE',
 		'GUILD_ROLE_DELETE', 'GUILD_ROLE_UPDATE', 'GUILD_BAN_ADD', 'GUILD_BAN_REMOVE',
 		'GUILD_EMOJIS_UPDATE', 'GUILD_INTEGRATIONS_UPDATE', 'CHANNEL_CREATE', 'CHANNEL_DELETE',
 		'CHANNEL_UPDATE', 'CHANNEL_PINS_UPDATE', 'MESSAGE_DELETE', 'MESSAGE_UPDATE',
-		'MESSAGE_CREATE', // ?
 		'MESSAGE_REACTION_ADD', // ?
-		'MESSAGE_DELETE_BULK',
+		'MESSAGE_DELETE_BULK', 'EMOJI_CREATE', 'EMOJI_DELETE', 'EMOJI_UPDATE',
 		'MESSAGE_REACTION_REMOVE', 'MESSAGE_REACTION_REMOVE_ALL', 'USER_UPDATE', 'PRESENCE_UPDATE',
-		'TYPING_START', 'VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE', 'WEBHOOKS_UPDATE'
+		'TYPING_START', 'VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE', 'WEBHOOKS_UPDATE',
+		'DIRECT_MESSAGE_TYPING', 'GUILD_BANS', 'GUILD_INTEGRATIONS', 'GUILD_WEBHOOKS', 'GUILD_INVITES',
+		'GUILD_VOICE_STATES', 'GUILD_MESSAGE_TYPING',
 	]
 });
-// const disbut = require('discord-buttons')(bot);
 
 bot.talkedRecently = new Set();
 bot.onlineNow = new Map();
@@ -56,9 +58,14 @@ require("./modules/classes.js")(bot);
 require("./modules/aneis.js")(bot);
 
 bot.commands = new Enmap();
+bot.slashes = new Enmap();
 bot.modules = new Enmap();
 bot.data = new Enmap({
 	name: "data"
+});
+
+bot.galos = new Enmap({
+	name: "galos"
 });
 
 bot.gangs = new Enmap({
@@ -75,6 +82,10 @@ bot.coroamuru = new Enmap({
 
 bot.bilhete = new Enmap({
 	name: "bilhete"
+})
+
+bot.casais = new Enmap({
+	name: "casais"
 })
 
 const init = async () => {
@@ -100,6 +111,17 @@ const init = async () => {
 			}
 		}
 	});
+
+	// Now we load any **slash** commands you may have in the ./slash directory.
+	const slashFiles = readdirSync("./slashes").filter(file => file.endsWith(".js"));
+	for (const file of slashFiles) {
+		const command = require(`./slashes/${file}`);
+		const commandName = file.split(".")[0];
+		console.log(`Loading Slash command: ${commandName}. 👌`, "log");
+
+		// Now set the name of the command with it's properties.
+		bot.slashes.set(command.commandData.name, command);
+	}
 
 	bot.on('shardError', error => {
 		console.error(new Date() + '. A websocket connection encountered an error:', error);

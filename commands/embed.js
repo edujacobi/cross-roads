@@ -7,7 +7,7 @@ exports.run = async (bot, message, args) => {
 			.setDescription(args.join(" "))
 			.setFooter(bot.user.username, bot.user.avatarURL())
 			.setTimestamp()
-  return message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `embed`", err))
+  return message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `embed`"))
 }
 // const Discord = require("discord.js");
 // exports.run = async (bot, message, args) => {

@@ -19,25 +19,26 @@ module.exports = async bot => {
 			type: "LISTENING"
 		});
 		setTimeout(() => {
-			bot.user.setActivity(`Temporada 5!`, {
+			bot.user.setActivity(`Temporada 6`, {
 				type: "PLAYING"
 			});
 		}, hora / 2)
 	}, hora)
 
 	setInterval(() => {
-		bot.putMoneyCassino()
-		bot.sortearBilhete()
-	}, (hora / 2))
-
-	bot.informRouboCancelado()
-	bot.informRinhaCancelada()
+		bot.decrescimoNivelCasal()
+	}, hora * 6)
 
 	setInterval(() => {
-		bot.investReceber()
+		// bot.putMoneyCassino()
+		bot.sortearBilhete()
 		if (global.gc)
 			global.gc()
-	}, hora) // 1h
+	}, (hora / 2))
+
+	bot.informRinhaRouboCancelado()
+
+	setInterval(() => bot.investReceber(), hora) // 1h
 
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`Cross Roads`, bot.user.avatarURL())

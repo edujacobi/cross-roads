@@ -37,6 +37,10 @@ exports.run = async (bot, message, args) => {
 		if (top.length > 0) {
 			topGlobal = top.sort((a, b) => b.money - a.money).slice(start, start + 10)
 
+			let userComando
+			if (!topGlobal.some(user => user.id === message.author.id))
+				userComando = top.find(user => user.id === message.author.id)
+
 			let topGlobalString = ""
 			let topGlobalStringID = ""
 
@@ -46,6 +50,13 @@ exports.run = async (bot, message, args) => {
 				topGlobalString += `\`${i + start + 1}.\` ${emote} ${mod}**${user.nick}**${mod} R$ ${user.money.toLocaleString().replace(/,/g, ".")}\n`;
 				topGlobalStringID += `\`${i + start + 1}.\` ${emote} ${mod}**${user.nick}**${mod} ${user.id}\n`;
 			});
+
+			if (userComando) {
+				let user = bot.data.get(userComando.id)
+				const i = top.indexOf(userComando)
+				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
+				topGlobalString += `\`${i + 1}.\` ${emote} __**${user.username}**__ R$ ${user.moni.toLocaleString().replace(/,/g, ".")}\n`;
+			}
 
 			resultado.setDescription(isID ? topGlobalStringID : topGlobalString)
 
@@ -77,7 +88,7 @@ exports.run = async (bot, message, args) => {
 
 		if (top.length <= 10) return
 
-		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `topgrana`", err))
+		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `topgrana`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️', '🆔'].includes(reaction.emoji.name) && user.id === message.author.id
 
@@ -100,19 +111,19 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `topgrana`", err))
+				}).catch(err => console.log("Não consegui editar mensagem `topgrana`"))
 
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topgrana`", err))
+					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topgrana`"))
 				if (currentIndex + 10 < top.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgrana`", err))
-				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topgrana`", err))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `topgrana`", err))
+					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgrana`"))
+				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topgrana`"))
+			}).catch(err => console.log("Não consegui remover as reações mensagem `topgrana`"))
 		})
 		collector.on('end', reaction => {
-			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topgrana`", err))
+			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topgrana`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `topgrana`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `topgrana`"))
 
 	// return message.channel.send(embedWithoutID).then(msg => {
 	// 	msg.react('🆔').then(r => {

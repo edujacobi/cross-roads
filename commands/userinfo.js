@@ -55,7 +55,7 @@ exports.run = async (bot, message, args) => {
 
 	let uGang = bot.gangs.get(uData.gangID)
 
-	let textoBadge = bot.getUserBadges(alvo, false)
+	let badges = bot.getUserBadges(alvo, false)
 
 	let trabalhando = (uData.jobTime > currTime) && uData.job != null
 
@@ -65,14 +65,19 @@ exports.run = async (bot, message, args) => {
 	else if (trabalhando) emojiSituação = bot.config.bulldozer
 	else if (uData.hospitalizado > currTime) emojiSituação = bot.config.hospital
 
+	let conjuge = uData.conjuge != null ? `\n<:girlfriend:799053368189911081> Casado com ${bot.data.get(uData.conjuge, 'username')}` : ''
+
 	const embed = new Discord.MessageEmbed()
 		.setColor(uGang ? uGang.cor : bot.colors.darkGrey)
 		.setAuthor(`Informações de ${uData.username}`, uGang ? bot.gangs.get(uData.gangID, 'icone') : "")
 		.setThumbnail(uData.classe ? bot.classes[uData.classe].imagem : '')
-		.setDescription(`${textoBadge != '' ? `${textoBadge}\n` : '' }R$ ${uData.moni.toLocaleString().replace(/,/g, ".")} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}${uData.vipTime > currTime ? ` • ${bot.badges.vip} VIP restante: ${minToDays((uData.vipTime - currTime)/ 1000 / 60)}` : ""}`)
-		.addField(`${emojiSituação} Situação󠀀󠀀`, `${uData.morto > currTime ? `Morto` : (uData.preso > currTime ? `Preso` : trabalhando ? `Trabalhando como ${bot.jobs[uData.job].desc}` : uData.hospitalizado > currTime ? `Hospitalizado` : `Vadiando`)}`, true)
-		.addField(`${bot.config.propertyG} Investimento`, `${uData.invest != null ? investimento : "Não possui"}`, true)
-		.addField(`${bot.config.coin} Daily e Weekly`, `D: ${currTime > uData.day + dia ? "Disponível" : bot.segToHour((uData.day + dia - currTime) / 1000)}\nW: ${currTime > uData.presente + semana ? "Disponível" : bot.segToHour((uData.presente + semana - currTime) / 1000)}`, true)
+		.setDescription(`${badges}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}${uData.vipTime > currTime ? ` • ${bot.badges.vip} VIP restante: ${minToDays((uData.vipTime - currTime)/ 1000 / 60)}` : ""}${conjuge}`)
+		.addField(`${emojiSituação} Situação󠀀󠀀`,
+			`${uData.morto > currTime ? `Morto` : (uData.preso > currTime ? `Preso` : trabalhando ? `Trabalhando como ${bot.jobs[uData.job].desc}` : uData.hospitalizado > currTime ? `Hospitalizado` : `Vadiando`)}`, true)
+		.addField(`${bot.config.propertyG} Investimento`,
+			`${uData.invest != null ? investimento : "Não possui"}`, true)
+		.addField(`${bot.config.coin} Daily e Weekly`,
+			`D: ${currTime > uData.day + dia ? "Disponível" : bot.segToHour((uData.day + dia - currTime) / 1000)}\nW: ${currTime > uData.weekly + semana ? "Disponível" : bot.segToHour((uData.weekly + semana - currTime) / 1000)}`, true)
 		.addField(`${bot.config.prisao} Prisão`,
 			`\`${uData.qtFugas.toLocaleString().replace(/,/g, ".")}\` fugas
 \`${uData.roubosL.toLocaleString().replace(/,/g, ".")}\` vezes preso
@@ -83,8 +88,8 @@ exports.run = async (bot, message, args) => {
 \`${uData.qtRoubado.toLocaleString().replace(/,/g, ".")}\` vezes roubado`, true)
 		.addField(`${bot.config.espancar} Espancamentos`,
 			`${uData.espancar > currTime ? `${bot.segToHour((uData.espancar - currTime) / 1000)} para espancar` : `Pode espancar`}
-Espancou \`${uData.espancarW.toLocaleString().replace(/,/g, ".")}\` jogadores
-Apanhou \`${uData.espancarL.toLocaleString().replace(/,/g, ".")}\` vezes`, true)
+\`${uData.espancarW.toLocaleString().replace(/,/g, ".")}\` sucessos
+\`${uData.espancarL.toLocaleString().replace(/,/g, ".")}\` vezes espancado`, true)
 		.addField(`${bot.badges.bilionario} Dinheiro`,
 			`\`R$ ${uData.jobGanhos.toLocaleString().replace(/,/g, ".")}\` de trabalhos
 \`R$ ${uData.investGanhos.toLocaleString().replace(/,/g, ".")}\` de investimentos
@@ -98,8 +103,8 @@ ${isNaN(uData.betW / uData.betJ) ? `Nenhum jogo` : `\`${(uData.betW / (uData.bet
 \`R$ ${uData.cassinoGanhos.toLocaleString().replace(/,/g, ".")}\` ganhos
 \`R$ ${uData.cassinoPerdidos.toLocaleString().replace(/,/g, ".")}\` perdidos`, true)
 		.addField(`${bot.badges.filantropo_s4} Esmolas`,
-			`${currTime > uData.esmolaEntregueHoje + hora ? "Pode entregar" : `${bot.segToHour((uData.esmolaEntregueHoje - currTime + hora) / 1000)} para entregar`}
-${currTime > uData.esmolaRecebidaHoje + hora ? "Pode receber" : `${bot.segToHour((uData.esmolaRecebidaHoje - currTime + hora) / 1000)} para receber`}
+			`${uData.esmolaEntregueHoje > currTime ? `${bot.segToHour((uData.esmolaEntregueHoje - currTime) / 1000)} para entregar` : "Pode entregar"}
+${uData.esmolaRecebidaHoje > currTime?  `${bot.segToHour((uData.esmolaRecebidaHoje - currTime) / 1000)} para receber` : "Pode receber"}
 \`R$ ${(uData.qtEsmolasDadas).toLocaleString().replace(/,/g, ".")}\` entregues 
 \`R$ ${(uData.qtEsmolasRecebidas).toLocaleString().replace(/,/g, ".")}\` recebidos`, true)
 		.addField(`${bot.config.hospital} Hospital`,
@@ -119,30 +124,31 @@ Cargo \`${uGang.membros.find(user => user.id == alvo).cargo}\``, true)
 
 	message.channel.send({
 		embeds: [embed]
-	}).then(msg => {
-		msg.react('757021182020157571').catch(err => console.log("Não consegui reagir mensagem `userinfo`", err)).then(r => {
-			const filter = (reaction, user) => reaction.emoji.id === '757021182020157571' && user.id == message.author.id
-			const announce = msg.createReactionCollector({
-				filter,
-				time: 90000
-			})
-			announce.on('collect', r => {
-				if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `userinfo`", err))
-				const embed = new Discord.MessageEmbed()
-					.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
-					.setDescription("Temporada 5")
-					// .setImage('https://cdn.discordapp.com/attachments/819942506585522196/854883927210983434/banner.png')
-					// .addField("Final da temporada 4", `Dia 12/06 ocorreu o final da temporada 4 do Cross Roads, após derrotar o Boss <:Coroamuru:817889856142704670> Coroamuru, iniciando a **Pré-temporada**`, true)
-					// .addField("Início da temporada 5", `A temporada 5 começou dia 21/06. Todos os jogadores foram resetados.`, true)
-					.addField("A Temporada 4 acabou e já estamos na Temporada 5!", `Quer entender o porquê de existir temporadas? Quem foi o Coroamuru? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/ruasdacruz)`)
-					.setColor(bot.colors.admin)
-					.setFooter(`Atenciosamente, Jacobi.`)
-				message.channel.send({
-					embeds: [embed]
-				}).catch(err => console.log("Não consegui enviar mensagem `userinfo`", err))
-			})
-		})
-	}).catch(err => console.log("Não consegui enviar mensagem `userinfo`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `userinfo`"))
+	// .then(msg => {
+	// 	msg.react('757021182020157571').catch(err => console.log("Não consegui reagir mensagem `userinfo`")).then(r => {
+	// 		const filter = (reaction, user) => reaction.emoji.id === '757021182020157571' && user.id == message.author.id
+	// 		const announce = msg.createReactionCollector({
+	// 			filter,
+	// 			time: 90000
+	// 		})
+	// 		announce.on('collect', r => {
+	// 			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `userinfo`"))
+	// 			const embed = new Discord.MessageEmbed()
+	// 				.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
+	// 				.setDescription("Temporada 6")
+	// 				// .setImage('https://cdn.discordapp.com/attachments/819942506585522196/854883927210983434/banner.png')
+	// 				// .addField("Final da temporada 4", `Dia 12/06 ocorreu o final da temporada 4 do Cross Roads, após derrotar o Boss <:Coroamuru:817889856142704670> Coroamuru, iniciando a **Pré-temporada**`, true)
+	// 				// .addField("Início da temporada 5", `A temporada 5 começou dia 21/06. Todos os jogadores foram resetados.`, true)
+	// 				.addField("A Temporada 5 acabou e já estamos na Temporada 6!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
+	// 				.setColor(bot.colors.admin)
+	// 				.setFooter(`Atenciosamente, Jacobi.`)
+	// 			message.channel.send({
+	// 				embeds: [embed]
+	// 			}).catch(err => console.log("Não consegui enviar mensagem `userinfo`"))
+	// 		})
+	// 	})
+	// })
 }
 exports.config = {
 	alias: ['info', 'ui']

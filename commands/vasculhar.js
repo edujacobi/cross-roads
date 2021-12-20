@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const Discord = require('discord.js')
 exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let multiplicador_evento = 1
@@ -6,71 +6,77 @@ exports.run = async (bot, message, args) => {
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 
 	function vasculharLugar(lugar, uData) {
-		let item = bot.getRandom(0, 17) //normal: 17
+		let item = uData.classe == 'mendigo' ? bot.getRandom(0, 15) : bot.getRandom(0, 17) //normal: 15/17
 		let achou = ''
 		uData.vasculhar = currTime + hora * multiplicador_evento
-
+		// if (lugar == baile)
+		// 	uData.vasculhar = currTime + 600000
 		Object.entries(lugar).forEach(([key, value]) => {
 			if (item == key) {
-				if (value.item != 'moni' && value.item != 'ficha' && value.item != 'granada' && value.item != 'flor') {
+				if (value.item != 'moni' && value.item != 'ficha' && value.item != 'granada' && value.item != 'flor' && value.item != 'badge' && value.item != 'ovo') {
 					Object.entries(uData).forEach(([key_udata, value_udata]) => {
-						if (key_udata == "_" + value.item) {
-							value_udata = value_udata > currTime ? value_udata + (value.tempo * hora) : currTime + (value.tempo * hora)
+						if (key_udata == '_' + value.item) {
+							value_udata = value_udata > currTime ? value_udata + value.tempo * hora : currTime + value.tempo * hora
 							uData[key_udata] = value_udata
 							Object.values(bot.guns).forEach(gun => {
 								if (gun.data == value.item) {
 									let emote = bot.config[gun.emote]
 									achou = true
 									uData.vasculharAchou += 1
-									if (message.author.id != bot.config.adminID)
-										bot.data.set(message.author.id, uData)
+									if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
 									return bot.createEmbed(message, `Você encontrou ${emote} **${gun.desc}** com duração de ${value.tempo} ${value.tempo == 1 ? `hora` : `horas`} enquanto vasculhava ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 								}
 							})
 						}
 					})
-
 				} else if (value.item == 'moni') {
 					let money = bot.getRandom(value.min, value.max)
 					uData.moni += money
 					achou = true
 					uData.vasculharAchou += 1
-					if (message.author.id != bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou **R$ ${money.toLocaleString().replace(/,/g, ".")}** enquanto vasculhava ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
-
+					if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
+					return bot.createEmbed(message, `Você encontrou **R$ ${money.toLocaleString().replace(/,/g, '.')}** enquanto vasculhava ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 				} else if (value.item == 'ficha') {
 					let ficha = bot.getRandom(value.min, value.max)
 					uData.ficha += ficha
 					achou = true
 					uData.vasculharAchou += 1
-					if (message.author.id != bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.ficha} **${ficha.toLocaleString().replace(/,/g, ".")} ${ficha == 1 ? `Ficha` : `Fichas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-as no Cassino!`, 'LIGHT_GREY')
-
+					if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
+					return bot.createEmbed(message, `Você encontrou ${bot.config.ficha} **${ficha.toLocaleString().replace(/,/g, '.')} ${ficha == 1 ? `Ficha` : `Fichas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-as no Cassino!`, 'LIGHT_GREY')
 				} else if (value.item == 'granada') {
 					let quant = bot.getRandom(value.min, value.max)
 					uData._ovogranada += quant
 					achou = true
 					uData.vasculharAchou += 1
-					if (message.author.id != bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.ovogranada} **${quant.toLocaleString().replace(/,/g, ".")} ${quant == 1 ? `Granada` : `Granadas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Shaka laka boom!`, 'LIGHT_GREY')
-
+					if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
+					return bot.createEmbed(message, `Você encontrou ${bot.config.ovogranada} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Granada` : `Granadas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Shaka laka boom!`, 'LIGHT_GREY')
 				} else if (value.item == 'flor') {
 					let quant = 1
 					uData._flor += quant
 					achou = true
 					uData.vasculharAchou += 1
-					if (message.author.id != bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.flor} **${quant.toLocaleString().replace(/,/g, ".")} ${quant == 1 ? `Flor` : `Flores`}** enquanto vasculhava ${bot.config.vasculhar}`, `Você poderá usá-las em breve nos Casamentos!`, 'LIGHT_GREY')
+					if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
+					return bot.createEmbed(message, `Você encontrou ${bot.config.flor} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Flor` : `Flores`}** enquanto vasculhava ${bot.config.vasculhar}`, `Você poderá usá-las em breve nos Casamentos!`, 'LIGHT_GREY')
+				} else if (value.item == 'ovo') {
+					let quant = bot.getRandom(value.min, value.max)
+					uData._ovo += quant
+					achou = true
+					uData.vasculharAchou += 1
+					if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
+					return bot.createEmbed(message, `Você encontrou ${bot.config.ovo} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Presente` : `Presentes`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-os no Mercado do Natal! → ;natal`, 'YELLOW')
 				}
+				// else if (value.item == 'badge') {
+				// 	achou = true
+				// 	uData.vasculhar = currTime + 600000
+				// 	uData.badgeBaileMandrake = true
+				// 	if (message.author.id != bot.config.adminID)
+				// 		bot.data.set(message.author.id, uData)
+				// 	return bot.createEmbed(message, `Você encontrou o ${bot.badges.mandrake} **Óculos Mandrake** enquanto vasculhava ${bot.config.vasculhar}`, `Ele ficará lindo no seu galo!`, 'LIGHT_GREY')
+				// }
 			}
 		})
 		if (!achou) {
-			if (message.author.id != bot.config.adminID)
-				bot.data.set(message.author.id, uData)
+			if (message.author.id != bot.config.adminID) bot.data.set(message.author.id, uData)
 			return bot.createEmbed(message, `Você não encontrou nada enquanto vasculhava ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 		}
 	}
@@ -79,220 +85,223 @@ exports.run = async (bot, message, args) => {
 
 	let lixao = {
 		1: {
-			item: "knife",
+			item: 'knife',
 			tempo: 6,
 		},
 		2: {
-			item: "9mm",
+			item: 'colt45',
 			tempo: 4,
 		},
 		3: {
-			item: "9mm",
+			item: 'colt45',
 			tempo: 3,
 		},
 		4: {
-			item: "moni",
+			item: 'moni',
 			min: 15,
 			max: 150,
 		},
 		5: {
-			item: "moni",
+			item: 'moni',
 			min: 50,
 			max: 500,
 		},
 		6: {
-			item: "ficha",
+			item: 'ficha',
 			min: 1,
 			max: 5,
 		},
 		7: {
-			item: "knife",
-			tempo: 4
+			item: 'knife',
+			tempo: 4,
 		},
 		8: {
-			item: "knife",
+			item: 'knife',
 			tempo: 3,
 		},
 		9: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 	}
 	let matagal = {
 		1: {
-			item: "knife",
+			item: 'knife',
 			tempo: 2,
 		},
 		2: {
-			item: "9mm",
+			item: 'colt45',
 			tempo: 1,
 		},
 		3: {
-			item: "money",
+			item: 'money',
 			min: 50,
 			max: 250,
 		},
 		4: {
-			item: "money",
+			item: 'money',
 			min: 75,
 			max: 750,
 		},
 		5: {
-			item: "money",
+			item: 'money',
 			min: 500,
 			max: 1000,
 		},
 		6: {
-			item: "ficha",
+			item: 'ficha',
 			min: 1,
 			max: 5,
 		},
 		7: {
-			item: "money",
+			item: 'money',
 			min: 750,
 			max: 1250,
 		},
 		8: {
-			item: "money",
+			item: 'money',
 			min: 100,
 			max: 500,
 		},
 		9: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 	}
 	let esgoto = {
 		1: {
-			item: "knife",
+			item: 'knife',
 			tempo: 2,
 		},
 		2: {
-			item: "9mm",
+			item: 'colt45',
 			tempo: 1,
 		},
 		3: {
-			item: "moni",
+			item: 'moni',
 			min: 15,
 			max: 150,
 		},
 		4: {
-			item: "moni",
+			item: 'moni',
 			min: 50,
 			max: 500,
 		},
 		5: {
-			item: "ficha",
+			item: 'ficha',
 			min: 1,
 			max: 5,
 		},
 		6: {
-			item: "ficha",
+			item: 'ficha',
 			min: 5,
 			max: 10,
 		},
 		7: {
-			item: "ficha",
+			item: 'ficha',
 			min: 10,
 			max: 15,
 		},
 		8: {
-			item: "ficha",
+			item: 'ficha',
 			min: 5,
 			max: 15,
 		},
 		9: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 	}
-	let fabrica = { // Nes: escopeta
+	let fabrica = {
+		// Nes: escopeta
 		1: {
-			item: "rifle",
+			item: 'rifle',
 			tempo: 6,
 		},
 		2: {
-			item: "colete",
+			item: 'colete',
 			tempo: 2,
 		},
 		3: {
-			item: "escopeta",
+			item: 'escopeta',
 			tempo: 4,
 		},
 		4: {
-			item: "mp5",
+			item: 'mp5',
 			tempo: 2,
 		},
 		5: {
-			item: "escopeta",
+			item: 'escopeta',
 			tempo: 4,
 		},
 		6: {
-			item: "moni",
+			item: 'moni',
 			min: 5000,
 			max: 10000,
 		},
 		7: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 	}
-	let usina = { // Nes: ak47
+	let usina = {
+		// Nes: ak47
 		1: {
-			item: "goggles",
+			item: 'goggles',
 			tempo: 4,
 		},
 		2: {
-			item: "colete",
+			item: 'colete',
 			tempo: 6,
 		},
 		3: {
-			item: "ak47",
+			item: 'ak47',
 			tempo: 4,
 		},
 		4: {
-			item: "m4",
+			item: 'm4',
 			tempo: 2,
 		},
 		5: {
-			item: "moni",
+			item: 'moni',
 			min: 10000,
 			max: 35000,
 		},
 		6: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 	}
-	let nave = { // Nes: RPG
+	let nave = {
+		// Nes: RPG
 		1: {
-			item: "rpg", //rpg
+			item: 'rpg', //rpg
 			tempo: 4,
 		},
 		2: {
-			item: "colete", // bazuca
+			item: 'colete', // bazuca
 			tempo: 6,
 		},
 		3: {
-			item: "ficha",
+			item: 'ficha',
 			min: 500,
 			max: 750,
 		},
 		4: {
-			item: "ficha",
+			item: 'ficha',
 			min: 750,
 			max: 1000,
 		},
 		5: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 	}
 	// let ninho = {
 	// 	1: {
@@ -336,25 +345,72 @@ exports.run = async (bot, message, args) => {
 	// 		max: 35,
 	// 	},
 	// }
+	let arvore = {
+		1: {
+			item: 'ovo',
+			min: 1,
+			max: 5,
+		},
+		2: {
+			item: 'ovo',
+			min: 5,
+			max: 10,
+		},
+		3: {
+			item: 'ovo',
+			min: 10,
+			max: 15,
+		},
+		4: {
+			item: 'ovo',
+			min: 10,
+			max: 15,
+		},
+		5: {
+			item: 'ovo',
+			min: 15,
+			max: 20,
+		},
+		6: {
+			item: 'ovo',
+			min: 5,
+			max: 10,
+		},
+		7: {
+			item: 'ovo',
+			min: 5,
+			max: 10,
+		},
+		8: {
+			item: 'ovo',
+			min: 20,
+			max: 30,
+		},
+		9: {
+			item: 'flor',
+			min: 1,
+			max: 1,
+		},
+	}
 	let base = {
 		1: {
-			item: "bazuca", // bazuca
+			item: 'bazuca', // bazuca
 			tempo: 1,
 		},
 		2: {
-			item: "exoesqueleto", // bazuca
+			item: 'exoesqueleto', // bazuca
 			tempo: 1,
 		},
 		3: {
-			item: "granada", // bazuca
+			item: 'granada', // bazuca
 			min: 1,
 			max: 2,
 		},
 		4: {
-			item: "flor",
+			item: 'flor',
 			min: 1,
-			max: 1
-		}
+			max: 1,
+		},
 		// 7: {
 		// 	item: "minigun", // bazuca
 		// 	tempo: 1,
@@ -368,104 +424,127 @@ exports.run = async (bot, message, args) => {
 		// 	tempo: 2,
 		// },
 	}
-
+	// let baile = {
+	// 	1: {
+	// 		item: "badge",
+	// 	},
+	// }
 
 	if (!option) {
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.vasculhar} Vasculhar`)
-			.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/814659864286461982/vasculhar_20210223172037.png")
-			.setDescription("Procuro pessoas corajosas e sem nojo de entrar em locais sujos e perigosos. Muitas coisas boas podem ser encontradas!\nVocê pode vasculhar uma vez a cada hora.")
+			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/814659864286461982/vasculhar_20210223172037.png')
+			.setDescription('Procuro pessoas corajosas e sem nojo de entrar em locais sujos e perigosos. Muitas coisas boas podem ser encontradas!\nVocê pode vasculhar uma vez a cada hora.')
 			.setColor('LIGHT_GREY')
-			.addField("Lixão", `O lixão tem chances maiores de encontrar **Armas**.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar lixão\``, true)
-			.addField("Matagal", `No matagal você encontrará **Dinheiro** mais facilmente.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar matagal\``, true)
-			.addField("Esgoto", `**Fichas** são encontradas com maior facilidade no esgoto.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar esgoto\``, true)
-			.addField("Fábrica de armas", `**Armas** melhores e mais **Dinheiro**.\n${bot.config.rifle}${bot.config.colete}${bot.config.escopeta}${bot.config.mp5}${bot.config.coin}\nNecessário: ${bot.config.escopeta}\n\`;vasculhar fábrica\``, true)
-			.addField("Usina nuclear", `**Armas** ainda mais fortes e muito **Dinheiro**.\n${bot.config.goggles}${bot.config.colete}${bot.config.ak47}${bot.config.m4}${bot.config.coin}\nNecessário: ${bot.config.ak47}\n\`;vasculhar usina\``, true)
-			.addField("Nave extraterrestre", `**Armas** estupidamente fortes e milhares de **Fichas**.\n${bot.config.rpg}${bot.config.colete}${bot.config.ficha}\nNecessário: ${bot.config.rpg}\n\`;vasculhar nave\``, true)
-			.addField("Base Militar", `Itens militares proibidões\n${bot.config.bazuca}${bot.config.exoesqueleto}${bot.config.ovogranada}\nNecessário: ${bot.config.minigun}\n\`;vasculhar base\``, true)
+			.addField('Lixão', `O lixão tem chances maiores de encontrar **Armas**.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar lixão\``, true)
+			.addField('Matagal', `No matagal você encontrará **Dinheiro** mais facilmente.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar matagal\``, true)
+			.addField('Esgoto', `**Fichas** são encontradas com maior facilidade no esgoto.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar esgoto\``, true)
+			.addField('Fábrica de armas', `**Armas** melhores e mais **Dinheiro**.\n${bot.config.rifle}${bot.config.colete}${bot.config.escopeta}${bot.config.mp5}${bot.config.coin}\nNecessário: ${bot.config.escopeta}\n\`;vasculhar fábrica\``, true)
+			.addField('Usina nuclear', `**Armas** ainda mais fortes e muito **Dinheiro**.\n${bot.config.goggles}${bot.config.colete}${bot.config.ak47}${bot.config.m4}${bot.config.coin}\nNecessário: ${bot.config.ak47}\n\`;vasculhar usina\``, true)
+			.addField('Nave extraterrestre', `**Armas** estupidamente fortes e milhares de **Fichas**.\n${bot.config.rpg}${bot.config.colete}${bot.config.ficha}\nNecessário: ${bot.config.rpg}\n\`;vasculhar nave\``, true)
+			.addField('Base Militar', `Itens militares proibidões\n${bot.config.bazuca}${bot.config.exoesqueleto}${bot.config.ovogranada}\nNecessário: ${bot.config.minigun}\n\`;vasculhar base\``, true)
 			// .addField(`${bot.config.ovo} Ninho de páscoa`, `O que o coelhinho esconde?\n\`;vasculhar ninho\``)
+			.addField(`🎄 Árvore de Natal`, `O que tem no saco do velhinho?\n\`;vasculhar árvore\``, true)
 			.setFooter(`${bot.user.username} • "ETs gostam de apostar em cassinos?"`, bot.user.avatarURL())
-			.setTimestamp();
+			.setTimestamp()
 
-		message.channel.send({
-			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `vasculhar`", err))
+		// if (message.channel.guild.id === '810546397786931200')
+		// 	embed.addField(`Bailão`, `Vapo, vapo, vapo\n${bot.badges.mandrake}\n\`;vasculhar bailão\``, true)
 
-	} else if (['lixao', 'lixão', 'l', '1',
-			'matagal', 'mata', 'm', '2',
-			'esgoto', 'e', '3',
-			'fabrica', 'fábrica', 'f', '4',
-			'usina', 'u', '5',
-			'nave', 'n', '6',
-			'base', 'b', '7'
-		].includes(option)) { // || option == 'arvore'
-		if (uData.job != null)
-			return bot.msgTrabalhando(message, uData)
+		message.channel
+			.send({
+				embeds: [embed],
+			})
+			.catch(err => console.log('Não consegui enviar mensagem `vasculhar`'))
+	} else if (
+		[
+			'lixao',
+			'lixão',
+			'l',
+			'1',
+			'matagal',
+			'mata',
+			'm',
+			'2',
+			'esgoto',
+			'e',
+			'3',
+			'fabrica',
+			'fábrica',
+			'f',
+			'4',
+			'usina',
+			'u',
+			'5',
+			'nave',
+			'n',
+			'6',
+			'base',
+			'b',
+			'7',
+			'arvore',
+			'árvore',
+			'a',
+			'8',
+			// 'baile', 'bailao', 'bailão', '8'
+		].includes(option)
+	) {
+		if (uData.job != null) return bot.msgTrabalhando(message, uData)
 
-		if (uData.preso > currTime)
-			return bot.msgPreso(message, uData)
+		if (uData.preso > currTime) return bot.msgPreso(message, uData)
 
-		if (uData.hospitalizado > currTime)
-			return bot.msgHospitalizado(message, uData)
+		if (uData.hospitalizado > currTime) return bot.msgHospitalizado(message, uData)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData)) return
 
-		if (uData.galoEmRinha)
-			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
+		if (bot.isGaloEmRinha(message.author.id)) return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		if (uData.vasculhar > currTime) {
 			let minutes = (uData.vasculhar - currTime) / 1000
 			return bot.createEmbed(message, `Você deve esperar mais ${bot.segToHour(minutes)} para vasculhar novamente ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 		}
 
-		if (['lixao', 'lixão', 'l', '1'].includes(option))
+		if (['lixao', 'lixão', 'l', '1'].includes(option)) {
 			vasculharLugar(lixao, uData)
-
-		else if (['matagal', 'mata', 'm', '2'].includes(option))
+		} else if (['matagal', 'mata', 'm', '2'].includes(option)) {
 			vasculharLugar(matagal, uData)
-
-		else if (['esgoto', 'e', '3'].includes(option))
+		} else if (['esgoto', 'e', '3'].includes(option)) {
 			vasculharLugar(esgoto, uData)
-
-		else if (['fabrica', 'fábrica', 'f', '4'].includes(option)) {
+		} else if (['fabrica', 'fábrica', 'f', '4'].includes(option)) {
 			if (uData._shotgun < currTime && uData._mp5 < currTime && uData._ak47 < currTime && uData._m4 < currTime && uData._sniper < currTime && uData._katana < currTime && uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime)
 				return bot.createEmbed(message, `É necessário possuir ${bot.config.escopeta} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(fabrica, uData)
-
 		} else if (['usina', 'u', '5'].includes(option)) {
-			if (uData._ak47 < currTime && uData._m4 < currTime && uData._sniper < currTime && uData._katana < currTime && uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.ak47} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData._ak47 < currTime && uData._m4 < currTime && uData._sniper < currTime && uData._katana < currTime && uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime) return bot.createEmbed(message, `É necessário possuir ${bot.config.ak47} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(usina, uData)
-
 		} else if (['nave', 'n', '6'].includes(option)) {
-			if (uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.rpg} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime) return bot.createEmbed(message, `É necessário possuir ${bot.config.rpg} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(nave, uData)
-
 		} else if (['base', 'b', '7'].includes(option)) {
-			if (uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.minigun} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData._minigun < currTime && uData._bazuca < currTime) return bot.createEmbed(message, `É necessário possuir ${bot.config.minigun} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(base, uData)
+		} else if (['arvore', 'árvore', 'a', '8'].includes(option)) {
+			vasculharLugar(arvore, uData)
 		}
-		// else if (option == 'base')
-		// 	vasculharLugar(base, uData)
+		// else if (['baile', 'bailao', 'bailão', '8'].includes(option)) {
+		// 	// if (message.author.id != bot.config.adminID)
+		// 	// 	return
 
+		// 	if (message.channel.guild.id !== '810546397786931200')
+		// 		return bot.createEmbed(message, `Você não está no **Bailão da Cruz**! ${bot.config.vasculhar}`, null, `LIGHT_GREY`)
+
+		// 	if (uData.badgeBaileMandrake != undefined)
+		// 		return bot.createEmbed(message, `Você já encontrou o óculos mandrake! ${bot.badges.mandrake}`, null, `LIGHT_GREY`)
+		// 	vasculharLugar(baile, uData)
+		// }
 		// else if (option == 'ninho')
 		// 	vasculharLugar(ninho, uData)
 
 		setTimeout(() => {
-			bot.users.fetch(message.author.id).then(user =>
-				user.send(`Você já pode vasculhar novamente! ${bot.config.vasculhar}`)
-				.catch(err => message.reply(`você já pode vasculhar novamente ${bot.config.vasculhar}`)
-					.catch(er => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Vasculhar\``))
-			)
+			bot.users.fetch(message.author.id).then(user => user.send(`Você já pode vasculhar novamente! ${bot.config.vasculhar}`).catch(err => message.reply(`você já pode vasculhar novamente ${bot.config.vasculhar}`).catch(er => `Não consegui responder ${bot.data.get(message.author.id, 'username')} nem no PV nem no canal. \`Vasculhar\``)))
 		}, hora)
-
-	} else
-		return bot.createEmbed(message, `Você deve escolher entre \`lixão\`, \`matagal\`, \`esgoto\`, \`fábrica\`, \`usina\`, \`nave\` e \`base\` ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
-
+	} else return bot.createEmbed(message, `Você deve escolher entre \`lixão\`, \`matagal\`, \`esgoto\`, \`fábrica\`, \`usina\`, \`nave\`, \`base\` e \`árvore\` ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 }
 exports.config = {
-	alias: ['v']
-};
+	alias: ['v'],
+}

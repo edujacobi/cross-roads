@@ -27,6 +27,12 @@ exports.run = async (bot, message, args) => {
 							ATK = ATK * 1.1
 						else
 							ATK = (ATK * 1.1).toFixed(1)
+
+					} else if (uData.classe == 'mendigo') {
+						if (ATK * 0.9 == Math.floor(ATK * 0.9))
+							ATK = ATK * 0.9
+						else
+							ATK = (ATK * 0.9).toFixed(1)
 					}
 				}
 				if (DEF && DEF.toString().indexOf('noite') == -1) {
@@ -43,7 +49,9 @@ exports.run = async (bot, message, args) => {
 				embed.addField(`${value.id}: ${emote} ${value.desc}`, `R$ ${(uData.classe == 'mafioso' ? value.preço  : value.preço * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}\n${value.atk != null ? `ATK ${ATK}\n` : ''}${value.def != null ? `DEF ${DEF}\n` : ''}`, true)
 			}
 		})
-		return message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `loja`", err))
+		return message.channel.send({
+			embeds: [embed]
+		}).catch(err => console.log("Não consegui enviar mensagem `loja`"))
 	}
 
 	if (option < 1 || (option % 1 != 0) || option > 15) // 16 = jetpack / 17 = minigun / 18 = bazuca ...
@@ -60,9 +68,10 @@ exports.run = async (bot, message, args) => {
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
 
-	if (uData.emRoubo)
-		return bot.msgEmRoubo(message)
-	if (uData.galoEmRinha)
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
+		
+	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 	Object.values(bot.guns).forEach(gun => {
@@ -71,16 +80,17 @@ exports.run = async (bot, message, args) => {
 			if (uData.moni < preço)
 				return bot.msgSemDinheiro(message);
 
-			if (uData["_" + gun.data] + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000)
+			if ((uData["_" + gun.data] + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData["_" + gun.data] < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
 				return bot.createEmbed(message, `Você não pode possuir mais que 720 horas de uma mesma arma ${bot.config.loja}`, null, 'GREEN')
 
-			let emote = bot.config[gun.emote]
 			uData.moni -= preço
 			uData.lojaGastos += preço
-			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} **${gun.desc}**`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN');
-			bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
-
 			
+			let emote = bot.config[gun.emote]
+
+			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} **${gun.desc}**`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN');
+			
+			bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
 
 			Object.entries(uData).forEach(([key_udata, value_udata]) => {
 				if (key_udata == "_" + gun.data && gun.data != 'minigun') {
@@ -90,10 +100,10 @@ exports.run = async (bot, message, args) => {
 			})
 
 			bot.log(message, new Discord.MessageEmbed()
-				.setDescription(`**${uData.username} comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} ${gun.desc}**`)
+				.setDescription(`**${bot.config.loja} ${uData.username} comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} ${gun.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
 				// .addField("Imposto", `R$ ${valor_imposto.toLocaleString().replace(/,/g, ".")}`, true)
-				.addField("Tempo restante", bot.segToHour((uData["_" + gun.data] - currTime)/1000), true)
+				.addField("Tempo restante", bot.segToHour((uData["_" + gun.data] - currTime) / 1000), true)
 				.setColor('GREEN'))
 		}
 	})

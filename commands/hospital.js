@@ -13,13 +13,13 @@ exports.run = async (bot, message, args) => {
 
         Object.entries(uData).forEach(([key, value]) => {
             Object.values(bot.guns).forEach(arma => {
-                if (value > currTime && arma.def > defPower && (key == "_" + arma.data || (key == "_9mm" && arma.data == "colt45")))
+                if (value > currTime && arma.def > defPower && key == "_" + arma.data)
                     defPower = arma.def
             })
         })
 
         //let tempo_restante_proporcao = (uData.hospitalizado / currTime) - 1
-        let preço = Math.floor((3000 + (defPower * (defPower / 6)) ** 2) + (uData.moni * 0.12) + (uData.ficha * 80 * 0.12))
+        let preço = Math.floor((3000 + (defPower * (defPower / 6)) ** 2) + (uData.moni * 0.1) + (uData.ficha * 80 * 0.1))
 
         const confirmed = new Discord.MessageEmbed()
             .setColor('RED')
@@ -29,7 +29,7 @@ exports.run = async (bot, message, args) => {
 
         bot.createEmbed(message, `Seu tratamento custará **R$ ${preço.toLocaleString().replace(/,/g, ".")}**. Confirmar pagamento? ${bot.config.hospital}`, null, 'RED')
             .then(msg => {
-                msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `hospital`", err)).then(r => {
+                msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `hospital`")).then(r => {
                     const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id
 
                     const confirm = msg.createReactionCollector({
@@ -39,7 +39,7 @@ exports.run = async (bot, message, args) => {
                     })
 
                     confirm.on('collect', r => {
-                        if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `hospital`", err))
+                        if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `hospital`"))
                             .then(m => {
                                 if (uData.moni < preço)
                                     return bot.msgSemDinheiro(message)
@@ -47,13 +47,11 @@ exports.run = async (bot, message, args) => {
                                 uData.moni -= preço
                                 uData.hospitalizado = 0
                                 uData.hospitalGastos += preço
-                                uData.hospitalizadoNotification = false
-                                //clearTimeout(uData.hospitalizadoNotification)
                                 bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
                                 bot.data.set(message.author.id, uData)
                                 msg.edit({
                                     embeds: [confirmed]
-                                }).catch(err => console.log("Não consegui editar mensagem `hospital`", err))
+                                }).catch(err => console.log("Não consegui editar mensagem `hospital`"))
                             })
 
                     })
@@ -74,7 +72,7 @@ exports.run = async (bot, message, args) => {
         message.channel.send({
             embeds: [embed]
         }).then(msg => {
-            msg.react('539497344450691077').catch(err => console.log("Não consegui reagir mensagem `hospital`", err))
+            msg.react('539497344450691077').catch(err => console.log("Não consegui reagir mensagem `hospital`"))
                 .then(() => {
                     const filter = (reaction, user) => reaction.emoji.id === '539497344450691077' && user.id == message.author.id;
                     const hospitalizados_ = msg.createReactionCollector({
@@ -122,12 +120,12 @@ exports.run = async (bot, message, args) => {
                         message.channel.send({
                             embeds: [Hospitalizados]
                         }).then(m => {
-                            if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `hospital`", err))
-                        }).catch(err => console.log("Não consegui enviar mensagem `hospitalizados`", err))
+                            if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `hospital`"))
+                        }).catch(err => console.log("Não consegui enviar mensagem `hospitalizados`"))
                     })
                 })
         }).catch(err => {
-            console.log("Hospital", err)
+            console.log("Não consegui enviar mensagem `hospitalizados`")
         })
     }
 }

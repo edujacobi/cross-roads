@@ -10,6 +10,19 @@ exports.run = async (bot, message, args) => {
 				return bot.config.gang2
 			case 3:
 				return bot.config.gang3
+			case 4:
+				return bot.config.gang4
+			case 5:
+				return bot.config.gang5
+			case 6:
+				return bot.config.gang6
+			case 7:
+				return bot.config.gang7
+			case 8:
+				return bot.config.gang8
+			case 9:
+				return bot.config.gang9
+
 		}
 	}
 
@@ -21,6 +34,7 @@ exports.run = async (bot, message, args) => {
 		if (gang != '') {
 			if (gang.nome != '') { //&& id != '1'
 				top.push({
+					id: id,
 					nome: gang.nome,
 					caixa: gang.caixa,
 					base: gang.base,
@@ -44,6 +58,10 @@ exports.run = async (bot, message, args) => {
 			topgrana = top.sort((a, b) => b.caixa - a.caixa).slice(start, start + 10)
 			toplevel = top.sort((a, b) => b.level - a.level).slice(start, start + 10)
 
+			let gangComando
+			if (!topgrana.some(gang => gang.id === bot.data.get(message.author.id, 'gangID')))
+				gangComando = top.find(gang => gang.id === bot.data.get(message.author.id, 'gangID'))
+
 			let topgranaString = ""
 			let toplevelString = ""
 
@@ -59,6 +77,14 @@ exports.run = async (bot, message, args) => {
 				let base = bot.bases[gang.base] ? bot.bases[gang.base].desc.split(" ")[0] : ''
 				toplevelString += `\`${i + start +1}.\` ${getIcone(gang.boneco)} ${mod}**${gang.nome}**${mod} \`${gang.base != null ? `${base} ${gang.level}` : 'Sem base'}\`\n`
 			})
+
+			if (gangComando) {
+				let gang = bot.gangs.get(userGangId)
+				const i = top.indexOf(gangComando)
+				let base = bot.bases[gang.base] ? bot.bases[gang.base].desc.split(" ")[0] : ''
+				topgranaString += `\`${i + 1}.\` ${getIcone(gang.boneco)} __**${gang.nome}**__ R$ ${(gang.caixa).toLocaleString().replace(/,/g, ".")}\n`;
+				toplevelString += `\`${i + 1}.\` ${getIcone(gang.boneco)} __**${gang.nome}**__ \`${gang.base != null ? `${base} ${gang.baseLevel}` : 'Sem base'}\`\n`;
+			}
 
 			resultado
 				.addField("Top Grana", topgranaString, true)
@@ -76,7 +102,7 @@ exports.run = async (bot, message, args) => {
 
 		if (top.length <= 5) return
 
-		msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgang`", err))
+		msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgang`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === message.author.id
 		const collector = msg.createReactionCollector({
@@ -96,18 +122,18 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `topgang`", err))
+				}).catch(err => console.log("Não consegui editar mensagem `topgang`"))
 
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topgang`", err))
+					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topgang`"))
 				if (currentIndex + 10 < top.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgang`", err))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `topgang`", err))
+					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgang`"))
+			}).catch(err => console.log("Não consegui remover as reações mensagem `topgang`"))
 		})
 		collector.on('end', reaction => {
-			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topgang`", err))
+			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topgang`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `topgang`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `topgang`"))
 };
 exports.config = {
 	alias: ['topgg', 'topgangue', 'tpgg', 'topmafia']

@@ -11,6 +11,8 @@ exports.run = async (bot, message, args) => {
 	const MIN = 10
 	// let option2 = args[1]
 
+	// return bot.createEmbed(message, `${bot.config.mafiaCasino} As apostas de Cara ou Coroa estão desativadas durante a primeira semana de temporada`)
+
 	if (uData.job != null)
 		return bot.msgTrabalhando(message, uData)
 
@@ -20,10 +22,10 @@ exports.run = async (bot, message, args) => {
 	if (uData.hospitalizado > time)
 		return bot.msgHospitalizado(message, uData)
 
-	if (uData.emRoubo)
-		return bot.msgEmRoubo(message)
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
 
-	if (uData.galoEmRinha)
+	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 	if (args[1] == 'allin') {

@@ -1,319 +1,545 @@
-const {
-	Permissions
-} = require('discord.js');
+const { Permissions } = require("discord.js");
 const Discord = require("discord.js");
+const Piii = require("piii");
+const piiiFilters = require("piii-filters");
 
 module.exports = (bot, message) => {
-	// if (message.author.id != bot.config.adminID && !bot.moderators.includes(message.author.id))
-	// 	return
+  // if (message.author.id != bot.config.adminID && !bot.moderators.includes(message.author.id))
+  // 	return
 
-	if (message.author.bot)
-		return;
+  // if (message.author.id != bot.config.adminID)
+  // 	return
 
-	if (message.channel.type == 'dm')
-		return;
+  if (message.author.bot) return;
 
-	if (message.mentions.has(bot.user) && !message.content.startsWith(bot.config.prefix) && !message.mentions.everyone)
-		return bot.createEmbed(message, "Olá! Meu prefixo é `;`. Caso não saiba como começar a jogar, use `;ajuda`!")
+  if (message.channel.type == "DM") return;
 
-	if (!message.content.startsWith(bot.config.prefix))
-		return;
+  if (
+    message.mentions.has(bot.user) &&
+    !message.content.startsWith(bot.config.prefix) &&
+    !message.mentions.everyone
+  )
+    return bot.createEmbed(
+      message,
+      "Olá! Meu prefixo é `;`. Caso não saiba como começar a jogar, use `;ajuda`!"
+    );
 
-	const args = message.content.slice(bot.config.prefix.length).trim().split(/ +/g);
+  if (!message.content.startsWith(bot.config.prefix)) return;
 
-	const command = args.shift().toLowerCase();
+  const args = message.content
+    .slice(bot.config.prefix.length)
+    .trim()
+    .split(/ +/g);
 
-	const cmd = bot.commands.get(command) || bot.commands.find(cmd => cmd.config && cmd.config.alias.includes(command));
+  const command = args.shift().toLowerCase();
 
-	if (!cmd)
-		return;
+  const cmd =
+    bot.commands.get(command) ||
+    bot.commands.find(
+      (cmd) => cmd.config && cmd.config.alias.includes(command)
+    );
 
-	if (!message || !message.guild || !message.guild.me)
-		return
+  if (!cmd) return;
 
-	bot.data.ensure(message.author.id, bot.defaultCarteira);
+  if (!message?.guild?.me) return;
 
-	if (!message.guild.me.permissions.has([
-			Permissions.FLAGS.MANAGE_MESSAGES,
-			Permissions.FLAGS.SEND_MESSAGES,
-			Permissions.FLAGS.EMBED_LINKS,
-			Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
-			Permissions.FLAGS.ADD_REACTIONS
-		]))
-		return bot.createEmbed(message, "<:badge_cata_bug:799043225557008474> **PERA!** Eu não possuo as permissões necessárias para o jogo rolar belezinha. Contate o Administrador deste Servidor.\n\nAs seguintes permissões são necessárias:\n`Gerenciar mensagens`, `Enviar mensagens`, `Inserir links`, `Usar emojis externos` e `Adicionar reações`")
+  bot.data.ensure(message.author.id, bot.defaultCarteira);
+  bot.galos.ensure(message.author.id, bot.defaultGalo);
 
-	if (!bot.data.has(message.author.id, "username")) {
-		const newUser = new Discord.MessageEmbed()
-			.setTitle(`Cadastro`)
-			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/856211643742945290/CrossRoadsLogo.png')
-			.setDescription(`Olá **${message.author.username}**, bem vindo ao **Cross Roads**!`)
-			.addField(`Para continuar jogando, defina seu **nick**`, `Na próxima mensagem, mande o nick escolhido`)
-			.setColor('GREEN')
-			.setFooter(`Proibido: caracteres especiais, emojis e acentos`)
-			.setTimestamp()
+  if (!message.guild.me.permissions.has([Permissions.FLAGS.SEND_MESSAGES]))
+    return message.author
+      .send(
+        "<:badge_cata_bug:799043225557008474> **PERA!** Eu não possuo as permissões necessárias para o jogo rolar belezinha. Contate o Administrador deste Servidor.\n\nAs seguintes permissões são necessárias:\n`Gerenciar mensagens`, `Enviar mensagens`, `Inserir links`, `Usar emojis externos` e `Adicionar reações`"
+      )
+      .catch((err) =>
+        console.log(
+          "Não consegui enviar mensagem pv `cadastro` (falta permissão enviar mensagens servidor"
+        )
+      );
 
-		return message.channel.send({
-			embeds: [newUser]
-		}).then(msg => {
+  if (
+    !message.guild.me.permissions.has([
+      Permissions.FLAGS.MANAGE_MESSAGES,
+      Permissions.FLAGS.EMBED_LINKS,
+      Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
+      Permissions.FLAGS.ADD_REACTIONS,
+    ])
+  )
+    return bot.createEmbed(
+      message,
+      "<:badge_cata_bug:799043225557008474> **PERA!** Eu não possuo as permissões necessárias para o jogo rolar belezinha. Contate o Administrador deste Servidor.\n\nAs seguintes permissões são necessárias:\n`Gerenciar mensagens`, `Enviar mensagens`, `Inserir links`, `Usar emojis externos` e `Adicionar reações`"
+    );
 
-			const filter = response => response.author.id == message.author.id
-			const collector = message.channel.createMessageCollector({
-				filter,
-				time: 180000,
-			})
+  let uData = bot.data.get(message.author.id);
 
-			collector.on('collect', m => {
-				let regex = /^[a-zA-Z0-9 !$.,%^&()+=/\\]{3,20}$/ugm
-				let nick = m.content
-				if (nick.length < 3)
-					return bot.createEmbed(message, `Escolha um nick maior`, `Mínimo de caracteres: 3`)
-				if (nick.length > 20)
-					return bot.createEmbed(message, `Escolha um nick menor`, `Máximo de caracteres: 20`)
-				if (nick.indexOf('jacobi') > -1 || nick.indexOf('cross roads') > -1 || nick.toLowerCase() == 'user')
-					return bot.createEmbed(message, `Este nick é reservado`, `Escolha outro nick`)
-				if (nick.indexOf('@') > -1 || nick.indexOf(':') > -1 || nick.indexOf(';') > -1 || nick.indexOf('`') > -1 || nick.indexOf('_') > -1 || nick.indexOf('*') > -1 || nick.toLowerCase().indexOf('iii') > -1 || nick.toLowerCase().indexOf('lll') > -1 || nick.toLowerCase().indexOf('lilil') > -1 || nick.indexOf('  ') > -1)
-					return bot.createEmbed(message, `Este nick é inválido`, `Escolha outro nick`)
-				if (!regex.test(nick))
-					return bot.createEmbed(message, 'Este nick é inválido', `Escolha outro nick`)
+  if (uData.username == undefined) {
+    const newUser = new Discord.MessageEmbed()
+      .setTitle(`Cadastro`)
+      .setThumbnail(
+        "https://cdn.discordapp.com/attachments/531174573463306240/856211643742945290/CrossRoadsLogo.png"
+      )
+      .setDescription(
+        `Olá **${message.author.username}**, bem vindo ao **Cross Roads**!`
+      )
+      .addField(
+        `Para continuar jogando, defina seu **nick**`,
+        `Na próxima mensagem, mande o nick escolhido`
+      )
+      .setColor("GREEN")
+      .setFooter(
+        `Proibido: caracteres especiais, emojis, acentos e palavras ofensivas`
+      )
+      .setTimestamp();
 
-				for (let [id, user] of bot.data) {
-					if (user.username != undefined && nick.toLowerCase() == user.username.toLowerCase())
-						return bot.createEmbed(message, `Este nick já está em uso`, `Escolha outro nick`)
-				}
+    return message.channel
+      .send({
+        embeds: [newUser],
+      })
+      .then((msg) => {
+        const filter = (response) => response.author.id == message.author.id;
+        const collector = message.channel.createMessageCollector({
+          filter,
+          time: 180000,
+          max: 1,
+        });
 
-				nick.replace(/\s/g, " ") // remove espaço bosta do caraios
-				collector.stop()
+        collector.on("collect", (m) => {
+          let regex = /^[a-zA-Z0-9 !$.,%^&()+=/\\]{3,18}$/gmu;
 
-				bot.createEmbed(message, `Deseja confirmar o nick **${nick}**?\n\nVocê não poderá alterá-lo depois!`, `Caso queira outro, utilize outro comando`)
-					.then(msg => {
-						msg.react('✅').catch(err => console.log("Não consegui reagir mensagem `cadastro`", err)).then(r => {
-							const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id == message.author.id
-							const confirm = msg.createReactionCollector({
-								filter,
-								max: 1,
-								time: 90000,
-								errors: ['time'],
-							})
+          const piii = new Piii({
+            filters: [...Object.values(piiiFilters), bot.palavrasBanidas],
+          });
 
-							confirm.on('collect', r => {
-								if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cadastro`", err))
-								bot.data.set(message.author.id, nick, "username")
-								bot.createEmbed(message, `Seu **nick** foi definido como **${nick}**!\nAgora você deverá escolher uma classe!`, `Use ;classe para continuar`, 'GREEN')
-								return bot.log(message, new Discord.MessageEmbed()
-									.setTitle("Novo jogador registrado!")
-									.setDescription(`**Nick: ${bot.data.get(message.author.id, "username")}**`)
-									.setColor(bot.colors.admin))
-							})
-						})
-					})
+          let nick = m.content;
+          nick.replace(/\s/g, " "); // remove espaço bosta do caraios
 
-			})
-		}).catch(err => console.log("Não consegui enviar mensagem `cadastro`", err))
+          let msgCadastro = `• Use outro comando para reiniciar o cadastro.`;
 
-	}
+          if (nick.length < 3)
+            return bot.createEmbed(
+              message,
+              `Escolha um nick maior`,
+              `Mínimo de caracteres: 3 ${msgCadastro}`
+            );
+          if (nick.length > 18)
+            return bot.createEmbed(
+              message,
+              `Escolha um nick menor`,
+              `Máximo de caracteres: 18 ${msgCadastro}`
+            );
+          if (
+            nick.toLowerCase().indexOf("jacobi") > -1 ||
+            nick.toLowerCase().indexOf("cross roads") > -1 ||
+            nick.toLowerCase() == "user"
+          )
+            return bot.createEmbed(
+              message,
+              `Este nick é reservado`,
+              `Escolha outro nick ${msgCadastro}`
+            );
+          if (
+            nick.indexOf("@") > -1 ||
+            nick.indexOf(":") > -1 ||
+            nick.indexOf(";") > -1 ||
+            nick.indexOf("`") > -1 ||
+            nick.indexOf("_") > -1 ||
+            nick.indexOf("*") > -1 ||
+            nick.toLowerCase().indexOf("iii") > -1 ||
+            nick.toLowerCase().indexOf("lll") > -1 ||
+            nick.toLowerCase().indexOf("lilil") > -1 ||
+            nick.indexOf("  ") > -1 ||
+            nick.toLowerCase().indexOf("granada") > -1 ||
+            nick.toLowerCase().indexOf("semgranada") > -1
+          )
+            return bot.createEmbed(
+              message,
+              `Este nick é inválido`,
+              `Escolha outro nick ${msgCadastro}`
+            );
+          if (!regex.test(nick))
+            return bot.createEmbed(
+              message,
+              "Este nick é inválido",
+              `Escolha outro nick ${msgCadastro}`
+            );
 
-	if (!bot.data.has(message.author.id, "classe")) {
+          for (let [id, user] of bot.data) {
+            if (
+              user.username != undefined &&
+              nick.toLowerCase() == user.username.toLowerCase()
+            )
+              return bot.createEmbed(
+                message,
+                `Este nick já está em uso`,
+                `Escolha outro nick ${msgCadastro}`
+              );
+          }
 
-		const embed = new Discord.MessageEmbed()
-			.setTitle(`Escolha de Classe`)
-			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/856211643742945290/CrossRoadsLogo.png')
-			.setColor('GREEN')
-			.setTimestamp()
-			.setDescription(`Olá **${bot.data.get(message.author.id, "username")}**, bem vindo à Temporada 5 do **Cross Roads**!\n\nAntes de continuar jogando você deve escolher uma **Classe**`)
+          if (piii.has(nick))
+            return bot.createEmbed(
+              message,
+              `Escolha um nick maior`,
+              `Palaras ofensivas não são aceitas ${msgCadastro}`
+            );
 
-		message.author.send({
-			embeds: [embed]
-		})
+          collector.stop();
 
-		Object.values(bot.classes).forEach(classe => {
-			message.author.send({
-				embeds: [new Discord.MessageEmbed()
-					.setTitle(classe.desc)
-					.setColor(classe.cor)
-					.setThumbnail(classe.imagem)
-					.addField("Positivo", classe.buff)
-					.addField("Negativo", classe.debuff)
-				]
-			})
-		})
+          bot
+            .createEmbed(
+              message,
+              `Deseja confirmar o nick **${nick}**?\n\nVocê não poderá alterá-lo depois!`,
+              `Caso queira outro, utilize outro comando`
+            )
+            .then((msg) => {
+              msg
+                .react("✅")
+                .catch((err) =>
+                  console.log("Não consegui reagir mensagem `cadastro`")
+                )
+                .then((r) => {
+                  const filter = (reaction, user) =>
+                    reaction.emoji.name === "✅" &&
+                    user.id == message.author.id;
+                  const confirm = msg.createReactionCollector({
+                    filter,
+                    max: 1,
+                    time: 90000,
+                    errors: ["time"],
+                  });
 
-		message.channel.send({
-			embeds: [new Discord.MessageEmbed()
-				.setColor('GREEN')
-				.setDescription(`**${bot.data.get(message.author.id, "username")}** chegou a hora de você escolher uma **Classe**! Te mandei as opções no privado!`)
-				.setFooter(bot.user.username, bot.user.avatarURL())
-				.setTimestamp()
-			]
-		}).catch(err => console.log("Não consegui enviar mensagem `classe`", err))
+                  confirm.on("collect", (r) => {
+                    if (msg)
+                      msg.reactions
+                        .removeAll()
+                        .catch((err) =>
+                          console.log(
+                            "Não consegui remover as reações mensagem `cadastro`"
+                          )
+                        );
+                    bot.data.set(message.author.id, nick, "username");
+                    bot.createEmbed(
+                      message,
+                      `Seu **nick** foi definido como **${nick}**!\nAgora você deverá escolher uma classe!`,
+                      `Use ;classe para continuar`,
+                      "GREEN"
+                    );
+                    return bot.log(
+                      message,
+                      new Discord.MessageEmbed()
+                        .setTitle("Novo jogador registrado!")
+                        .setDescription(
+                          `**Nick: ${bot.data.get(
+                            message.author.id,
+                            "username"
+                          )}**`
+                        )
+                        .setColor(bot.colors.admin)
+                    );
+                  });
+                });
+            });
+        });
+      })
+      .catch((err) => console.log("Não consegui enviar mensagem `cadastro`"));
+  }
 
-		const escolha = new Discord.MessageEmbed()
-			.setColor('GREEN')
-			.setDescription(`Clique na classe que você deseja escolher!`)
+  if (uData.classe == undefined) {
+    const embed = new Discord.MessageEmbed()
+      .setTitle(`Escolha de Classe`)
+      .setThumbnail(
+        "https://cdn.discordapp.com/attachments/531174573463306240/856211643742945290/CrossRoadsLogo.png"
+      )
+      .setColor("GREEN")
+      .setTimestamp()
+      .setDescription(
+        `Olá **${uData.username}**, bem vindo à Temporada 6 do **Cross Roads**!\n\nAntes de continuar jogando você deve escolher uma **Classe**`
+      );
 
-		return message.author.send({
-			embeds: [escolha]
-		}).then(msg => {
-			msg.react(bot.classes.ladrao.emote)
-				.then(() => msg.react(bot.classes.advogado.emote))
-				.then(() => msg.react(bot.classes.mafioso.emote))
-				.then(() => msg.react(bot.classes.empresario.emote))
-				.then(() => msg.react(bot.classes.assassino.emote))
-				.catch(err => console.log("Não consegui reagir mensagem `cadastro classe`", err))
+    message.author
+      .send({
+        embeds: [embed],
+      })
+      .catch((err) =>
+        message
+          .reply(
+            "Ops... não consigo te mandar mensagens no PV. Verifique suas configurações e use algum comando novamente"
+          )
+          .catch((err) => console.log("Não consegui enviar mensagem `classe`"))
+      );
 
-			let filter = (reaction, user) => [bot.classes.ladrao.emote, bot.classes.advogado.emote, bot.classes.mafioso.emote, bot.classes.empresario.emote, bot.classes.assassino.emote].includes(reaction.emoji.id) && user.id === message.author.id
+    Object.values(bot.classes).forEach((classe) => {
+      message.author
+        .send({
+          embeds: [
+            new Discord.MessageEmbed()
+              .setTitle(classe.desc)
+              .setColor(classe.cor)
+              .setThumbnail(classe.imagem)
+              .addField("Positivo", classe.buff)
+              .addField("Negativo", classe.debuff),
+          ],
+        })
+        .catch((err) => console.log("Não consegui enviar mensagem `classe`"));
+    });
 
-			const collector = msg.createReactionCollector({
-				filter,
-				time: 180000,
-				max: 1,
-				errors: ['time'],
+    message.channel
+      .send({
+        embeds: [
+          new Discord.MessageEmbed()
+            .setColor("GREEN")
+            .setDescription(
+              `**${uData.username}** chegou a hora de você escolher uma **Classe**! Te mandei as opções no privado!`
+            )
+            .setFooter(bot.user.username, bot.user.avatarURL())
+            .setTimestamp(),
+        ],
+      })
+      .catch((err) => console.log("Não consegui enviar mensagem `classe`"));
 
-			})
+    const escolha = new Discord.MessageEmbed()
+      .setColor("GREEN")
+      .setDescription(`Clique na classe que você deseja escolher!`);
 
-			collector.on('collect', r => {
-				if (bot.data.has(message.author.id, "classe"))
-					return message.channel.send({
-						embeds: [new Discord.MessageEmbed()
-							.setColor('GREEN')
-							.setDescription(`Você já escolheu uma classe!`)
-							.setFooter(bot.user.username, bot.user.avatarURL())
-							.setTimestamp()
-						]
-					}).catch(err => console.log("Não consegui enviar mensagem `classe`", err))
+    return message.author
+      .send({
+        embeds: [escolha],
+      })
+      .then((msg) => {
+        msg
+          .react(bot.classes.ladrao.emote)
+          .then(() => msg.react(bot.classes.advogado.emote))
+          .then(() => msg.react(bot.classes.mafioso.emote))
+          .then(() => msg.react(bot.classes.empresario.emote))
+          .then(() => msg.react(bot.classes.assassino.emote))
+          .then(() => msg.react(bot.classes.mendigo.emote))
+          .catch((err) =>
+            console.log("Não consegui reagir mensagem `cadastro classe`")
+          );
 
-				let escolha = r.emoji.id
-				let classeEscolhida
-				if (escolha === bot.classes.ladrao.emote)
-					classeEscolhida = 'ladrao'
-				if (escolha === bot.classes.advogado.emote)
-					classeEscolhida = 'advogado'
-				if (escolha === bot.classes.mafioso.emote)
-					classeEscolhida = 'mafioso'
-				if (escolha === bot.classes.empresario.emote)
-					classeEscolhida = 'empresario'
-				if (escolha === bot.classes.assassino.emote)
-					classeEscolhida = 'assassino'
+        let filter = (reaction, user) =>
+          [
+            bot.classes.ladrao.emote,
+            bot.classes.advogado.emote,
+            bot.classes.mafioso.emote,
+            bot.classes.empresario.emote,
+            bot.classes.assassino.emote,
+            bot.classes.mendigo.emote,
+          ].includes(reaction.emoji.id) && user.id === message.author.id;
 
-				const escolhido = new Discord.MessageEmbed()
-					.setColor('GREEN')
-					.setDescription(`Você escolheu a classe **${bot.classes[classeEscolhida].desc}**!`)
-					.setFooter(`Use ;ajuda para começar a jogar Cross Roads!`)
+        const collector = msg.createReactionCollector({
+          filter,
+          time: 180000,
+          max: 1,
+          errors: ["time"],
+        });
 
-				msg.delete()
-				message.author.send({
-					embeds: [escolhido]
-				})
-				bot.data.set(message.author.id, classeEscolhida, "classe")
+        collector.on("collect", (r) => {
+          if (bot.data.has(message.author.id, "classe"))
+            return message.channel
+              .send({
+                embeds: [
+                  new Discord.MessageEmbed()
+                    .setColor("GREEN")
+                    .setDescription(`Você já escolheu uma classe!`)
+                    .setFooter(bot.user.username, bot.user.avatarURL())
+                    .setTimestamp(),
+                ],
+              })
+              .catch((err) =>
+                console.log("Não consegui enviar mensagem `classe`")
+              );
 
-				return bot.data.get(message.author.id, "classeAlterada") > 0 ?
-					bot.log(message, new Discord.MessageEmbed()
-						.setTitle(`${bot.data.get(message.author.id, "username")} alterou sua classe`)
-						.setDescription(`Classe escolhida: **${classeEscolhida}**`)
-						.setColor(bot.colors.admin)) :
-					bot.log(message, new Discord.MessageEmbed()
-						.setTitle(`${bot.data.get(message.author.id, "username")} definiu a classe`)
-						.setDescription(`**Classe escolhida: ${classeEscolhida}**`)
-						.setColor(bot.colors.admin))
+          let escolha = r.emoji.id;
+          let classeEscolhida;
+          if (escolha === bot.classes.ladrao.emote) classeEscolhida = "ladrao";
+          if (escolha === bot.classes.advogado.emote)
+            classeEscolhida = "advogado";
+          if (escolha === bot.classes.mafioso.emote)
+            classeEscolhida = "mafioso";
+          if (escolha === bot.classes.empresario.emote)
+            classeEscolhida = "empresario";
+          if (escolha === bot.classes.assassino.emote)
+            classeEscolhida = "assassino";
+          if (escolha === bot.classes.mendigo.emote)
+            classeEscolhida = "mendigo";
 
-			})
-		}).catch(err => message.reply("Ops... não consigo te mandar mensagens no PV. Verifique suas configurações e use algum comando novamente")
-			.catch(er => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal`))
-	}
+          const escolhido = new Discord.MessageEmbed()
+            .setColor("GREEN")
+            .setDescription(
+              `Você escolheu a classe **${bot.classes[classeEscolhida].desc}**!`
+            )
+            .setFooter(`Use ;ajuda para começar a jogar Cross Roads!`);
 
-	if (bot.data.get(message.author.id, "morto") > new Date().getTime())
-		return
+          msg.delete();
+          message.author.send({
+            embeds: [escolhido],
+          });
+          bot.data.set(message.author.id, classeEscolhida, "classe");
 
-	if (!bot.data.get(message.author.id, "dataInicio") || bot.data.get(message.author.id, "dataInicio") == '') {
-		let date = new Date()
-		let day = date.getDate()
-		let month = date.getMonth() + 1
-		let year = date.getFullYear()
-		bot.data.set(message.author.id, `${day}/${month}/${year}`, "dataInicio")
-	}
+          return bot.data.get(message.author.id, "classeAlterada") > 0
+            ? bot.log(
+                message,
+                new Discord.MessageEmbed()
+                  .setTitle(`${uData.username} alterou sua classe`)
+                  .setDescription(`Classe escolhida: **${classeEscolhida}**`)
+                  .setColor(bot.colors.admin)
+              )
+            : bot.log(
+                message,
+                new Discord.MessageEmbed()
+                  .setTitle(`${uData.username} definiu a classe`)
+                  .setDescription(`**Classe escolhida: ${classeEscolhida}**`)
+                  .setColor(bot.colors.admin)
+              );
+        });
+      })
+      .catch((err) =>
+        message
+          .reply(
+            "Ops... não consigo te mandar mensagens no PV. Verifique suas configurações e use algum comando novamente"
+          )
+          .catch(
+            (er) =>
+              `Não consegui responder ${uData.username} nem no PV nem no canal`
+          )
+      );
+  }
 
-	let jogador = message.member.guild.roles.cache.find(role => role.id === "824341916929622017");
-	if (message.member.guild.id && message.member.guild.id === '529674666692837378' && jogador)
-		message.guild.members.cache.get(message.author.id).roles.add(jogador).catch(err => console.log("Não consegui adicionar o cargo Jogador de " + message.author.id));
+  if (bot.isPlayerMorto(uData)) return;
 
-	let booster = message.member.guild.roles.cache.find(role => role.id === "758691633544953936"); //cargo booster
-	let isBooster = false
-	if( message.member.guild.id && message.member.guild.id === '529674666692837378' && booster) // mensagem no server cross e cargo booster
-		isBooster = true
+  if (!bot.isComandoUsavelViagem(message)) return bot.isPlayerViajando(uData);
 
-	let vip = message.member.guild.roles.cache.find(role => role.id === "529680357591613442");
-	let hasVipRole = message.member.guild.roles.cache.has(role => role.id === "529680357591613442");
-	let isVipWithoutRole = message.member.guild.id && message.member.guild.id === '529674666692837378' && !hasVipRole && bot.data.get(message.author.id, 'vipTime') > new Date().getTime()
-	let isNotVipAnymoreButWithRole = message.member.guild.id && message.member.guild.id === '529674666692837378' && hasVipRole && bot.data.get(message.author.id, 'vipTime') < new Date().getTime()
+  if (!uData.dataInicio || uData.dataInicio == "") {
+    let date = new Date();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    bot.data.set(message.author.id, `${day}/${month}/${year}`, "dataInicio");
+  }
 
-	if (message.member.guild.id && message.member.guild.id === '529674666692837378' && bot.data.get(message.author.id, "username") != message.member.nickname && message.author.id != bot.config.adminID) {
-		if (message.guild.members.cache.get(bot.user.id).permissions.has(Permissions.FLAGS.MANAGE_NICKNAMES) && message.guild.members.cache.get(bot.user.id).permissions.has(Permissions.FLAGS.CHANGE_NICKNAME))
-			message.guild.members.cache.get(message.author.id).setNickname(bot.data.get(message.author.id, "username")).catch(err => console.log("Não setar o nickname de " + message.author.id));
-	}
+  let isServerCrossRoads = message.member?.guild?.id === "529674666692837378";
 
-	if (message.member.guild.id && message.member.guild.id === '529674666692837378' && isVipWithoutRole)
-		message.guild.members.cache.get(message.author.id).roles.add(vip).catch(err => console.log("Não consegui adicionar o cargo VIP de " + message.author.id));
+  let jogador = message.member?.guild?.roles?.cache?.find(
+    (role) => role.id === "824341916929622017"
+  );
+  if (isServerCrossRoads && jogador)
+    message.guild?.members?.cache
+      ?.get(message.author.id)
+      .roles.add(jogador)
+      .catch((err) =>
+        console.log(
+          "Não consegui adicionar o cargo Jogador de " + message.author.id
+        )
+      );
 
-	if (message.member.guild.id && message.member.guild.id === '529674666692837378' && isNotVipAnymoreButWithRole)
-		message.guild.members.cache.get(message.author.id).roles.remove(vip).catch(err => console.log("Não consegui remover o cargo VIP de " + message.author.id));
+  let booster = message.member?.roles?.cache.has(
+    (role) => role.id === "758691633544953936"
+  ); //cargo booster
+  let isBooster = isServerCrossRoads && booster;
 
-	// const isCambioCommand = command === 'cambio' || command === 'c';
-	// if (bot.talkedRecently.has(message.author.id) && (isCambioCommand || bot.data.get(message.author.id, 'vipTime') < new Date().getTime())) {
-	if (bot.talkedRecently.has(message.author.id) && bot.data.get(message.author.id, 'vipTime') < new Date().getTime()) { // não vip
-		if (bot.moderators.includes(message.author.id))
-			message.reply("Moderador, você deve esperar 1 segundo entre cada comando.")
-			.catch(er => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV. \`Mensagem Cooldown\``)
-			.then(m => setTimeout(() => m.delete(), 900))
-		else
-			message.reply("Você deve esperar 3 segundos entre cada comando.")
-			.catch(er => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV. \`Mensagem Cooldown\``)
-			.then(m => setTimeout(() => m.delete(), 2700))
+  let isVip = uData.vipTime > new Date().getTime();
+  let vip = message.member?.guild?.roles?.cache?.find(
+    (role) => role.id === "529680357591613442"
+  );
+  let hasVipRole = message.member?.roles?.cache?.has(
+    (role) => role.id === "529680357591613442"
+  );
+  let isVipWithoutRole = isServerCrossRoads && !hasVipRole && isVip;
+  let isNotVipAnymoreButWithRole = isServerCrossRoads && hasVipRole && !isVip;
 
-	} else {
-		bot.onlineNow.set(message.author.id, new Date().getTime())
+  if (
+    isServerCrossRoads &&
+    uData.username != message.member.nickname &&
+    message.author.id !== bot.config.adminID
+  ) {
+    if (
+      message.guild?.me?.permissions?.has([
+        Permissions.FLAGS.MANAGE_NICKNAMES,
+        Permissions.FLAGS.CHANGE_NICKNAME,
+      ])
+    )
+      message.guild?.members?.cache
+        ?.get(message.author.id)
+        .setNickname(uData.username)
+        .catch((err) =>
+          console.log("Não consegui setar o nickname de " + message.author.id)
+        );
+  }
 
-		// console.log(message.author.username, command, args)
+  if (isServerCrossRoads && isVipWithoutRole)
+    message.guild?.members?.cache
+      ?.get(message.author.id)
+      .roles?.add(vip)
+      .catch((err) =>
+        console.log(
+          "Não consegui adicionar o cargo VIP de " + message.author.id
+        )
+      );
 
-		cmd.run(bot, message, args)
+  if (isServerCrossRoads && isNotVipAnymoreButWithRole)
+    message.guild?.members?.cache
+      ?.get(message.author.id)
+      .roles?.remove(vip)
+      .catch((err) =>
+        console.log("Não consegui remover o cargo VIP de " + message.author.id)
+      );
 
-		if (message.author.id != bot.config.adminID || bot.data.get(message.author.id, 'vipTime') < new Date().getTime() || !isBooster)
-			bot.talkedRecently.add(message.author.id)
+  // Se tá no cooldown
+  if (bot.talkedRecently.has(message.author.id)) {
+    // if (bot.moderators.includes(message.author.id))
+    //   return message
+    //     .reply("Moderador, você deve esperar 1 segundo entre cada comando.")
+    //     .then((m) => setTimeout(() => m.delete(), 900))
+    //     .catch(
+    //       (er) =>
+    //         `Não consegui responder ${uData.username}. \`Mensagem Cooldown\``
+    //     );
+    // else
+      return message
+        .reply("Você deve esperar 3 segundos entre cada comando.")
+        .then((m) => setTimeout(() => m.delete(), 2700))
+        .catch(
+          (er) =>
+            `Não consegui responder ${uData.username}. \`Mensagem Cooldown\``
+        );
+  }
 
-		// if (bot.data.get(message.author.id, 'vipTime') < new Date().getTime() && !isBooster) { //não vip
-		// 	if (bot.moderators.includes(message.author.id)) //moderador
-		// 		setTimeout(() => {
-		// 			bot.talkedRecently.delete(message.author.id)
-		// 		}, 1000)
-		// 	else
-		// 		setTimeout(() => {
-		// 			bot.talkedRecently.delete(message.author.id)
-		// 		}, 3250)
-		// } else
-		// 	bot.talkedRecently.delete(message.author.id)
+  bot.onlineNow.set(message.author.id, new Date().getTime());
+  bot.talkedRecently.add(message.author.id);
+  // console.log(message.author.username, command, args)
 
+  cmd.run(bot, message, args);
 
-		// if (bot.data.get(message.author.id, 'vipTime') > new Date().getTime()) // vip
-		// 	bot.talkedRecently.delete(message.author.id)
+  if (isVip || isBooster || bot.isAdmin(message.author.id) || bot.isMod(message.author.id))
+    bot.talkedRecently.delete(message.author.id);
 
-		// else if (isBooster) // server booster
-		// 	bot.talkedRecently.delete(message.author.id)
+  else setTimeout(() => bot.talkedRecently.delete(message.author.id), 3250);
 
-		if (bot.moderators.includes(message.author.id)) // moderador
-			setTimeout(() => bot.talkedRecently.delete(message.author.id), 1000)
+  const embed = new Discord.MessageEmbed()
+    .setAuthor(
+      bot.data.has(message.author.id, "username")
+        ? `${uData.username} (${message.author.id})`
+        : `${message.author.username} (${message.author.id})`,
+      message.author.avatarURL()
+    )
+    .setDescription(
+      `${
+        bot.data.has(message.author.id, "username")
+          ? uData.username
+          : message.author.username
+      } **${message.content}**`
+    )
+    .setColor(bot.colors.background)
+    .setFooter(
+      `Servidor ${message.guild.name}. Canal #${message.channel.name}`,
+      message.guild.iconURL()
+    )
+    .setTimestamp();
 
-		else
-			setTimeout(() => bot.talkedRecently.delete(message.author.id), 3250)
-
-		const embed = new Discord.MessageEmbed()
-			.setAuthor(bot.data.has(message.author.id, "username") ? `${bot.data.get(message.author.id, "username")} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())
-			.setDescription(`${bot.data.has(message.author.id, "username") ? bot.data.get(message.author.id, "username") : message.author.username} **${message.content}**`)
-			.setColor(bot.colors.background)
-			.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
-			.setTimestamp();
-		bot.channels.cache.get('564988393713303579').send({
-			embeds: [embed]
-		}).catch(err => console.log("Não consegui fazer log de ", command, args, err))
-
-
-		//.catch(err => console.error(err))
-	}
+  bot.channels.cache
+    .get("564988393713303579")
+    .send({
+      embeds: [embed],
+    })
+    .catch((err) => console.log("Não consegui fazer log de ", command, args));
 };

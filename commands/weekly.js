@@ -8,8 +8,8 @@ exports.run = async (bot, message, args) => {
 	// let weekly_ficha = uData.vipTime > currTime ? 15 : 10
 
 
-	if (currTime > uData.presente + semana) {
-		uData.presente = currTime
+	if (currTime > uData.weekly + semana) {
+		uData.weekly = currTime
 		uData.moni += parseInt(weekly_moni)
 		// uData.ficha += parseInt(weekly_ficha)
 		bot.data.set(message.author.id, uData)
@@ -21,7 +21,7 @@ exports.run = async (bot, message, args) => {
 			.setColor('GREEN'))
 
 	} else
-		return bot.createEmbed(message, `Você já recebeu esta semana. O Weekly ficará disponível novamente em ${bot.segToHour((uData.presente + semana - currTime) / 1000)} ${bot.config.coin}`, null, 'GREEN')
+		return bot.createEmbed(message, `Você já recebeu esta semana. O Weekly ficará disponível novamente em ${bot.segToHour((uData.weekly + semana - currTime) / 1000)} ${bot.config.coin}`, null, 'GREEN')
 }
 exports.config = {
 	alias: ['w', 'semanal']

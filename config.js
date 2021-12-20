@@ -1,10 +1,10 @@
 const config = {
 
-	
-	"token": "NTI2MjAzNTAyMzE4MzIxNjY1.Xt_rSw.L_jm-bZ7tg-VQ9Q3s9P0NNy0SHM",
+
+	"token": "my-token",
 	"prefix": ";",
 	"adminID": "332228051871989761",
-	
+
 	"ficha": "<:ficha:757021259451203665>",
 	"coin": "<:coin:539572031436619777>",
 
@@ -27,7 +27,7 @@ const config = {
 	"escopeta": "<:escopeta:754480874472472606>",
 	"katana": "<:katana:754480878104870944>",
 	"minigun": "<:minigun:757033333619163208>",
-	"ovogranada": "<:Granada:829906313239855105>",
+	"ovogranada": "<:GranadaNatal:921846896056737852>",	//"<:Granada:829906313239855105>",
 	"ovogranada2": "<:OvoGranada:829906313710272517>",
 
 	// ações
@@ -38,7 +38,7 @@ const config = {
 	// outros
 	"flor": "<:Flor:879107094010290266>",
 	"whey": "<:Whey_Protein:825828797265739798>",
-	"superWhey" : '<:Super_Whey:829906315434393631>',
+	"superWhey": '<:Super_Whey:829906315434393631>',
 	//"tshirt": "<:tshirt:799040747172134963>",
 	//"saveGame": "<:saveGame:799040747206213632>",
 	"propertyG": "<:investimento:539497344996212736>",
@@ -57,7 +57,7 @@ const config = {
 	//"ammugun": "<:ammugun:539497341057761281>",
 	"emmetGun": "<:reagir:539501924307959808>",
 	"thetruth": "<:thetruth:539502365611655178>",
-	"mercadonegro" : "<:MercadoNegro:853054490441416724>",
+	"mercadonegro": "<:MercadoNegro:853054490441416724>",
 	"police": "<:policia:539502682545717288>",
 	//"ryder": "<:radar_RYDER:738241043178324022>",
 	"hospital": "<:hospital:539497344450691077>",
@@ -65,6 +65,12 @@ const config = {
 	"gang1": "<:gang_amarelo:758817092341334017>",
 	"gang2": "<:gang_azul:758817092119035935>",
 	"gang3": "<:gang_verde:758817092023091243>",
+	"gang4": "<:radar_gangBD:890729902402318416>",
+	"gang5": "<:radar_gangBl:890729902150664242>",
+	"gang6": "<:radar_gangPk:890729902331006977>",
+	"gang7": "<:radar_gangR:890729901722845215>",
+	"gang8": "<:radar_gangW:890729902159044619>",
+	"gang9": "<:radar_gangYL:890733727284625409>",
 	"vip": "<:vip:778572312215027744>",
 	"loja": "<:Loja:853054490915635221>",
 	"galo": "<:galo:798219260782575626>",
@@ -72,8 +78,9 @@ const config = {
 	"carregamento": "<:carregamento:539497345197277214>",
 	"prisao": "<:prisao:817097391840296980>",
 	"cellphone": "<:celular:734247685422579714>",
-	"ovo": "<:ovo:827309700285595699>",
-	
+	"ovo": "<:Presente:921753148610211901>", //"<:ovo:827309700285595699>",
+	"aviao": "<:aviao:916097534936637450>"
+
 }
 
 module.exports = config;

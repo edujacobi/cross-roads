@@ -1,144 +1,175 @@
 const Discord = require("discord.js");
 
 exports.run = async (bot, message, args) => {
-	if (message.author.id != bot.config.adminID) return message.reply("Comando em manutenção")
+	// if (message.author.id != bot.config.adminID) return message.reply("Comando em manutenção")
 	let uData = bot.data.get(message.author.id)
 
-	let adjetivo = ['campeão', 'guerreiro', 'meu bruxo', 'meu amigo', 'meu chapa', 'cliente', 'comparsa']
+	let adjetivo = ['campeão', 'guerreiro', 'meu bruxo', 'meu amigo', 'meu chapa', 'cliente', 'comparsa', 'parceiro']
 
 	bot.shuffle(adjetivo)
 
 	let count = 1
+
+	let dia = new Date().getDay()
+	let hora = new Date().getHours()
+	let currTime = new Date().getTime()
+
+	let fds = false
+	if (dia == 0 || dia == 6 || (dia == 5 && hora >= 20)) //FDS
+		fds = true
 
 	let canal = message.channel.name.replace(/-/g, " ")
 	canal = canal.charAt(0).toUpperCase() + canal.slice(1)
 
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`**Bar de ${canal}**`)
-		.setDescription(`Chega aí, ${adjetivo[0]}, gostaria de beber alguma coisa?`)
+		.setDescription(`${fds ? `**Happy Hour ativado!\n**` : ''}Chega aí, ${adjetivo[0]}, gostaria de beber alguma coisa?`)
 		.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/847607054419492874/radar_dateDrink.png')
 		.setTimestamp()
 		.setColor('AQUA')
 		.setFooter(uData.username, message.member.user.avatarURL())
 
-	const button = new DiscordButton.MessageButton()
-		.setStyle('gray')
+	const button = new Discord.MessageButton()
+		.setStyle('SECONDARY')
 		.setLabel('Beber!')
-		.setID('beber')
+		.setCustomId(message.id + message.author.id)
 
-	let msg = await message.channel.send({
-		button: button,
-		embed: embed
-	}).catch(err => console.log("Não consegui enviar mensagem `beber`", err))
+	if (uData.preso > currTime || uData.hospitalizado > currTime || (uData.jobTime > currTime && uData.job != null) || uData.emRoubo.tempo > currTime || uData.emEspancamento.tempo > currTime)
+		button.setDisabled(true)
 
-	const filter = (button) => button.clicker.user.id === message.author.id
+	let row = new Discord.MessageActionRow()
+		.addComponents(button);
 
-	const collector = msg.createButtonCollector(filter, {
-		idle: 60000
-	});
+	await message.channel.send({
+		components: [row],
+		embeds: [embed]
+	}).then(msg => {
 
-	button.setLabel('Beber mais!')
+		// .catch(err => console.log("Não consegui enviar mensagem `beber`"))
 
-	collector.on('collect', b => {
-		b.defer();
-		let uData = bot.data.get(message.author.id)
-		let dia = new Date().getDay()
-		let hora = new Date().getHours()
-		let currTime = new Date().getTime()
+		const filter = (button) => (message.id + message.author.id) === button.customId && button.user.id === message.author.id
 
-		if (uData.preso > currTime)
-			return bot.msgPreso(message, uData)
+		const collector = message.channel.createMessageComponentCollector({
+			filter,
+			idle: 60000
+		});
 
-		if (uData.hospitalizado > currTime)
-			return bot.msgHospitalizado(message, uData)
+		button.setLabel('Beber mais!')
 
-		if (uData.job != null)
-			return bot.msgTrabalhando(message, uData)
+		row = new Discord.MessageActionRow()
+			.addComponents(button);
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		collector.on('collect', async i => {
 
-		let bebidas = [
-			'água mineral', 'whisky', 'café', 'vodka', 'vinho', 'gin', 'tônica', 'caipirinha', 'cerveja', 'chá', 
-			'sakê', 'leite', 'energético', 'refrigerante', 'suco', 'cachaça', 'água da torneira', 'chimarrão', 
-			'tererê', 'nescau', 'toddynho', 'catuaba', 'limonada', 'corote', 'champanha', 'licor', 'água sanitária',
-			'tequila', 'iogurte', 'tubaína', 'água da chuva', 'caldo de cana', 'água de coco', 'água do miojo',
-			'gasolina', 'mel', 'vitamina'
-		]
+			await i.deferUpdate();
 
-		let sensacoes = [
-			'forte', 'vigoroso', 'potente', 'poderoso', 'ativo', 'dinâmico', 'robusto', 'másculo', 'viril',
-			'masculino', 'firme', 'decidido', 'resoluto', 'enfático', 'veemente', 'expressivo', 'drástico',
-			'radical', 'vivo', 'vivaz', 'incansável', 'incisivo', 'caloroso', 'agradável', 'jovial', 'álacre',
-			'animado', 'animoso', 'aprazerado', 'bem-disposto', 'bem-humorado', 'contente', 'divertido', 'exultante',
-			'feliz', 'festejador', 'festivo', 'folgazão', 'foliador', 'fortunoso', 'galhardo', 'jubiloso', 'jucundo',
-			'ledo', 'lépido', 'prazenteiro', 'radiante', 'risonho', 'satisfeito', 'sorridente', 'abatido', 'apático',
-			'indiferente', 'desinteressado', 'desempolgado', 'parado', 'caído', 'cabisbaixo', 'prostrado', 'desencorajado',
-			'desestimulado', 'desalentado', 'desapontado', 'desiludido', 'deprimido', 'triste', 'esmorecido', 'entorpecido',
-			'sucumbido', 'desacoroçoado', 'descorçoado', 'derrotado', 'feminino'
-		]
+			let uData = bot.data.get(message.author.id)
+			let currTime = new Date().getTime()
 
-		bot.shuffle(bebidas)
-		bot.shuffle(sensacoes)
+			if (uData.preso > currTime)
+				return bot.msgPreso(message, uData)
 
-		let bebida = bebidas[0]
-		let sensacao = sensacoes[0]
+			if (uData.hospitalizado > currTime)
+				return bot.msgHospitalizado(message, uData)
 
-		count++
+			if (uData.jobTime > currTime && uData.job != null)
+				return bot.msgTrabalhando(message, uData)
 
-		let texto_coma = ''
+			if (bot.isUserEmRouboOuEspancamento(message, uData))
+				return
 
-		let chance_coma = 5
-		if (dia == 0 || dia == 6 || (dia == 5 && hora >= 20)) //FDS
-			chance_coma = 15
+			if (bot.isPlayerMorto(uData)) return;
 
-		if (bot.getRandom(0, 100) < chance_coma) {
-			uData.qtHospitalizado += 1
-			let minutos = Math.floor(bot.getRandom(1, 5))
-			uData.hospitalizado = currTime + minutos * 60 * 1000
-			bot.data.set(message.author.id, uData)
-			texto_coma = `\n${bot.config.hospital} Você bebeu demais e entrou em coma alcoólico, e ficará hospitalizado por ${bot.segToHour(minutos * 60)}`
-		}
+			if (bot.isPlayerViajando(uData))
+            	return bot.msgPlayerViajando(message);
 
-		let textoCount = ''
-		if (count > 5)
-			textoCount += "\n\"Desce redondo, hein?\"\n"
-		if (count > 10)
-			textoCount += `\"Vai com calma, ${adjetivo[1]}.\"\n`
-		if (count > 15)
-			textoCount += "\"Acho que já deu por hoje.\"\n"
-		if (count > 20)
-			textoCount += "\"Depois de hoje, duvido não ter cirrose.\"\n"
-		if (count > 25)
-			textoCount += "\"Você é um deus ou algo do tipo?\"\n"
+			let bebidas = [
+				'água mineral', 'whisky', 'café', 'vodka', 'vinho', 'gin', 'tônica', 'caipirinha', 'cerveja', 'chá',
+				'sakê', 'leite', 'energético', 'refrigerante', 'suco', 'cachaça', 'água da torneira', 'chimarrão',
+				'tererê', 'nescau', 'toddynho', 'catuaba', 'limonada', 'corote', 'champanha', 'licor', 'água sanitária',
+				'tequila', 'iogurte', 'tubaína', 'água da chuva', 'caldo de cana', 'água de coco', 'água do miojo',
+				'gasolina', 'mel', 'vitamina'
+			]
 
-		const embed = new Discord.MessageEmbed()
-			.setDescription(`${bot.config.dateDrink} Você bebeu **${bebida}** e se sente **${sensacao}**!${textoCount}${texto_coma}`)
-			.setColor(texto_coma != '' ? bot.colors.hospital : 'AQUA')
-			.setTimestamp()
-			.setFooter(uData.username, message.member.user.avatarURL())
+			let sensacoes = [
+				'forte', 'vigoroso', 'potente', 'poderoso', 'ativo', 'dinâmico', 'robusto', 'másculo', 'viril',
+				'masculino', 'firme', 'decidido', 'resoluto', 'enfático', 'veemente', 'expressivo', 'drástico',
+				'radical', 'vivo', 'vivaz', 'incansável', 'incisivo', 'caloroso', 'agradável', 'jovial', 'álacre',
+				'animado', 'animoso', 'aprazerado', 'bem-disposto', 'bem-humorado', 'contente', 'divertido', 'exultante',
+				'feliz', 'festejador', 'festivo', 'folgazão', 'foliador', 'fortunoso', 'galhardo', 'jubiloso', 'jucundo',
+				'ledo', 'lépido', 'prazenteiro', 'radiante', 'risonho', 'satisfeito', 'sorridente', 'abatido', 'apático',
+				'indiferente', 'desinteressado', 'desempolgado', 'parado', 'caído', 'cabisbaixo', 'prostrado', 'desencorajado',
+				'desestimulado', 'desalentado', 'desapontado', 'desiludido', 'deprimido', 'triste', 'esmorecido', 'entorpecido',
+				'sucumbido', 'desacoroçoado', 'descorçoado', 'derrotado', 'feminino'
+			]
 
-		const buttonHosp = new DiscordButton.MessageButton()
-			.setStyle('gray')
-			.setLabel('Você já bebeu demais.')
-			.setID('beber2')
-			.setDisabled()
+			bot.shuffle(bebidas)
+			bot.shuffle(sensacoes)
 
+			let bebida = bebidas[0]
+			let sensacao = sensacoes[0]
 
-		button.setLabel(button.label + "!")
-		if (texto_coma == '')
+			count++
+
+			let texto_coma = ''
+			let chance_coma = fds ? 15 : 5
+
+			if (bot.getRandom(0, 100) < chance_coma) {
+				// uData.qtHospitalizado += 1
+				let minutos = Math.floor(bot.getRandom(1, 5))
+				uData.hospitalizado = currTime + minutos * 60 * 1000
+				bot.data.set(message.author.id, uData)
+				texto_coma = `\n${bot.config.hospital} Você bebeu demais e entrou em coma alcoólico, e ficará hospitalizado por ${bot.segToHour(minutos * 60)}`
+				collector.stop()
+			}
+
+			let textoCount = ''
+			if (count > 5)
+				textoCount += "\n\"Desce redondo, hein?\"\n"
+			if (count > 10)
+				textoCount += `\"Vai com calma, ${adjetivo[1]}.\"\n`
+			if (count > 15)
+				textoCount += "\"Acho que já deu por hoje.\"\n"
+			if (count > 20)
+				textoCount += "\"Depois de hoje, duvido não ter cirrose.\"\n"
+			if (count > 25)
+				textoCount += "\"Você é um deus ou algo do tipo?\"\n"
+			if (count > 30)
+				textoCount += "\"Você é o diabo, isso sim.\"\n"
+			if (count > 35)
+				textoCount += "\"Estou declarando falência!\"\n"
+
+			const embed = new Discord.MessageEmbed()
+				.setDescription(`${bot.config.dateDrink} Você bebeu **${bebida}** e se sente **${sensacao}**!${textoCount}${texto_coma}`)
+				.setColor(texto_coma == '' ? 'AQUA' : bot.colors.hospital)
+				.setTimestamp()
+				.setFooter(uData.username, message.member.user.avatarURL())
+
+			if (texto_coma != '')
+				embed.setFooter(`${uData.username} • Você bebeu ${count - 1}`, message.member.user.avatarURL())
+
+			const buttonHosp = new Discord.MessageActionRow()
+				.addComponents(
+					new Discord.MessageButton()
+					.setStyle('SECONDARY')
+					.setLabel('Você já bebeu demais.')
+					.setCustomId(message.id + message.author.id + 'coma')
+					.setDisabled(true)
+				);
+
+			if (button.label.length < 64)
+				button.setLabel(button.label + "!")
+
+			row = new Discord.MessageActionRow()
+				.addComponents(button);
+
 			msg.edit({
-				embed: embed,
-				button: button
-			}).catch(err => console.log("Não consegui editar mensagem `beber`", err));
+				embeds: [embed],
+				components: texto_coma == '' ? [row] : [buttonHosp]
+			}).catch(err => console.log("Não consegui editar mensagem `beber`"));
 
-		else msg.edit({
-			embed: embed,
-			button: buttonHosp
-		}).catch(err => console.log("Não consegui editar mensagem `beber`", err));
-
-	});
-
+		});
+	})
 
 };
 exports.config = {

@@ -7,7 +7,7 @@ exports.run = async (bot, message, args) => {
 
 	for (let [id, user] of bot.data) {
 		if (user.username != undefined) {
-			if (id != bot.config.adminID && user.betJ >= 100) {
+			if (id != bot.config.adminID && user.betJ >= 200) {
 				top.push({
 					nick: user.username,
 					id: id,
@@ -25,12 +25,16 @@ exports.run = async (bot, message, args) => {
 		const resultado = new Discord.MessageEmbed()
 			.setTitle(`${bot.badges.sortudo_s4} Ranking Sortudos`)
 			.setColor('GREEN')
-			.setFooter(`${bot.user.username} • Para entrar no ranking, jogue 100 vezes no cassino\nMostrando ${start + 1}-${start + current.length} usuários de ${top.length.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
+			.setFooter(`${bot.user.username} • Para entrar no ranking, jogue 200 vezes no cassino\nMostrando ${start + 1}-${start + current.length} usuários de ${top.length.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
 			.setTimestamp()
 
 		if (top.length > 0) {
 			topWinrate = top.sort((a, b) => b.winrate - a.winrate).slice(start, start + 10)
 			topGanhos = top.sort((a, b) => b.ganhos - a.ganhos).slice(start, start + 10)
+
+			let userComando
+			if (!topWinrate.some(user => user.id === message.author.id))
+				userComando = top.find(user => user.id === message.author.id)
 
 			let topWinrateString = ""
 			let topWinrateStringID = ""
@@ -50,6 +54,14 @@ exports.run = async (bot, message, args) => {
 				topGanhosStringID += `\`${i + start + 1}.\` ${emote} ${mod}**${user.nick}**${mod} ${user.id}\n`
 			})
 
+			if (userComando) {
+				let user = bot.data.get(userComando.id)
+				const i = top.indexOf(userComando)
+				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
+				topWinrateString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${((user.betW / user.betJ) * 100).toFixed(2).toLocaleString().replace(/,/g, ".")} %\n`;
+				topGanhosString += `\`${i + 1}.\` ${emote} __**${user.username}**__ R$ ${user.cassinoGanhos.toLocaleString().replace(/,/g, ".")}\n`;
+			}
+
 			resultado
 				.addField(`Top Winrate`, isID ? topWinrateStringID : topWinrateString, true)
 				.addField(`Top Ganhos`, isID ? topGanhosStringID : topGanhosString, true)
@@ -65,7 +77,7 @@ exports.run = async (bot, message, args) => {
 
 		if (top.length <= 10) return
 
-		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `topsortudo`", err))
+		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `topsortudo`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️', '🆔'].includes(reaction.emoji.name) && user.id === message.author.id
 		const collector = msg.createReactionCollector({
@@ -87,19 +99,19 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `topsortudo`", err))
+				}).catch(err => console.log("Não consegui editar mensagem `topsortudo`"))
 
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topsortudo`", err))
+					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topsortudo`"))
 				if (currentIndex + 10 < top.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topsortudo`", err))
-				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topsortudo`", err))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `topsortudo`", err))
+					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topsortudo`"))
+				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topsortudo`"))
+			}).catch(err => console.log("Não consegui remover as reações mensagem `topsortudo`"))
 		})
 		collector.on('end', reaction => {
-			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topsortudo`", err))
+			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topsortudo`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `topsortudo`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `topsortudo`"))
 };
 // --
 exports.config = {

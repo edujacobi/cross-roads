@@ -93,7 +93,7 @@ exports.run = async (bot, message, args) => {
 
 		if (userEncontrados.length <= 15) return
 
-		msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `procurar`", err))
+		msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `procurar`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === message.author.id
 
@@ -111,14 +111,14 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `procurar`", err))
+				}).catch(err => console.log("Não consegui editar mensagem `procurar`"))
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `procurar`", err))
+					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `procurar`"))
 				if (currentIndex + 15 < userEncontrados.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `procurar`", err))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `procurar`", err))
+					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `procurar`"))
+			}).catch(err => console.log("Não consegui remover as reações mensagem `procurar`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `procurar`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `procurar`"))
 };
 
 exports.config = {

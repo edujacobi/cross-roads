@@ -99,6 +99,6 @@ exports.run = async (bot, message, args) => {
 
 		m.edit({
 			embeds: [embed2]
-		}).catch(err => console.log("Não consegui editar mensagem `topserver`", err))
-	}).catch(err => console.log("Não consegui enviar mensagem `topserver`", err))
+		}).catch(err => console.log("Não consegui editar mensagem `topserver`"))
+	}).catch(err => console.log("Não consegui enviar mensagem `topserver`"))
 }

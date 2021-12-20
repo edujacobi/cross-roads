@@ -49,7 +49,7 @@ exports.run = async (bot, message, args) => {
 	return message.channel.send({
 		embeds: [embedWithoutID]
 	}).then(msg => {
-		msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topovo`", err)).then(r => {
+		msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topovo`")).then(r => {
 			const withoutIDFilter = (reaction, user) => reaction.emoji.id === '827309700285595699' && user.id == message.author.id;
 			const withIDFilter = (reaction, user) => reaction.emoji.name === '🆔' && user.id == message.author.id;
 
@@ -67,9 +67,9 @@ exports.run = async (bot, message, args) => {
 					r.users.remove(bot.user.id).then(m => {
 						msg.edit({
 								embeds: [embedWithoutID]
-							}).catch(err => console.log("Não consegui editar mensagem `topovo`", err))
+							}).catch(err => console.log("Não consegui editar mensagem `topovo`"))
 							.then(m => {
-								msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topovo`", err));
+								msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `topovo`"));
 							});
 					});
 				});
@@ -79,15 +79,15 @@ exports.run = async (bot, message, args) => {
 					r.users.remove(bot.user.id).then(m => {
 						msg.edit({
 								embeds: [embedWithID]
-							}).catch(err => console.log("Não consegui editar mensagem `topovo`", err))
+							}).catch(err => console.log("Não consegui editar mensagem `topovo`"))
 							.then(m => {
-								msg.react('827309700285595699').catch(err => console.log("Não consegui reagir mensagem `topovo`", err));
+								msg.react('827309700285595699').catch(err => console.log("Não consegui reagir mensagem `topovo`"));
 							});
 					});
 				});
 			});
 		});
-	}).catch(err => console.log("Não consegui enviar mensagem `topovo`", err));
+	}).catch(err => console.log("Não consegui enviar mensagem `topovo`"));
 };
 //--
 exports.config = {

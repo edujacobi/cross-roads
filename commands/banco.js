@@ -13,7 +13,7 @@ exports.run = async (bot, message, args) => {
 	message.channel.send({
 			embeds: [embed]
 		})
-		.catch(err => console.log("Não consegui enviar mensagem `banco`", err));
+		.catch(err => console.log("Não consegui enviar mensagem `banco`"));
 };
 exports.config = {
 	alias: ['bank']

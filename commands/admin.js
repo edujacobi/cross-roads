@@ -13,12 +13,13 @@ exports.run = async (bot, message, args) => {
 		.addField(`🚫 Liberar ação`, "`;liberar opcoes`", true)
 		.addField(`💬 Comunicar`, "`;comunicar`", true)
 		.addField(`👥 Trocar conta`, "`;trocarconta`", true)
+		.addField(`<:Classe_Mafioso:823012843288657970> Top classes`, "`;classes top`", true)
 		.setFooter(bot.user.username, bot.user.avatarURL())
 		.setTimestamp();
 	return message.channel.send({
 			embeds: [embed]
 		})
-		.catch(err => console.log("Não consegui enviar mensagem `admin`", err));
+		.catch(err => console.log("Não consegui enviar mensagem `admin`"));
 };
 
 exports.config = {

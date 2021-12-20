@@ -22,42 +22,43 @@ exports.run = async (bot, message, args) => {
 \`;investir parar\` : Abandona o investimento atual`)
 
 		.addField(`${bot.config.roubar} Roubar`,
-			`\`;roubar\` : Mais informações sobre os roubos
+			`\`;roubar\` : Informações sobre os roubos
 \`;roubar [jogador]\` : Tenta roubar um jogador`)
 
 		.addField(`${bot.config.police} Prisão`,
-			`\`;prisao\` : Mais informações sobre a prisão
+			`\`;prisao\` : Informações sobre a prisão
 \`;prisao fugir\` : Tenta escapar da prisão
 \`;prisao subornar\` : Tenta subornar os guardas`)
 
 		.addField(`${bot.config.mafiaCasino} Apostar`,
-			`\`;cassino\` : Mais informações sobre os jogos
+			`\`;cassino\` : Informações sobre os jogos
 \`;galo info\` : Informações sobre a rinha de galos`)
 
 		.addField(`${bot.config.hospital} Hospital`,
-			`\`;hospital\` : Mais informações sobre o hospital
+			`\`;hospital\` : Informações sobre o hospital
 \`;hospital particular\` : Paga pelo tratamento
-\`;espancar\` : Mais informações sobre espancamentos
+\`;espancar\` : Informações sobre espancamentos
 \`;espancar [jogador]\` : Tenta espancar um jogador`)
 
 		.addField(`${bot.config.car} Informações`,
 			`\`;inv [jogador]\` : Abre o inventário do jogador
 \`;userinfo [jogador]\` : Informações relevantes sobre o jogador
-\`;top\` : Mostra os Rankings
-\`;badges\` : Mostra todas as badges existentes
+\`;top\` : Rankings da temporada
+\`;badges\` : Todas as badges existentes
 \`;arma (nome)\` : Informações das armas
-\`;stats\` : Mostra estatísticas interessantes
+\`;stats\` : Estatísticas interessantes
 \`;vip\` : Informações sobre o VIP`)
 
 		.addField(`${bot.config.gang} Gangues`,
-			`\`;gangue (info)\` : Mostra informações sobre gangues
-\`;gangue base (info)\` : Mostra informações sobre bases de gangues`)
+			`\`;gangue (info)\` : Informações sobre gangues
+\`;gangue base (info)\` : Informações sobre bases de gangues`)
 
-		.addField(`${bot.config.dateDrink} Úteis`,
+		.addField(`${bot.config.vadiando} Úteis`,
 			`\`;daily\` : Recebe os R$ 500 diários
-\`;weekly\` : Recebe os R$ 1000 e 10 fichas semanais
+\`;weekly\` : Recebe os R$ 1000
 \`;me <ação>\` : Realiza uma ação
 \`;nick\` : Altera seu nick por R$ 50.000
+\`;classe\` : Informações sobre as classes
 \`;vasculhar\` : Procura por armas, fichas e dinheiro
 \`;esmola [jogador]\` : Doa R$ 50 para outro jogador
 \`;beber\` : Bebe uma refrescante bebida
@@ -69,7 +70,7 @@ exports.run = async (bot, message, args) => {
 		.setTimestamp();
 	message.channel.send({
 		embeds: [embed]
-	}).catch(err => console.log("Não consegui enviar mensagem `comandos`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `comandos`"))
 }
 
 exports.config = {

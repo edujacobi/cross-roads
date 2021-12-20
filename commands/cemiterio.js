@@ -16,7 +16,7 @@ exports.run = async (bot, message, args) => {
     message.channel.send({
         embeds: [embed]
     }).then(msg => {
-        msg.react('🪦').catch(err => console.log("Não consegui reagir mensagem `cemiterio`", err))
+        msg.react('🪦').catch(err => console.log("Não consegui reagir mensagem `cemiterio`"))
             .then(() => {
                 const filter = (reaction, user) => reaction.emoji.name === '🪦' && user.id == message.author.id;
                 const mortos_ = msg.createReactionCollector({
@@ -62,9 +62,9 @@ exports.run = async (bot, message, args) => {
                     message.channel.send({
                         embeds: [Mortos]
                     }).then(m => {
-                        if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cemiterio`", err))
-                    }).catch(err => console.log("Não consegui enviar mensagem `mortos`", err))
+                        if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cemiterio`"))
+                    }).catch(err => console.log("Não consegui enviar mensagem `mortos`"))
                 })
             })
-    }).catch(err => console.log("Não consegui enviar mensagem `cemiterio`", err))
+    }).catch(err => console.log("Não consegui enviar mensagem `cemiterio`"))
 }

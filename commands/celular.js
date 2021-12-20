@@ -1,5 +1,8 @@
 exports.run = async (bot, message, args) => {
-	const Discord = require('discord.js');
+	const Discord = require('discord.js')
+	const Piii = require("piii")
+	const piiiFilters = require("piii-filters")
+
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 	let targetMention = message.mentions.members.first()
 	let targetNoMention = []
@@ -9,16 +12,35 @@ exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let vip = uData.vipTime > currTime ? true : false
 
+	const piii = new Piii({
+		filters: [
+			...Object.values(piiiFilters),
+			bot.palavrasBanidas
+		],
+		censor: badWord => {
+			// return badWord.charAt(0) + "*".repeat(badWord.length - 1)
+			let words = [
+				'amor', 'abraço', 'amo', 'flor', 'flores', 'coração', 'paraíso', 'amizade', 'fofo', 'fofinho',
+				'iti malia', 'pão', 'vida', 'UwU', 'te amo', 's-senpai', 'bola', 'futebol', 'lindo', 'maravilhoso',
+				'encantador', 'charme', 'nenê', 'chamego', 'gatinho', 'cuti-cuti', 'bonito', 'arco-íris', 'adorável',
+				'amável', 'graça', ':3'
+			]
+			// bot.shuffle(words)
+			// return `\`[${words[0]}]\``
+			return "`***`"
+		}
+	})
+
 	// if (vip) return message.reply(`Comando em testes ${bot.config.vip}`)
 
 	if (option == 'credito') {
 		if (uData._celular < currTime)
 			return bot.createEmbed(message, `Você não possui um celular para comprar créditos ${bot.config.cellphone}`)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+            return
 
-		if (uData.galoEmRinha)
+		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 		if (quantidade == 'allin' || quantidade == 'all' || quantidade == 'tudo') {
@@ -106,6 +128,7 @@ exports.run = async (bot, message, args) => {
 			.setDescription('Digite a mensagem e envie')
 			.setFooter(`De: ${uData.username}`, message.member.user.avatarURL())
 			.setTimestamp();
+
 		message.channel.send({
 				embeds: [descricao_sms]
 			})
@@ -132,12 +155,16 @@ exports.run = async (bot, message, args) => {
 					let sms = m.content
 					sms.replace(/\s/g, " ")
 
-					if (sms.length < 1)
+					let isSMScensorWords = piii.has(sms)
+
+					let smsEnviado = piii.filter(sms)
+
+					if (smsEnviado.length < 1)
 						return bot.createEmbed(message, `Você precisa mandar uma mensagem`)
-					if (sms.length > 512)
+					if (smsEnviado.length > 512)
 						return bot.createEmbed(message, `Seu SMS é muito grande. Limite de Caracteres: 512`)
 
-					descricao_sms.setDescription(sms)
+					descricao_sms.setDescription(smsEnviado)
 
 					uData.celularCredito -= 1
 					bot.data.set(message.author.id, uData)
@@ -146,18 +173,18 @@ exports.run = async (bot, message, args) => {
 						//.setAuthor(`SMS de ${uData.username}`, message.member.user.avatarURL())
 						.setTitle(`📩 Você recebeu um SMS!`)
 						.setColor(bot.colors.darkGrey)
-						.setDescription(sms)
-						.setFooter(`De: ${uData.username}`, message.member.user.avatarURL())
+						.setDescription(smsEnviado)
+						.setFooter(`De: ${uData.username}${isSMScensorWords ? ` • Este SMS contém palavras ofensivas censuradas!` : ''}`, message.member.user.avatarURL())
 						.setTimestamp();
 
 					const sms_enviando = new Discord.MessageEmbed()
 						.setTitle(`📨 Enviando SMS para ${tData.username}...`)
 						.setColor(bot.colors.darkGrey)
-						.setFooter(`De: ${uData.username}`, message.member.user.avatarURL())
+						.setFooter(`De: ${uData.username}${isSMScensorWords ? ` • Seu SMS contém palavras ofensivas que foram censuradas!` : ''}`, message.member.user.avatarURL())
 
 					msg.edit({
 						embeds: [sms_enviando]
-					}).catch(err => console.log("Não consegui editar mensagem `casar`", err)).then(r => {
+					}).catch(err => console.log("Não consegui editar mensagem `sms`")).then(r => {
 						setTimeout(() => {
 
 							bot.users.fetch(alvo).then(user => user.send({
@@ -168,25 +195,28 @@ exports.run = async (bot, message, args) => {
 							const sms_final = new Discord.MessageEmbed()
 								.setTitle(`📨 SMS enviado para ${tData.username}!`)
 								.setColor(bot.colors.darkGrey)
-								.setDescription(sms)
-								.setFooter(`De: ${uData.username}`, message.member.user.avatarURL())
+								.setDescription(smsEnviado)
+								.setFooter(`De: ${uData.username}${isSMScensorWords ? ` • Seu SMS contém palavras ofensivas que foram censuradas!` : ''}`, message.member.user.avatarURL())
 								.setTimestamp();
 
 							m.delete()
 
-							bot.log(new Discord.MessageEmbed()
-								.setDescription(`**${uData.username} enviou um SMS para ${tData.username}**`)
-								.addField("Conteúdo da mensagem", `${sms}`)
+							const log = new Discord.MessageEmbed()
+								.setDescription(`${bot.config.cellphone} **${uData.username} enviou um SMS para ${tData.username}**`)
+								.addField("Conteúdo da mensagem", `${smsEnviado}`)
 								.setColor(message.member.displayColor) // bot.colors.background // 
-							)
+							if (isSMScensorWords)
+								log.addField("Mensagem original", sms)
+
+							bot.log(message, log)
 
 							return msg.edit({
 								embeds: [sms_final]
-							})
+							}).catch(err => console.log("Não consegui editar a mensagem `celular`"))
 						}, vip ? 3000 : 10000)
 					})
 				})
-			}).catch(err => console.log("Não consegui enviar mensagem `celular`", err))
+			}).catch(err => console.log("Não consegui enviar mensagem `celular`"))
 
 	} else if (option == 'bloquear') {
 		let uData = bot.data.get(message.author.id);
@@ -215,7 +245,7 @@ exports.run = async (bot, message, args) => {
 			.setTimestamp()
 		message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `celular`", err))
+		}).catch(err => console.log("Não consegui enviar mensagem `celular`"))
 	}
 };
 

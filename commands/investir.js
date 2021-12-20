@@ -52,16 +52,18 @@ exports.run = async (bot, message, args) => {
 				.setTimestamp();
 
 			if (uData.preso > currTime)
-				embed.setDescription(`Você está preso por mais ${bot.segToHour(currTime - uData.preso)/1000} e só receberá lucros quando estiver solto`)
+				embed.setDescription(`Você está preso por mais ${bot.segToHour((currTime - uData.preso)/1000)} e só receberá lucros quando estiver solto`)
 			if (uData.hospitalizado > currTime)
-				embed.setDescription(`Você está hospitalizado por mais ${bot.segToHour(currTime - uData.hospitalizado)/1000} e só receberá lucros quando estiver curado`)
+				embed.setDescription(`Você está hospitalizado por mais ${bot.segToHour((currTime - uData.hospitalizado)/1000)} e só receberá lucros quando estiver curado`)
 
 			if ((uData.investTime + semana) < currTime) {
 				embed.setTitle(`${bot.config.propertyR} ${bot.investimentos[uData.invest].desc}`)
-				.setColor('RED')
-				.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/854848920010489856/radar_propertyR.png")
+					.setColor('RED')
+					.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/854848920010489856/radar_propertyR.png")
 			}
-			message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `investir`", err));
+			message.channel.send({
+				embeds: [embed]
+			}).catch(err => console.log("Não consegui enviar mensagem `investir`"));
 
 		} else
 			return bot.createEmbed(message, `O ID deve ser entre 1 e ${Object.keys(bot.investimentos).length} ${bot.config.propertyG}`, null, 'GREEN')
@@ -74,10 +76,10 @@ exports.run = async (bot, message, args) => {
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+			return
 
-		if (uData.galoEmRinha)
+		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		if (uData.invest == null)
@@ -120,10 +122,10 @@ exports.run = async (bot, message, args) => {
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+			return
 
-		if (uData.galoEmRinha)
+		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		Object.entries(bot.investimentos).forEach(([key, investimento]) => {

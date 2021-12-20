@@ -16,7 +16,7 @@ exports.run = async (bot, message, args) => {
 		.setTitle(`${bot.config.vip} Seja VIP`)
 		.setThumbnail("https://media.discordapp.net/attachments/531174573463306240/799060089503875072/VIP.png")
 		.setColor(0xffd700)
-		.addField("Vantagens", "Badge exclusiva no inventário\nBônus de 50% no `;daily` e `;weekly`\nRecarga na alteração de nick\nAvatar GIF do galo\nImune ao cooldown entre comandos\nEntrega esmolas 50% maiores\nEnvio de SMS mais rápido\nAcesso ao canal de desenvolvimento\nAcesso à categoria VIP do servidor Cross Roads\nCargo VIP no servidor do Cross Roads\n25% de desconto na troca de Classe\nPode solicitar alteração do `Jogando desde`\nSorteios do Bilhete premiado exclusivos\nMuito mais a vir!")
+		.addField("Vantagens", "Badge exclusiva no inventário\nBônus de 50% no `;daily` e `;weekly`\nRecarga na alteração de nick\nAvatar GIF do galo\nDobro de limite de caracteres no título do galo\nImune ao cooldown entre comandos\nEntrega esmolas 50% maiores\nEnvio de SMS mais rápido\nAcesso ao canal de desenvolvimento\nAcesso à categoria VIP do servidor Cross Roads\nCargo VIP no servidor do Cross Roads\n25% de desconto na troca de Classe\nPode solicitar alteração do `Jogando desde`\nSorteios do Bilhete premiado exclusivos\nMuito mais a vir!")
 		.addField("Como adquirir", "Mande uma DM pro Jacobi#5109. Caso não consiga, entre no servidor do Cross Roads. Valores: R$ 8,00 = 1 mês. R$ 20,00 = 3 meses.")
 		.setFooter(`${bot.data.get(message.author.id, "username")} • Clique na reação para abrir a lista de VIPs`, message.member.user.avatarURL())
 		.setTimestamp();
@@ -24,7 +24,7 @@ exports.run = async (bot, message, args) => {
 	message.channel.send({
 		embeds: [embed]
 	}).then(msg => {
-		msg.react('778572312215027744').catch(err => console.log("Não consegui reagir mensagem `vip`", err))
+		msg.react('778572312215027744').catch(err => console.log("Não consegui reagir mensagem `vip`"))
 			.then(() => {
 				const filter = (reaction, user) => reaction.emoji.id === '778572312215027744' && user.id == message.author.id;
 				const vips_ = msg.createReactionCollector({
@@ -69,9 +69,9 @@ exports.run = async (bot, message, args) => {
 					message.channel.send({
 						embeds: [membros]
 					}).then(m => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `vip`", err))
-					}).catch(err => console.log("Não consegui enviar mensagem `vip`", err))
+						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `vip`"))
+					}).catch(err => console.log("Não consegui enviar mensagem `vip`"))
 				})
 			})
-	}).catch(err => console.log("Não consegui enviar mensagem `vip`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `vip`"))
 };

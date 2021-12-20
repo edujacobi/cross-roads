@@ -11,7 +11,7 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `\`;liberar <opcao> <id>\``)
 
 	if (option == 'opcoes')
-		return bot.createEmbed(message, `Olha, ${bot.data.get(message.author.id, "username")}, suas opções são:\n\`prisao\`, \`hospital\`, \`roubar\`, \`emroubo\`, \`espancar\`, \`galorinha\`, \`galocansado\``)
+		return bot.createEmbed(message, `Olha, ${bot.data.get(message.author.id, "username")}, suas opções são:\n\`prisao\`, \`hospital\`, \`roubar\`, \`emroubo\`, \`emespancamento\`, \`espancar\`, \`galorinha\`, \`galocansado\``)
 
 	if (!id)
 		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, escolha um ID de usuário`)
@@ -36,22 +36,30 @@ exports.run = async (bot, message, args) => {
 		bot.createEmbed(message, `${uData.username} pode roubar novamente ${bot.config.roubar}`)
 
 	} else if (option == 'emroubo') {
-		uData.emRoubo = false
+		uData.emRoubo.tempo = 0
 		bot.createEmbed(message, `${uData.username} não está mais em um roubo ${bot.config.roubar}`)
+
+	} else if (option == 'emespancamento') {
+		uData.emEspancamento.tempo = 0
+		bot.createEmbed(message, `${uData.username} não está mais em um espancamento ${bot.config.espancar}`)
 
 	} else if (option == 'espancar') {
 		uData.espancar = currTime
 		bot.createEmbed(message, `${uData.username} pode espancar novamente ${bot.config.espancar}`)
 
 	} else if (option == 'galorinha') {
-		uData.galoEmRinha = false
-		bot.createEmbed(message, `${uData.galoNome} não está mais em uma rinha ${bot.config.galo}`)
+		let uGalo = bot.galos.get(id)
+		uGalo.emRinha = false
+		bot.galos.set(id, uGalo)
+		bot.createEmbed(message, `${uGalo.nome} não está mais em uma rinha ${bot.config.galo}`)
 
 	} else if (option == 'galocansado') {
-		uData.tempoRinha = currTime
-		bot.createEmbed(message, `${uData.galoNome} pode rinhar novamente ${bot.config.galo}`)
+		let uGalo = bot.galos.get(id)
+		uGalo.descansar = currTime
+		bot.galos.set(id, uGalo)
+		bot.createEmbed(message, `${uGalo.nome} pode rinhar novamente ${bot.config.galo}`)
 	} else
-		return bot.createEmbed(message, `Bah, ${bot.data.get(message.author.id, "username")}, escolha uma opção:\n\`prisao\`, \`hospital\`, \`roubar\`, \`emroubo\`, \`espancar\`, \`galorinha\`, \`galocansado\``)
+		return bot.createEmbed(message, `Bah, ${bot.data.get(message.author.id, "username")}, escolha uma opção:\n\`prisao\`, \`hospital\`, \`roubar\`, \`emroubo\`, \`emespancamento\`, \`espancar\`, \`galorinha\`, \`galocansado\``)
 
 	bot.data.set(id, uData)
 

@@ -13,12 +13,10 @@ exports.run = async (bot, message, args) => {
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
 
-	if (uData.emRoubo)
-		return bot.msgEmRoubo(message)
-	if (uData.galoEmRinha)
-		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
 
-	if (uData.galoEmRinha)
+	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Você não pode receber enquanto seu galo está em uma rinha ${bot.config.galo}`)
 
 	let linhaTrabalho = ''

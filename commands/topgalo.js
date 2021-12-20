@@ -8,13 +8,14 @@ exports.run = async (bot, message, args) => {
 	bot.data.indexes.forEach(user => { //gera lista para top global
 		if (bot.users.fetch(user)) {
 			let uData = bot.data.get(user)
-			if ((uData.galoW + uData.galoL) >= 10) {
+			let uGalo = bot.galos.get(user)
+			if ((uGalo.wins + uGalo.loses) >= 20) {
 				top.push({
 					nick: uData.username,
-					galo: uData.galoNome,
-					wins: uData.galoW,
-					level: uData.galoPower - 30,
-					winrate: uData.galoW / (uData.galoL + uData.galoW) * 100,
+					galo: uGalo.nome,
+					wins: uGalo.wins,
+					level: uGalo.power - 30,
+					winrate: uGalo.wins / (uGalo.loses + uGalo.wins) * 100,
 					classe: uData.classe
 				})
 			}
@@ -27,13 +28,17 @@ exports.run = async (bot, message, args) => {
 		const resultado = new Discord.MessageEmbed()
 			.setTitle(`${bot.badges.topGalo_s4} Ranking Galos`)
 			.setColor('GREEN')
-			.setFooter(`${bot.user.username} • Para entrar no Ranking, seu galo deve realizar 10 rinhas\nMostrando ${start + 1}-${start + current.length} usuários de ${top.length.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
+			.setFooter(`${bot.user.username} • Para entrar no Ranking, seu galo deve realizar 20 rinhas\nMostrando ${start + 1}-${start + current.length} usuários de ${top.length.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
 			.setTimestamp()
 
 		if (top.length > 0) {
 			topWins = top.sort((a, b) => b.wins - a.wins).slice(start, start + 5)
 			topWinrate = top.sort((a, b) => b.winrate - a.winrate).slice(start, start + 5)
 			topLevel = top.sort((a, b) => b.level - a.level).slice(start, start + 5)
+
+			let userComando
+			if (!topWins.some(user => user.id === message.author.id))
+				userComando = top.find(user => user.id === message.author.id)
 
 			let topWinsString = ""
 			let topWinrateString = ""
@@ -55,6 +60,16 @@ exports.run = async (bot, message, args) => {
 				topLevelString += `\`${i + start + 1}.\` ${mod}**${user.galo}**${mod}: \`${user.level}\` (${emote} ${user.nick})\n`
 			})
 
+			if (userComando) {
+				let user = bot.data.get(userComando.id)
+				let galo = bot.galos.get(userComando.id)
+				const i = top.indexOf(userComando)
+				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
+				topWinsString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${galo.wins.toLocaleString().replace(/,/g, ".")}\n`;
+				topWinrateString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${(galo.wins / (galo.loses + galo.wins) * 100).toLocaleString().replace(/,/g, ".")} %\n`;
+				topLevelString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${(galo.power - 30).toLocaleString().replace(/,/g, ".")}\n`;
+			}
+
 			resultado.addField("Vitórias", topWinsString)
 				.addField("Win rate", topWinrateString)
 				.addField("Level", topLevelString)
@@ -71,7 +86,7 @@ exports.run = async (bot, message, args) => {
 
 		if (top.length <= 5) return
 
-		msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgalo`", err))
+		msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgalo`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === message.author.id
 		const collector = msg.createReactionCollector({
@@ -91,18 +106,18 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `topgalo`", err))
+				}).catch(err => console.log("Não consegui editar mensagem `topgalo`"))
 
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topgalo`", err))
+					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `topgalo`"))
 				if (currentIndex + 5 < top.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgalo`", err))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `topgalo`", err))
+					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `topgalo`"))
+			}).catch(err => console.log("Não consegui remover as reações mensagem `topgalo`"))
 		})
 		collector.on('end', reaction => {
-			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topgalo`", err))
+			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `topgalo`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `topgalo`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `topgalo`"))
 };
 // --
 exports.config = {

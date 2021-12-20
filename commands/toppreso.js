@@ -6,7 +6,7 @@ exports.run = async (bot, message, args) => {
 	let isID = false
 
 	for (let [id, user] of bot.data) {
-		if (user.username != undefined) {
+		if (user.username != undefined && user.roubosL > 0) {
 			if (id != bot.config.adminID) {
 				top.push({
 					nick: user.username,
@@ -32,6 +32,10 @@ exports.run = async (bot, message, args) => {
 			topGlobalPreso = top.sort((a, b) => b.vezes - a.vezes).slice(start, start + 10)
 			topGlobalFuga = top.sort((a, b) => b.fugiu - a.fugiu).slice(start, start + 10)
 
+			let userComando
+			if (!topGlobalPreso.some(user => user.id === message.author.id))
+				userComando = top.find(user => user.id === message.author.id)
+
 			let topGlobalStringPreso = ""
 			let topGlobalStringPresoID = ""
 			let topGlobalStringFuga = ""
@@ -50,6 +54,15 @@ exports.run = async (bot, message, args) => {
 				topGlobalStringFugaID += `\`${i + start + 1}.\` ${emote} ${mod}**${user.nick}**${mod} ${user.id}\n`
 			})
 
+			if (userComando) {
+				let user = bot.data.get(userComando.id)
+				const i = top.indexOf(userComando)
+				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
+				topGlobalStringPreso += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${user.roubosL.toLocaleString().replace(/,/g, ".")}\n`;
+				topGlobalStringFuga += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${user.qtFugas.toLocaleString().replace(/,/g, ".")}\n`;
+
+			}
+
 			resultado
 				.addField(`Top Presos`, isID ? topGlobalStringPresoID : topGlobalStringPreso, true)
 				.addField(`Top Fujão`, isID ? topGlobalStringFugaID : topGlobalStringFuga, true)
@@ -66,7 +79,7 @@ exports.run = async (bot, message, args) => {
 
 		if (top.length <= 10) return
 
-		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `toppreso`", err))
+		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `toppreso`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️', '🆔'].includes(reaction.emoji.name) && user.id === message.author.id
 		const collector = msg.createReactionCollector({
@@ -88,19 +101,19 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `toppreso`", err))
+				}).catch(err => console.log("Não consegui editar mensagem `toppreso`"))
 
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `toppreso`", err))
+					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `toppreso`"))
 				if (currentIndex + 10 < top.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `toppreso`", err))
-				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `toppreso`", err))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `toppreso`", err))
+					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `toppreso`"))
+				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `toppreso`"))
+			}).catch(err => console.log("Não consegui remover as reações mensagem `toppreso`"))
 		})
 		collector.on('end', reaction => {
-			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `toppreso`", err))
+			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `toppreso`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `toppreso`", err))
+	}).catch(err => console.log("Não consegui enviar mensagem `toppreso`"))
 };
 // --
 exports.config = {

@@ -205,7 +205,9 @@ Há uma pequena chance do alvo ser também espancado!`)
 		embed.setFooter(bot.data.get(message.author.id, "username"), message.member.user.avatarURL())
 			.setTimestamp();
 
-		return message.channel.send({ embeds: [embed] })
+		return message.channel.send({
+				embeds: [embed]
+			})
 			.then(msg => {
 				msg.react(emoji_1)
 					.then(() => msg.react(emoji_2))
@@ -222,36 +224,36 @@ Há uma pequena chance do alvo ser também espancado!`)
 						const seisFilter = (reaction, user) => reaction.emoji.id === emoji_6 && user.id == message.author.id
 
 						const um = msg.createReactionCollector({
-						umFilter, 
+							umFilter,
 							max: 1,
 							time: 60000,
 							errors: ['time'],
 						})
-						const dois = msg.createReactionCollector( {
+						const dois = msg.createReactionCollector({
 							doisFilter,
 							max: 1,
 							time: 60000,
 							errors: ['time'],
 						})
-						const tres = msg.createReactionCollector( {
+						const tres = msg.createReactionCollector({
 							tresFilter,
 							max: 1,
 							time: 60000,
 							errors: ['time'],
 						})
 						const quatro = msg.createReactionCollector({
-							quatroFilter, 
+							quatroFilter,
 							max: 1,
 							time: 60000,
 							errors: ['time'],
 						})
-						const cinco = msg.createReactionCollector( {
+						const cinco = msg.createReactionCollector({
 							cincoFilter,
 							max: 1,
 							time: 60000,
 							errors: ['time'],
 						})
-						const seis = msg.createReactionCollector( {
+						const seis = msg.createReactionCollector({
 							seisFilter,
 							max: 1,
 							time: 60000,
@@ -471,12 +473,7 @@ Há uma pequena chance do alvo ser também espancado!`)
 			target_espancado = true
 			setTimeout(async () => {
 				await bot.users.fetch(alvo).then(user => {
-					let userT = bot.data.get(alvo)
-					if (userT.hospitalizadoNotification) {
-						user.send(`Você está curado! ${bot.config.hospital}`).catch()
-						userT.hospitalizadoNotification = false
-						bot.data.set(alvo, userT)
-					}
+					user.send(`Você está curado! ${bot.config.hospital}`).catch()
 				})
 			}, tempo_hospitalizado * 60 * 1000)
 		}

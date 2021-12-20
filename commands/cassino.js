@@ -29,7 +29,7 @@ exports.run = async (bot, message, args) => {
 			.setTimestamp();
 		message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `cassino`", err))
+		}).catch(err => console.log("Não consegui enviar mensagem `cassino`"))
 
 	} else {
 		let currTime = new Date().getTime()
@@ -41,10 +41,11 @@ exports.run = async (bot, message, args) => {
 
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
-		if (uData.emRoubo)
-			return bot.msgEmRoubo(message)
 
-		if (uData.galoEmRinha)
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
+            return
+
+		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 		if (option == 'allin' || option == 'all' || option == 'tudo')

@@ -1,6 +1,6 @@
 module.exports = (bot) => {
 
-	let multiplicador_tempo_evento = 0.75
+	let multiplicador_tempo_evento = 1
 
 	bot.jobs = {
 		pedreiro: {
@@ -121,6 +121,13 @@ module.exports = (bot) => {
 			time: 24 * 60 * multiplicador_tempo_evento,
 			pagamento: 10000000,
 			arma: "minigun"
+		},
+		conquistador: {
+			id: 18,
+			desc: "Conquistador Galático",
+			time: 72 * 60 * multiplicador_tempo_evento,
+			pagamento: 50000000,
+			arma: ["bazuca", "minigun", "exoesqueleto", "jetpack"]
 		},
 	};
 }

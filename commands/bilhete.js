@@ -3,7 +3,7 @@ exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let uData = bot.data.get(message.author.id)
 	let multiplicador_evento = 1
-	let preço = 5000 * (bot.bilhete.get('diaUltimoSorteio') * 10 + 1) * multiplicador_evento
+	let preço = 500 * (bot.bilhete.get('diaUltimoSorteio') * 10 + 1) * multiplicador_evento
 	let total = bot.bilhete.get('acumulado')
 	let lastWinner = bot.bilhete.get('lastWinner')
 	let userBilhete = bot.bilhete.get(message.author.id)
@@ -49,7 +49,7 @@ exports.run = async (bot, message, args) => {
 				})
 
 				bilhete.on('collect', r => {
-					if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `bilhete`", err))
+					if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `bilhete`"))
 					currTime = new Date().getTime()
 					uData = bot.data.get(message.author.id)
 
@@ -59,16 +59,22 @@ exports.run = async (bot, message, args) => {
 
 					if (userBilhete)
 						return bot.createEmbed(message, `Você já comprou um bilhete para este sorteio! 🎟️`, `Seu bilhete: #${userBilhete.numero}`)
+
 					if (uData.preso > currTime)
 						return bot.msgPreso(message, uData)
 
 					if (uData.hospitalizado > currTime)
 						return bot.msgHospitalizado(message, uData)
 
-					if (uData.emRoubo)
-						return bot.msgEmRoubo(message)
+					if (bot.isUserEmRouboOuEspancamento(message, uData))
+						return
 
-					if (uData.galoEmRinha)
+					if (bot.isPlayerMorto(uData)) return;
+
+					if (bot.isPlayerViajando(uData))
+						return bot.msgPlayerViajando(message);
+
+					if (bot.isGaloEmRinha(message.author.id))
 						return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 					if (uData.moni < 1)
@@ -112,17 +118,17 @@ exports.run = async (bot, message, args) => {
 
 					msg.edit({
 						embeds: [embedEd]
-					}).catch(err => console.log("Não consegui editar mensagem `bilhete`", err));
+					}).catch(err => console.log("Não consegui editar mensagem `bilhete`"));
 					bot.createEmbed(message, `🎟️ Bilhete #${userBilhete.numero} comprado. Boa sorte!`)
 
 				})
 
 				bilhete.on('end', async response => {
-					if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `bilhete`", err))
+					if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `bilhete`"))
 				})
-			}).catch(err => console.log("Não consegui reagir mensagem `bilhete`", err))
+			}).catch(err => console.log("Não consegui reagir mensagem `bilhete`"))
 		})
-		.catch(err => console.log("Não consegui enviar mensagem `bilhete`", err))
+		.catch(err => console.log("Não consegui enviar mensagem `bilhete`"))
 
 };
 exports.config = {

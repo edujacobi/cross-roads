@@ -1,4 +1,24 @@
 const badges = {
+	// S5 ---------------------------------
+	"topGrana1_s5": "<:Top1_Grana_S5:889681658167558154> ",
+	"topGrana2_s5": "<:Top2_Grana_S5:889681658196930601> ",
+	"topGrana3_s5": "<:Top3_Grana_S5:889681659782381610> ",
+	"fujao_s5": "<:badge_fujao1:895069436011221032> ",
+	"sortudo_s5": "<:badge_sortudo:895069996684812288> ",
+	"maoBoba_s5": "<:badge_mao_boba:895069436845903883> ",
+	"bolsoLargo_s5": "<:badge_bolso_largo2:895069430357323816> ",
+	"topGalo_s5": "<:badge_top_galo:895069437143699518> ",
+	"filantropo_s5": "<:badge_filantropo:895069436304838676> ",
+	"hipocondriaco_s5": "<:badge_hipocondriaco:895069436141273148> ",
+	"investidor_s5": "<:badge_investidor:895069436086726666> ",
+	"deputado_s5": "<:badge_deputado:895069435545665606> ",
+	"esmagaCranio_s5": "<:badge_esmaga_cranio:895069436678119434> ",
+	"workaholic_s5": "<:badge_workaholic:895069436963348550> ",
+	"patricinha_s5": "<:badge_patricinha:895069436682326036> ",
+	"topGangue_s5": "<:badge_top_gangue:895069437735108609> ",
+	"traderElite_s5": "<:badge_trader_elite:895069437139484703> ",
+	"xeroqueHolmes_s5": "<:badge_xeroque_holmes:895069800257171476>	",
+
 	// S4 ---------------------------------
 	"topGrana1_s4": "<:Top1Grana:853052970115006485> ",
 	"topGrana2_s4": "<:Top2Grana:853052970464051250> ",
@@ -60,12 +80,14 @@ const badges = {
 	"vip": "<:vip:778572312215027744> ",
 	"bilionario": "<:badge_bilionario:799043221270691851> ",
 
-	"evento_natal_2020": "<:badge_natal_2020:799043225536561182> ",
+	"evento_natal_2020": "<:badge_natal_2020:912837287539269672> ",	//"<:badge_natal_2020:799043225536561182> ",
+	"evento_halloween_2021" : "<:badge_halloween_2021:904559838992932884> ",
 	"campeao_canja": "<:Campeao_Canja:825763812506075197> ",
 	"ovos_dourados": "<:badge_Ovos_Dourados:829907391519916063> ",
 	"galoelho": "<:badge_Galoelho:830022962497060884> ",
 	"coroamuruUniao": "<:aUniaoFazAForca:852733210404454430> ",
 	"coroamuruDerrotei": "<:EuDerroteiCoroamuru:852733290616062002> ",
+	"mandrake": "<:Mandrake:893958240038166540> ",
 
 	"dev": "<:dev:801248050071994418> ",
 	"mod": "<:mod:823251404742721578> ",
