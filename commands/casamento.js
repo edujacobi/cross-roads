@@ -190,7 +190,7 @@ exports.run = async (bot, message, args) => {
 
                 uCasamento.mural = mensagem
 
-                bot.casais.set(uData.casamentoID, uCasamento)
+                bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
                 embed.fields[0].value = uCasamento.mural.length > 0 ? `"${uCasamento.mural}"` : `...`
 
@@ -240,7 +240,7 @@ exports.run = async (bot, message, args) => {
 
             bot.data.set(message.author.id, uData)
 
-            bot.casais.set(uData.casamentoID, uCasamento)
+            bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
             embed.fields[1].value = `${uCasamento.flores.toString()} entregues\n${bot.segToHour((currTime - uCasamento.ultimaFlor)/1000)} desde a última flor`
             embed.fields[4].value = `${getStringNivelCasamento(uCasamento.nivel)} **${uCasamento.nivel}**`
@@ -360,7 +360,7 @@ exports.run = async (bot, message, args) => {
                     uCasamento.viagem = currTime + 24 * 60 * 60 * 1000
                     uCasamento.ultimaViagem = currTime
 
-                    bot.casais.set(uData.casamentoID, uCasamento)
+                    bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
                     msgViagem.edit({
                         components: [],

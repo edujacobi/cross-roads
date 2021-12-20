@@ -98,7 +98,7 @@ exports.run = async (bot, message, args) => {
 		uGang.cor = (Math.random() * 0xFFFFFF << 0).toString(16)
 		uData.moni -= 2500000
 		bot.data.set(message.author.id, uData)
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 		bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(2500000 * bot.imposto))
 
 		return bot.createEmbed(message, `Você criou a gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -126,7 +126,7 @@ exports.run = async (bot, message, args) => {
 		if (desc.length > 255)
 			return bot.createEmbed(message, `Defina uma descrição menor. Limite de caracteres: 255. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Descrição da gangue **${uGang.nome}** alterada! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -177,7 +177,7 @@ exports.run = async (bot, message, args) => {
 		if (nome.length > 20)
 			return bot.createEmbed(message, `Defina um nome menor. Limite de caracteres: 20 ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `A gangue **${old_nome}** agora é **${uGang.nome}**! ${getIcone(uGang.boneco)}`), null, uGang.cor
 
@@ -202,7 +202,7 @@ exports.run = async (bot, message, args) => {
 
 		uGang.cor = '0x' + args[1]
 
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Cor da gangue **${uGang.nome}** alterada! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -225,7 +225,7 @@ exports.run = async (bot, message, args) => {
 
 		uGang.icone = args[1]
 
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Imagem da gangue **${uGang.nome}** alterada! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -294,7 +294,7 @@ exports.run = async (bot, message, args) => {
 										cargo: 'membro',
 										depositado: 0
 									})
-									bot.gangs.set(uData.gangID, uGang) // Salva gangue
+									bot.gangs.set(uData.gangID.toString(), uGang) // Salva gangue
 									bot.data.set(target.id, tData) // Salva user
 									// Manda mensagem
 									return msg.edit({
@@ -345,7 +345,7 @@ exports.run = async (bot, message, args) => {
 					let id = achou
 					uGang.membros.splice(uGang.membros.findIndex(user => user.id == message.author.id), 1)
 					uGang.membros[achou].cargo = 'lider'
-					bot.gangs.set(uData.gangID, uGang)
+					bot.gangs.set(uData.gangID.toString(), uGang)
 					uData.gangID = null
 					bot.data.set(message.author.id, uData)
 
@@ -365,7 +365,7 @@ exports.run = async (bot, message, args) => {
 
 				// uGang.membros.set(newLider, 'lider', 'cargo')
 				uGang.membros[0].cargo = 'lider'
-				bot.gangs.set(uData.gangID, uGang)
+				bot.gangs.set(uData.gangID.toString(), uGang)
 				uData.gangID = null
 				bot.data.set(message.author.id, uData)
 
@@ -376,7 +376,7 @@ exports.run = async (bot, message, args) => {
 				return bot.createEmbed(message, `Você saiu da gangue **${uGang.nome}**. **${bot.data.get(newLider, "username")}** foi definido como novo líder. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 			} else {
-				bot.gangs.set(uData.gangID, '')
+				bot.gangs.set(uData.gangID.toString(), '')
 				//bot.gangs.delete(uData.gangID)
 				uData.gangID = null
 				bot.data.set(message.author.id, uData)
@@ -386,7 +386,7 @@ exports.run = async (bot, message, args) => {
 		} else {
 			uGang.membros.splice(uGang.membros.findIndex(user => user.id == message.author.id), 1)
 
-			bot.gangs.set(uData.gangID, uGang)
+			bot.gangs.set(uData.gangID.toString(), uGang)
 
 			uData.gangID = null
 			bot.data.set(message.author.id, uData)
@@ -445,7 +445,7 @@ exports.run = async (bot, message, args) => {
 		// if (membro_remover > -1)
 		// 	uGang.membros.splice(membro_remover, 1)
 		uGang.membros.splice(uGang.membros.findIndex(user => user.id == target.id), 1)
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		tData.gangID = null
 		bot.data.set(target.id, tData)
@@ -532,7 +532,7 @@ exports.run = async (bot, message, args) => {
 								uGang.membros[uGang.membros.findIndex(user => user.id == target.id)].cargo = 'lider'
 								uGang.membros[uGang.membros.findIndex(user => user.id == message.author.id)].cargo = 'membro'
 
-								bot.gangs.set(uData.gangID, uGang)
+								bot.gangs.set(uData.gangID.toString(), uGang)
 
 								uGang.membros.forEach(membro => {
 									if (membro.id != message.author.id)
@@ -578,7 +578,7 @@ exports.run = async (bot, message, args) => {
 			// message.reply(`${achou} ${uGang.membros[achou]}`)
 			if (achou) {
 				uGang.membros[achou].cargo = 'membro'
-				bot.gangs.set(uData.gangID, uGang)
+				bot.gangs.set(uData.gangID.toString(), uGang)
 				return bot.createEmbed(message, `**${bot.data.get(uGang.membros[achou].id, "username")}** foi destituído do cargo de vice-líder da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, uGang.cor)
 			}
 
@@ -611,7 +611,7 @@ exports.run = async (bot, message, args) => {
 
 		uGang.membros[uGang.membros.findIndex(user => user.id == target.id)].cargo = 'vice'
 
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Você definiu **${tData.username}** como vice-líder da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -701,7 +701,7 @@ exports.run = async (bot, message, args) => {
 
 								// uGang.membros.set(message.author.id, uGang.membros.get(message.author.id, 'depositado') + parseInt(valor), 'depositado')
 								uGang.membros[uGang.membros.findIndex(user => user.id == message.author.id)].depositado += parseInt(valor)
-								bot.gangs.set(uData.gangID, uGang)
+								bot.gangs.set(uData.gangID.toString(), uGang)
 								setTimeout(() => {
 									bot.users.fetch(message.author.id).then(user =>
 										user.send(`Você pode depositar novamente na sua gangue ${getIcone(uGang.boneco)}`)
@@ -897,7 +897,7 @@ exports.run = async (bot, message, args) => {
 				// uGang.tempoCarregamento = 24
 				// uGang.chanceCarregamento = 35
 				uGang.caixa -= 2000000
-				bot.gangs.set(uData.gangID, uGang)
+				bot.gangs.set(uData.gangID.toString(), uGang)
 
 				return bot.createEmbed(message, `Você comprou a base **${bot.bases[uGang.base].desc}** para a gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -952,7 +952,7 @@ exports.run = async (bot, message, args) => {
 										// uGang.baseDEF += 5
 										// uGang.tempoCarregamento -= 1
 										// uGang.chanceCarregamento += 1
-										bot.gangs.set(uData.gangID, uGang)
+										bot.gangs.set(uData.gangID.toString(), uGang)
 										msg.edit({
 											embeds: [new Discord.MessageEmbed()
 												.setDescription(`A base **${bot.bases[uGang.base].desc}** de **${uGang.nome}** foi melhorada! ${getIcone(uGang.boneco)}\n${prox_beneficios}`)
@@ -1028,7 +1028,7 @@ exports.run = async (bot, message, args) => {
 			uGang.carregamento = currTime
 			uGang.carregamentoAtivo = false
 
-			bot.gangs.set(uData.gangID, uGang)
+			bot.gangs.set(uData.gangID.toString(), uGang)
 
 			return bot.createEmbed(message, `Você parou o carregamento da gangue **${uGang.nome}**. R$ ${(Math.floor(custo / 3 * 2)).toLocaleString().replace(/,/g, ".")} foram devolvidos ao caixa da gangue. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 		}
@@ -1052,7 +1052,7 @@ exports.run = async (bot, message, args) => {
 			if (chance < chanceCarregamento) {
 				uGang.estoque += 1
 				uGang.carregamentoAtivo = false
-				bot.gangs.set(uData.gangID, uGang)
+				bot.gangs.set(uData.gangID.toString(), uGang)
 
 				uGang.membros.forEach(membro => {
 					bot.users.fetch(membro.id).then(user => {
@@ -1065,7 +1065,7 @@ exports.run = async (bot, message, args) => {
 
 			} else {
 				uGang.carregamentoAtivo = false
-				bot.gangs.set(uData.gangID, uGang)
+				bot.gangs.set(uData.gangID.toString(), uGang)
 
 				let textos = [
 					'Seu carregamento foi roubado!',
@@ -1123,7 +1123,7 @@ exports.run = async (bot, message, args) => {
 								uGang.carregamento = currTime + (((uGang.base == 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2) * 60 * 60 * 1000 * multiplicadorEventoCarregamento) //currTime + (((uGang.base == 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2) * 60 * 60 * 1000)
 								uGang.carregamentoAtivo = true
 
-								bot.gangs.set(uData.gangID, uGang)
+								bot.gangs.set(uData.gangID.toString(), uGang)
 
 								setTimeout(() => {
 									bot.users.fetch(message.author.id).then(user =>
@@ -1189,7 +1189,7 @@ exports.run = async (bot, message, args) => {
 		})
 
 		uGang.caixa += parte
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message,
 			`Sua gangue **${uGang.nome}** exportou um carregamento no valor de R$ ${venda.toLocaleString().replace(/,/g, ".")}.\nCada membro recebeu R$ ${parte.toLocaleString().replace(/,/g, ".")}. Foram depositados R$ ${parte.toLocaleString().replace(/,/g, ".")} no caixa da gangue. ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -1418,7 +1418,7 @@ exports.run = async (bot, message, args) => {
 															}, 2700000)
 															bot.data.set(membro, userD)
 														})
-														bot.gangs.set(uData.gangID, uGang)
+														bot.gangs.set(uData.gangID.toString(), uGang)
 														const embed_robb_final = new Discord.MessageEmbed()
 															.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082883578495087/file-folder_1f4c1.png`)
 															.setDescription(`Sua gangue **${uGang.nome}** conseguiu com sucesso 📁 **Roubar a Planta do Banco**! ${getIcone(uGang.boneco)}`)
@@ -1454,7 +1454,7 @@ exports.run = async (bot, message, args) => {
 																})
 															}, 21600000)
 														})
-														bot.gangs.set(uData.gangID, uGang)
+														bot.gangs.set(uData.gangID.toString(), uGang)
 														const embed_robb_final = new Discord.MessageEmbed()
 															.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082883578495087/file-folder_1f4c1.png`)
 															.setDescription(`Deu ruim! Vocês foram pegos enquanto tentavam escapar!\nSua gangue **${uGang.nome}** falhou em 📁 **Roubar a Planta do Banco**, e todos os membros presentes ficarão presos por ${bot.segToHour(tempo_preso / 1000)} ${bot.config.police}`)
@@ -1485,7 +1485,7 @@ exports.run = async (bot, message, args) => {
 								uGang.golpeMissao2.concluido = true
 								uGang.golpeMissao2.time = currTime + 21600000 // 6h
 
-								bot.gangs.set(uData.gangID, uGang)
+								bot.gangs.set(uData.gangID.toString(), uGang)
 								return bot.createEmbed(message, `Sua gangue comprou 🚗 **Carros de Fuga** para o golpe! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 							} else if (r.emoji.name === '💻') {
@@ -1626,7 +1626,7 @@ exports.run = async (bot, message, args) => {
 															}, 21600000);
 															bot.data.set(membro, userD);
 														});
-														bot.gangs.set(uData.gangID, uGang);
+														bot.gangs.set(uData.gangID.toString(), uGang);
 														const embed_hack_final = new Discord.MessageEmbed()
 															.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082999072587846/laptop_1f4bb.png`)
 															.setDescription(`Sua gangue **${uGang.nome}** conseguiu com sucesso 💻 **Hackear o Sistema de Câmeras**! ${getIcone(uGang.boneco)}`)
@@ -1654,7 +1654,7 @@ exports.run = async (bot, message, args) => {
 																});
 															}, tempo_preso);
 														});
-														bot.gangs.set(uData.gangID, uGang);
+														bot.gangs.set(uData.gangID.toString(), uGang);
 														const embed_hack_final = new Discord.MessageEmbed()
 															.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082999072587846/laptop_1f4bb.png`)
 															.setDescription(`Deu merda! A Polícia Federal rastreou o seu IP!\nSua gangue **${uGang.nome}** falhou em 💻 **Hackear o Sistema de Câmeras**, e todos os membros presentes ficarão presos por ${bot.segToHour(tempo_preso / 1000)} ${bot.config.police}`)
@@ -1845,7 +1845,7 @@ exports.run = async (bot, message, args) => {
 														uGang.valorRoubadoBanco += valor_roubado
 														uGang.caixa += parte * 1
 														uGang.golpeW++
-														bot.gangs.set(uData.gangID, uGang);
+														bot.gangs.set(uData.gangID.toString(), uGang);
 
 														const embed_bank_final = new Discord.MessageEmbed()
 															//.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770078593975320596/radar_cash.png`)
@@ -1873,7 +1873,7 @@ exports.run = async (bot, message, args) => {
 															}, tempo_preso)
 														})
 														uGang.golpeL++
-														bot.gangs.set(uData.gangID, uGang)
+														bot.gangs.set(uData.gangID.toString(), uGang)
 
 														const embed_bank_final = new Discord.MessageEmbed()
 															//.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770078593975320596/radar_cash.png`)
@@ -1938,7 +1938,7 @@ exports.run = async (bot, message, args) => {
 		if (tag.length < 2 || tag.length > 3)
 			return bot.createEmbed(message, `A TAG deve ter 2 ou 3 caracteres ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.gangs.set(uData.gangID, uGang)
+		bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `A TAG da gangue gangue **${uGang.nome}** foi definida como **${uGang.tag}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -1985,7 +1985,7 @@ exports.run = async (bot, message, args) => {
 					if (bonecos.includes(reaction.emoji.id))
 						uGang.boneco = bonecos.indexOf(reaction.emoji.id)
 
-					bot.gangs.set(uData.gangID, uGang)
+					bot.gangs.set(uData.gangID.toString(), uGang)
 
 					const embedEd = new Discord.MessageEmbed()
 						.setTitle(`${getIcone(uGang.boneco)} Ícone`)
