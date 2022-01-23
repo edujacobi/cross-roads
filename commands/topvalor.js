@@ -20,7 +20,7 @@ exports.run = async (bot, message, args) => {
 		const current = top.slice(start, start + 10)
 
 		const resultado = new Discord.MessageEmbed()
-			.setTitle(`${bot.badges.topGrana1_s4} Ranking Valores`)
+			.setTitle(`${bot.badges.topGrana1_s6} Ranking Valores`)
 			.setColor('GREEN')
 			.setFooter(`${bot.user.username} • Mostrando ${start + 1}-${start + current.length} usuários de ${top.length.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
 			.setTimestamp()

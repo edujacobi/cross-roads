@@ -29,7 +29,7 @@ exports.run = async (bot, message, args) => {
 		.setTimestamp()
 
 	let buttons = [
-		{nome: 'Valores', emote: '853052970115006485', comando: 'topvalor'},
+		{nome: 'Valores', emote: '934631819444355112', comando: 'topvalor'},
 		{nome: 'Grana', emote: '539572031436619777', comando: 'topgrana'},
 		{nome: 'Ficha', emote: '757021259451203665', comando: 'topficha'},
 		{nome: 'Galo', emote: '853053236952825856', comando: 'topgalo'},
@@ -44,7 +44,7 @@ exports.run = async (bot, message, args) => {
 		{nome: 'Gastadores', emote: '817097198860894310', comando: 'topgastador'},
 		{nome: 'Subornadores', emote: '816407267779411989', comando: 'topsuborno'},
 		{nome: 'Doentes', emote: '817965402621083748', comando: 'topdoente'},
-		{nome: 'Vasculhadores', emote: '816407267581886575', comando: 'topvasculhar'},
+		{nome: 'Vasculhadores', emote: '934632286337503264', comando: 'topvasculhar'},
 		// {nome: 'Presentes', emote: '921753148610211901', comando: 'toppresente'},
 	]
 	let rows = []
