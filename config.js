@@ -25,7 +25,7 @@ const config = {
 	"escopeta": "<:escopeta:754480874472472606>",
 	"katana": "<:katana:754480878104870944>",
 	"minigun": "<:minigun:757033333619163208>",
-	"ovogranada": "<:GranadaNatal:921846896056737852>",	//"<:Granada:829906313239855105>",
+	"ovogranada": "<:Granada:829906313239855105>", //<:GranadaNatal:921846896056737852>
 	"ovogranada2": "<:OvoGranada:829906313710272517>",
 
 	// ações

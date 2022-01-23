@@ -103,13 +103,13 @@ const init = async () => {
 	}
 
 	bot.on('shardError', error => {
-		console.error(new Date() + '.\nA websocket connection encountered an error:', error)
+		console.warn(new Date() + '.\nA websocket connection encountered an error:', error)
 	})
 	bot.on('unhandledRejection', error => {
-		console.error(new Date() + '.\nUnhandled promise rejection:', error)
+		console.warn(new Date() + '.\nUnhandled promise rejection:', error)
 	})
 	bot.on('unknownInteraction', error => {
-		console.error(new Date() + '.\nUnknown Interaction:')
+		console.warn(new Date() + '.\nUnknown Interaction:')
 	})
 	bot.login(process.env.TOKEN)
 }

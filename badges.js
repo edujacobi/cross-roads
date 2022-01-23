@@ -1,4 +1,25 @@
 const badges = {
+
+	// S6 ---------------------------------
+	"topGrana1_s6": "<:Top1_Grana_S6:934631819444355112> ",
+	"topGrana2_s6": "<:Top2_Grana_S6:934631819008147458> ",
+	"topGrana3_s6": "<:Top3_Grana_S5:934631819528253500> ",
+	"fujao_s6": "<:badge_fujao1:934631818844581949> ",
+	"sortudo_s6": "<:badge_sortudo:934631819624718347> ",
+	"maoBoba_s6": "<:badge_mao_boba:934631819146588220> ",
+	"bolsoLargo_s6": "<:badge_bolso_largo:934631813949845645> ",
+	"topGalo_s6": "<:badge_top_galo:934631819381465148> ",
+	"filantropo_s6": "<:badge_filantropo:934631819024941056> ",
+	"hipocondriaco_s6": "<:badge_hipocondriaco:934631818311905290> ",
+	"investidor_s6": "<:badge_investidor:934631818769096714> ",
+	"deputado_s6": "<:badge_deputado:934631819079462952> ",
+	"esmagaCranio_s6": "<:badge_esmaga_cranio:934631820153192488> ",
+	"workaholic_s6": "<:badge_workaholic:934631819243028480> ",
+	"patricinha_s6": "<:badge_patricinha:934631819255615599> ",
+	"topGangue_s6": "<:badge_top_gangue:934631819435974717> ",
+	"traderElite_s6": "<:badge_trader_elite:934631819536637993> ",
+	"xeroqueHolmes_s6": "<:badge_xeroqueHolmes:934632286337503264>	",
+	
 	// S5 ---------------------------------
 	"topGrana1_s5": "<:Top1_Grana_S5:889681658167558154> ",
 	"topGrana2_s5": "<:Top2_Grana_S5:889681658196930601> ",
@@ -90,6 +111,7 @@ const badges = {
 	"coroamuruUniao": "<:aUniaoFazAForca:852733210404454430> ",
 	"coroamuruDerrotei": "<:EuDerroteiCoroamuru:852733290616062002> ",
 	"mandrake": "<:Mandrake:893958240038166540> ",
+	"mandrakeChavoso": "<:badge_mandrakeChavoso:934631816546123876> ",
 
 	"dev": "<:Desenvolvedor:925465898414899241> ",//"<:dev:801248050071994418> ",
 	"mod": "<:mod:823251404742721578> ",

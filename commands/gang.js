@@ -894,7 +894,7 @@ exports.run = async (bot, message, args) => {
 					.setCustomId(message.id + message.author.id + 'upgrade')
 
 				let btnMembros = new Discord.MessageButton()
-					.setStyle('PRIMARY')
+					.setStyle('SECONDARY')
 					.setLabel('Membros')
 					.setCustomId(message.id + message.author.id + 'membros')
 
@@ -1282,7 +1282,6 @@ exports.run = async (bot, message, args) => {
 
 	}
 	else if (option === 'golpe') { //lider e vice
-		//if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return message.channel.send('Comando em manutenção')
 		let uData = bot.data.get(message.author.id)
 		let uGang = bot.gangs.get(uData.gangID)
 		let currTime = new Date().getTime()
@@ -2279,7 +2278,7 @@ exports.run = async (bot, message, args) => {
 					.setCustomId(message.id + message.author.id + 'nomes')
 
 				let btnBase = new Discord.MessageButton()
-					.setStyle('PRIMARY')
+					.setStyle('SECONDARY')
 					.setLabel('Base')
 					.setDisabled(gang.base == null)
 					.setCustomId(message.id + message.author.id + 'base')

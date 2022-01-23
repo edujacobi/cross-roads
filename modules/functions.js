@@ -254,7 +254,8 @@ module.exports = bot => {
 					user.investGanhos += praSacar
 					user.investLast = currTime
 
-				} else if (user.invest != null) {
+				}
+				else if (user.invest != null) {
 					// se já passou uma semana
 					//linhaInvest = `Seu investimento **${bot.investimentos[user.invest].desc}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} dele ${bot.config.propertyR}`
 					let invest = bot.investimentos[user.invest].desc
@@ -263,7 +264,8 @@ module.exports = bot => {
 							user_send.send(`Seu investimento **${invest}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} dele ${bot.config.propertyR}`)
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
-					} else {
+					}
+					else {
 						bot.users.fetch(id).then(user_send => {
 							user_send.send(`Seu investimento **${invest}** acabou ${bot.config.propertyR}`)
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
@@ -423,56 +425,106 @@ module.exports = bot => {
 				textoBadge += bot.badges.hipocondriaco_s4
 			if (userId === '698361824340344965') //Top vasculhamentos - Xeroque Holmes
 				textoBadge += bot.badges.xeroqueHolmes_s4
-		}
 
-		// TEMPORADA 5 -------------------------------
-		if (userId === '565928906356424705') //Top 1 Grana Temporada 5
-			textoBadge += bot.badges.topGrana1_s5
-		if (userId === '743494282308223156') //Top 2 Grana Temporada 5
-			textoBadge += bot.badges.topGrana2_s5
-		if (userId === '367423139132604416') //Top 3 Grana Temporada 5
-			textoBadge += bot.badges.topGrana3_s5
-		if (userId === '606290632725626940') //Top Pancada - EsmagaCrânio
-			textoBadge += bot.badges.esmagaCranio_s5
+
+			// TEMPORADA 5 -------------------------------
+			if (userId === '565928906356424705') //Top 1 Grana Temporada 5
+				textoBadge += bot.badges.topGrana1_s5
+			if (userId === '743494282308223156') //Top 2 Grana Temporada 5
+				textoBadge += bot.badges.topGrana2_s5
+			if (userId === '367423139132604416') //Top 3 Grana Temporada 5
+				textoBadge += bot.badges.topGrana3_s5
+			if (userId === '606290632725626940') //Top Pancada - EsmagaCrânio
+				textoBadge += bot.badges.esmagaCranio_s5
+			if (userId === '481618309851250688') //Top Fugas - Fujão
+				textoBadge += bot.badges.fujao_s5
+			if (userId === '880983727885406248') //Top Win rate cassino - Sortudo
+				textoBadge += bot.badges.sortudo_s5
+			if (userId === '145466251496390656') //Top ganhos cassino - Trader Elite
+				textoBadge += bot.badges.traderElite_s5
+			if (userId === '731765213237346357') //Top Roubos qt - Mão Boba
+				textoBadge += bot.badges.maoBoba_s5
+			if (userId === '593444673297580042') //Top Roubos vl - Bolso Largo
+				textoBadge += bot.badges.bolsoLargo_s5
+			if (userId === '726587303476330577') //Top Win rate galo - Top Galo
+				textoBadge += bot.badges.topGalo_s5
+			if (userId === '145466251496390656') //Top esmola - Filantropo
+				textoBadge += bot.badges.filantropo_s5
+			if (userId === '566417328586096655') //Top investidor - Investidor
+				textoBadge += bot.badges.investidor_s5
+			if (userId === '565928906356424705') //Top trabalhador - Workaholic
+				textoBadge += bot.badges.workaholic_s5
+			if (userId === '566417328586096655') //Top gastador - Patricinha
+				textoBadge += bot.badges.patricinha_s5
+			if (userId === '593444673297580042') //Top suborno - Deputado
+				textoBadge += bot.badges.deputado_s5
+			if (userId === '555414232989040661') //Top hospital doente - Hipocondriaco
+				textoBadge += bot.badges.hipocondriaco_s5
+			if (userId === '731765213237346357') //Top vasculhamentos - Xeroque Holmes
+				textoBadge += bot.badges.xeroqueHolmes_s5
+			if ([
+				'646778544512565248', '740753560706220153',
+				'859916007853785128', '533848042387013648',
+				'334086157686013952', '684897590529359918',
+				'145466251496390656', '726587303476330577',
+				'508730960469164047', '708669255343800321',
+				'776684955362656286', '578192731256389633',
+				'342505762624503808', '671843186649333791',
+				'370042915373973505', '818674190756347924',
+				'882698935838322739', '495412204703580160',
+				'784245228029870162', '561191619311697921',
+			].includes(userId))
+				textoBadge += bot.badges.topGangue_s5
+		}
+		// TEMPORADA 6 -------------------------------
+		if (userId === '684185796093542402') //Top 1 Grana Temporada 6
+			textoBadge += bot.badges.topGrana1_s6
+		if (userId === '555414232989040661') //Top 2 Grana Temporada 6
+			textoBadge += bot.badges.topGrana2_s6
+		if (userId === '902321015223369759;bu') //Top 3 Grana Temporada 6
+			textoBadge += bot.badges.topGrana3_s6
+		if (userId === '555414232989040661') //Top Pancada - EsmagaCrânio
+			textoBadge += bot.badges.esmagaCranio_s6
 		if (userId === '481618309851250688') //Top Fugas - Fujão
-			textoBadge += bot.badges.fujao_s5
-		if (userId === '880983727885406248') //Top Win rate cassino - Sortudo
-			textoBadge += bot.badges.sortudo_s5
-		if (userId === '145466251496390656') //Top ganhos cassino - Trader Elite
-			textoBadge += bot.badges.traderElite_s5
-		if (userId === '731765213237346357') //Top Roubos qt - Mão Boba
-			textoBadge += bot.badges.maoBoba_s5
-		if (userId === '593444673297580042') //Top Roubos vl - Bolso Largo
-			textoBadge += bot.badges.bolsoLargo_s5
-		if (userId === '726587303476330577') //Top Win rate galo - Top Galo
-			textoBadge += bot.badges.topGalo_s5
-		if (userId === '145466251496390656') //Top esmola - Filantropo
-			textoBadge += bot.badges.filantropo_s5
-		if (userId === '566417328586096655') //Top investidor - Investidor
-			textoBadge += bot.badges.investidor_s5
-		if (userId === '565928906356424705') //Top trabalhador - Workaholic
-			textoBadge += bot.badges.workaholic_s5
-		if (userId === '566417328586096655') //Top gastador - Patricinha
-			textoBadge += bot.badges.patricinha_s5
-		if (userId === '593444673297580042') //Top suborno - Deputado
-			textoBadge += bot.badges.deputado_s5
-		if (userId === '555414232989040661') //Top hospital doente - Hipocondriaco
-			textoBadge += bot.badges.hipocondriaco_s5
-		if (userId === '731765213237346357') //Top vasculhamentos - Xeroque Holmes
-			textoBadge += bot.badges.xeroqueHolmes_s5
+			textoBadge += bot.badges.fujao_s6
+		if (userId === '924864319437541416') //Top Win rate cassino - Sortudo
+			textoBadge += bot.badges.sortudo_s6
+		if (userId === '481618309851250688') //Top ganhos cassino - Trader Elite
+			textoBadge += bot.badges.traderElite_s6
+		if (userId === '593444673297580042') //Top Roubos qt - Mão Boba
+			textoBadge += bot.badges.maoBoba_s6
+		if (userId === '731765213237346357') //Top Roubos vl - Bolso Largo
+			textoBadge += bot.badges.bolsoLargo_s6
+		if (userId === '684185796093542402') //Top Win rate galo - Top Galo
+			textoBadge += bot.badges.topGalo_s6
+		if (userId === '593444673297580042') //Top esmola - Filantropo
+			textoBadge += bot.badges.filantropo_s6
+		if (userId === '338191478637592577') //Top investidor - Investidor
+			textoBadge += bot.badges.investidor_s6
+		if (userId === '642831476852785212') //Top trabalhador - Workaholic
+			textoBadge += bot.badges.workaholic_s6
+		if (userId === '338191478637592577') //Top gastador - Patricinha
+			textoBadge += bot.badges.patricinha_s6
+		if (userId === '731765213237346357') //Top suborno - Deputado
+			textoBadge += bot.badges.deputado_s6
+		if (userId === '842100049432281189') //Top hospital doente - Hipocondriaco
+			textoBadge += bot.badges.hipocondriaco_s6
+		if (userId === '555414232989040661') //Top vasculhamentos - Xeroque Holmes
+			textoBadge += bot.badges.xeroqueHolmes_s6
 		if ([
-			'646778544512565248', '740753560706220153',
-			'859916007853785128', '533848042387013648',
-			'334086157686013952', '684897590529359918',
-			'145466251496390656', '726587303476330577',
-			'508730960469164047', '708669255343800321',
-			'776684955362656286', '578192731256389633',
-			'342505762624503808', '671843186649333791',
-			'370042915373973505', '818674190756347924',
-			'882698935838322739', '495412204703580160',
-			'784245228029870162', '561191619311697921',
+			'338191478637592577', '755135847157858395',
+			'863437497039454259', '632577162830020618',
+			'821218418710675496', '736225030157107300',
+			'842100049432281189', '461210195536642052',
+			'755183560377499710', '566417328586096655',
+			'720828847771222056', '869654855126499380',
+			'868098562418962543', '898959920588795964',
+			'372142137594347531', '474956360891629578',
+			'743494282308223156', '503304962785148958',
+			'676224670122639360', '920506496792551556',
 		].includes(userId))
-			textoBadge += bot.badges.topGangue_s5
+			textoBadge += bot.badges.topGangue_s6
+
 
 		// OUTROS ------------------------------------
 
@@ -493,7 +545,7 @@ module.exports = bot => {
 			'460196598539092025', '660136362514579468', '650893454519435264',
 			'332228051871989761', '555414232989040661', '667107441149870090',
 			'732499761013325840', '593444673297580042', '727924880380526592',
-			'562709955661135922']
+			'662380115308576801']
 			.includes(userId)) textoBadge += bot.badges.bilionario
 
 		if (['332228051871989761', '493121335749246989', '843955033543540756', '517013970310397974', '390655016307916812'].includes(userId)) textoBadge += bot.badges.evento_natal_2020 // 12/2020
@@ -505,6 +557,17 @@ module.exports = bot => {
 		if (bot.data.has(userId, 'badgeHalloween2021') && bot.data.get(userId, 'badgeHalloween2021') === true) textoBadge += bot.badges.evento_halloween_2021 // 10/2021
 
 		if (bot.data.has(userId, 'badgeNatal2021') && bot.data.get(userId, 'badgeNatal2021') === true) textoBadge += bot.badges.evento_natal_2021 // 12/2021
+
+		if ([
+			'593444673297580042', '782981311249121341', '662380115308576801',
+			'390655016307916812', '555414232989040661', '555414232989040661',
+			'571408267377508363', '731765213237346357', '840795540640104448',
+			'702941658811203585', '736646173225385985', '716131530346463254',
+			'274726815476744192', '372142137594347531', '481618309851250688',
+
+			'666077411615572031', '555552682224648194', '642924823156228106',
+			'843955033543540756', '697549215475433552', '332228051871989761']
+			.includes(userId)) textoBadge += bot.badges.mandrakeChavoso
 
 		if (textoBadge === '') return ''
 

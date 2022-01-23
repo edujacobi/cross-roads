@@ -371,7 +371,7 @@ exports.run = async (bot, message, args) => {
 			const embedTemp = new Discord.MessageEmbed()
 				.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
 				.setDescription("Final da Temporada 6")
-				.addField("A Temporada 6 encerrará dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
+				.addField("A Temporada 6 encerrou dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
 				.addField("A Temporada 7 iniciará dia 31/01!", `Um reset total acontecerá, fique ligado!`)
 				.setColor(bot.colors.admin)
 				.setFooter(`Atenciosamente, Jacobi`)
