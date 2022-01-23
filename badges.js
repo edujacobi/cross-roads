@@ -64,7 +64,7 @@ const badges = {
 	"topGrana1_s3": "<:badge_top1grana_s3:817193158026461184> ",
 	"topGrana2_s3": "<:badge_top2grana_s3:817193158655344650> ",
 	"topGrana3_s3": "<:badge_top3grana_s3:817193159448723466> ",
-	"fujao_s3": "<:badge_fujao:825762987637342219> ",
+	"fujao_s3": "<:badge_fujao:934896677620437093> ",
 	"sortudo_s3": "<:badge_sortudo:819694112076726303> ",
 	"maoBoba_s3": "<:badge_mao_boba:817965403274739732> ",
 	"bolsoLargo_s3": "<:badge_bolso_largo:817965462095790102> ",

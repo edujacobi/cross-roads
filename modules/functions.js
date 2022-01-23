@@ -481,7 +481,7 @@ module.exports = bot => {
 			textoBadge += bot.badges.topGrana1_s6
 		if (userId === '555414232989040661') //Top 2 Grana Temporada 6
 			textoBadge += bot.badges.topGrana2_s6
-		if (userId === '902321015223369759;bu') //Top 3 Grana Temporada 6
+		if (userId === '902321015223369759') //Top 3 Grana Temporada 6
 			textoBadge += bot.badges.topGrana3_s6
 		if (userId === '555414232989040661') //Top Pancada - EsmagaCrânio
 			textoBadge += bot.badges.esmagaCranio_s6
