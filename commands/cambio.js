@@ -1,15 +1,28 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	// if (message.author.id != bot.config.adminID)
 	// 	return
 	let uData = bot.data.get(message.author.id)
-	const LIMIT = 100
+	// const LIMIT = 100
 	let currTime = new Date().getTime()
 	let valorFicha = 80 // cada ficha vale 80 no câmbio
 	let texto = ''
 	let option = args[0]
 
+	if (!option){
+		const embed = new Discord.MessageEmbed()
+			.setTitle(`${bot.config.mafiaCasino} Câmbio`)
+			.setDescription(`Troque suas fichas por dinheiro! Cada ficha vale R$ 80.
 
+O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.config.prisao} Prisão é de R$ 40.
+
+\`;cambio [quantidade]\``)
+			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setTimestamp()
+		
+		return message.channel.send({embeds: [embed]})
+			.catch(() => console.log("Não consegui enviar mensagem `cambio`"))
+	}
 	// 	return bot.msgPreso(message, uData)
 
 	if (uData.hospitalizado > currTime) {
@@ -31,7 +44,7 @@ exports.run = async (bot, message, args) => {
 	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
-	if (option == 'allin' || option == 'all' || option == 'tudo')
+	if (['allin', 'all', 'tudo'].includes(option))
 		option = uData.ficha
 
 	// if (args[0] > LIMIT){
@@ -43,7 +56,7 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `Você não tem ${bot.config.ficha} **fichas** suficientes para trocar`)
 
 	if (option <= 0 || (option % 1 != 0))
-		return bot.msgValorInvalido(message);
+		return bot.msgValorInvalido(message)
 
 	if (parseInt(uData.ficha) < option)
 		return bot.createEmbed(message, `Você não tem esta quantidade de ${bot.config.ficha} **fichas** para trocar`, `Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`)
@@ -58,81 +71,96 @@ exports.run = async (bot, message, args) => {
 		.setTitle(`${bot.config.mafiaCasino} Câmbio`)
 		.setDescription(`${texto}Confirmar troca de ${bot.config.ficha} ${valor.toLocaleString().replace(/,/g, ".")} fichas por R$ ${cambio.toLocaleString().replace(/,/g, ".")}?`)
 		.setFooter(`${bot.user.username} • "Me manda uma esmola!"`, bot.user.avatarURL())
-		.setTimestamp();
+		.setTimestamp()
 
-	message.channel.send({
-			embeds: [embed]
-		})
-		.then(msg => {
-			msg.react(aceitar)
-				.then(() => msg.react(negar)).catch(err => console.log("Não consegui reagir mensagem `cambio`"))
-				.then(r => {
+	let row = new Discord.MessageActionRow()
+		.addComponents(new Discord.MessageButton()
+			.setStyle('SUCCESS')
+			.setLabel('Aceitar')
+			.setEmoji(aceitar)
+			.setCustomId(message.id + message.author.id + 'aceitar'))
 
-					const filter = (reaction, user) => [aceitar, negar].includes(reaction.emoji.id) && user.id == message.author.id
+		.addComponents(new Discord.MessageButton()
+			.setStyle('DANGER')
+			.setLabel('Cancelar')
+			.setEmoji(negar)
+			.setCustomId(message.id + message.author.id + 'negar'))
 
-					const cambioReaction = msg.createReactionCollector({
-						filter,
-						time: 90000,
-						max: 1
-					})
 
-					cambioReaction.on('collect', r => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cambio`"))
+	let msg = await message.channel.send({embeds: [embed], components: [row]})
+		.catch(() => console.log("Não consegui enviar mensagem `cambio`"))
 
-						if (r.emoji.id === aceitar) {
-							uData = bot.data.get(message.author.id)
 
-							if (bot.isUserEmRouboOuEspancamento(message, uData))
-								return
+	const filter = (button) => [
+		message.id + message.author.id + 'aceitar',
+		message.id + message.author.id + 'negar',
+	].includes(button.customId) && button.user.id === message.author.id
 
-							if (bot.isPlayerMorto(uData)) return;
+	const collector = message.channel.createMessageComponentCollector({
+		filter,
+		time: 90000,
+	})
 
-							if (bot.isPlayerViajando(uData))
-								return bot.msgPlayerViajando(message);
+	collector.on('collect', async b => {
+		await b.deferUpdate()
+		
+		if (b.customId === message.id + message.author.id + 'aceitar') {
+			uData = bot.data.get(message.author.id)
 
-							if (bot.isGaloEmRinha(message.author.id))
-								return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
+			if (bot.isUserEmRouboOuEspancamento(message, uData))
+				return
 
-							if (uData.ficha < 1)
-								return bot.createEmbed(message, `Você não tem ${bot.config.ficha} **fichas** suficientes para trocar`)
+			if (bot.isPlayerMorto(uData)) return
 
-							if (parseInt(uData.ficha) < valor)
-								return bot.createEmbed(message, `Você não tem esta quantidade de ${bot.config.ficha} **fichas** para trocar`, `Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`)
+			if (bot.isPlayerViajando(uData))
+				return bot.msgPlayerViajando(message)
 
-							if (cambio > bot.banco.get('cassino'))
-								return bot.createEmbed(message, `O Cassino não tem caixa suficiente para trocar fichas com você`, `Caixa: R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
+			if (bot.isGaloEmRinha(message.author.id))
+				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
-							uData.ficha -= valor
-							uData.moni += cambio
-							bot.banco.set('cassino', bot.banco.get('cassino') - cambio)
+			if (uData.ficha < 1)
+				return bot.createEmbed(message, `Você não tem ${bot.config.ficha} **fichas** suficientes para trocar`)
 
-							bot.data.set(message.author.id, uData)
+			if (parseInt(uData.ficha) < valor)
+				return bot.createEmbed(message, `Você não tem esta quantidade de ${bot.config.ficha} **fichas** para trocar`, `Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`)
 
-							embed.setDescription(`Você trocou ${bot.config.ficha} **${valor.toLocaleString().replace(/,/g, ".")} fichas** por R$ ${cambio.toLocaleString().replace(/,/g, ".")} ${bot.config.mafiaCasino}`)
-								.setColor('GREEN')
-								.setFooter(`${bot.user.username} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
+			if (cambio > bot.banco.get('cassino'))
+				return bot.createEmbed(message, `O Cassino não tem caixa suficiente para trocar fichas com você`, `Caixa: R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
 
-							return msg.edit({
-								embeds: [embed]
-							}).catch(err => console.log("Não consegui editar mensagem `cambio`"));
+			uData.ficha -= valor
+			uData.moni += cambio
+			bot.banco.set('cassino', bot.banco.get('cassino') - cambio)
 
-						} else if (r.emoji.id === negar) {
-							embed.setDescription(`Câmbio recusado`)
-								.setColor('RED')
-								.setFooter(`${bot.user.username} • "Bora apostar mais!"`, bot.user.avatarURL())
+			bot.data.set(message.author.id, uData)
 
-							return msg.edit({
-								embeds: [embed]
-							}).catch(err => console.log("Não consegui editar mensagem `cambio`"));
-						}
-					})
+			embed.setDescription(`Você trocou ${bot.config.ficha} **${valor.toLocaleString().replace(/,/g, ".")} fichas** por R$ ${cambio.toLocaleString().replace(/,/g, ".")} ${bot.config.mafiaCasino}`)
+				.setColor('GREEN')
+				.setFooter(`${bot.user.username} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
 
-					cambioReaction.on('end', async response => {
-						if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `cambio`"))
-					})
-				})
-		}).catch(err => console.log("Não consegui enviar mensagem `cambio`"))
-};
+			return msg.edit({
+				embeds: [embed],
+				components: []
+			}).catch(() => console.log("Não consegui editar mensagem `cambio`"))
+
+		} else if (b.customId === message.id + message.author.id + 'negar') {
+			embed.setDescription(`Câmbio recusado`)
+				.setColor('RED')
+				.setFooter(`${bot.user.username} • "Bora apostar mais!"`, bot.user.avatarURL())
+
+			return msg.edit({
+				embeds: [embed],
+				components: []
+			}).catch(() => console.log("Não consegui editar mensagem `cambio`"))
+		}
+	})
+
+	collector.on('end', async () => {
+		return msg.edit({
+			components: []
+		}).catch(() => console.log("Não consegui editar mensagem `cambio`"))
+	})
+		
+}
 exports.config = {
 	alias: ['c', 'exchange']
-};
+}

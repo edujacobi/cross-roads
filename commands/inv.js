@@ -1,9 +1,7 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 
 exports.run = async (bot, message, args) => {
 	const semana = 7 * 24 * 60 * 60 * 1000 // 7 dias
-	let targetMention = message.mentions.members.first()
-	let targetNoMention = []
 	let currTime = new Date().getTime()
 	let textGuns = ''
 	let textGuns2 = ''
@@ -11,39 +9,12 @@ exports.run = async (bot, message, args) => {
 	let emoteFechar = '<:Fechar_Inventario:823344220597256223>'
 	let emoteAbrir = '<:Abrir_Inventario:823344220966223972>'
 
-	/*
-	Para ver inventário sem pingar (funciona para outros servidores)
-	 Se não tiver uma menção, ele irá pegar a string fornecida (espera-se o username do usuário) e irá procurar
-	 em todo o banco de dados se há alguém com o user. Caso houver mais de um usuário com o mesmo username, ele
-	 informará uma lista dos usuários junto de suas tags (username + discriminator). Se informar a tag ou id, 
-	 o usuário será selecionado corretamente
-	*/
-	if (!targetNoMention[0] && args[0] && !targetMention) { // se não mencionou mas quer ver inv de outro user
+	let {
+		uData,
+		alvo
+	} = bot.findUser(message, args)
 
-		let name = args.join(" ").toLowerCase()
-
-		bot.data.forEach((item, id) => {
-			if (bot.data.has(id, "username") && item.username.toLowerCase() == name)
-				targetNoMention.push(id)
-
-			else if (id.toString() == name) {
-				targetNoMention.push(id)
-			}
-		})
-
-		if (!targetNoMention[0])
-			return bot.createEmbed(message, "Usuário não encontrado.")
-	}
-
-	let alvo
-
-	if (targetNoMention.length > 0)
-		alvo = targetNoMention[0]
-	else
-		alvo = targetMention ? targetMention.id : message.author.id
-
-	let uData = bot.data.get(alvo)
-	if (!uData || uData.username == undefined) return bot.createEmbed(message, "Este usuário não possui um inventário")
+	if (!uData) return
 
 	/*
 	Montagem do Inventário + Informações do usuário
@@ -52,7 +23,7 @@ exports.run = async (bot, message, args) => {
 	*/
 	let investimento = uData.invest != null ? ` • ${(currTime < uData.investTime + semana ? bot.config.propertyG : bot.config.propertyR)} ${bot.investimentos[uData.invest].desc}` : ''
 
-	let classe = (uData.classe != undefined) ? `, ${bot.classes[uData.classe].desc}` : ""
+	let classe = uData.classe !== undefined ? `, ${bot.classes[uData.classe].desc}` : ""
 
 	let miniSituation = `Vadiando`
 	if (uData.emRoubo.tempo > currTime && uData.emRoubo.isAlvo)
@@ -75,7 +46,7 @@ exports.run = async (bot, message, args) => {
 		miniSituation = `Trabalhando`
 	else if (uData.hospitalizado > currTime)
 		miniSituation = `Hospitalizado`
-	if (uData.roubar > currTime && uData.preso < currTime)
+	if (uData.roubo > currTime && uData.preso < currTime)
 		miniSituation += ` e procurado`
 	if (uData.jobTime < currTime && uData.job)
 		miniSituation += ` e pode receber salário`
@@ -90,11 +61,11 @@ exports.run = async (bot, message, args) => {
 
 	const invClosed = new Discord.MessageEmbed()
 		.setColor(uGang ? uGang.cor : bot.colors.darkGrey)
-		.setAuthor(`Inventário de ${(uGang && uGang.tag != '') ? `[${uGang.tag}] ` : ``}${uData.username}`) //, avatar)
+		.setAuthor(`Inventário de ${(uGang && uGang.tag !== '') ? `[${uGang.tag}] ` : ``}${uData.username}`) //, avatar)
 		.setThumbnail(uData.classe ? bot.classes[uData.classe].imagem : 'https://cdn.discordapp.com/attachments/531174573463306240/814662917696782376/Inventario.png')
 		.setDescription(`${badges}R$ ${uData.moni != null ? uData.moni.toLocaleString().replace(/,/g, ".") : 'Bugado'}${investimento}${conjugeClosed}`)
 		.setFooter(`${miniSituation} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`)
-		.setTimestamp();
+		.setTimestamp()
 
 	let horaInvestimento = uData.invest != null ? (currTime < uData.investTime + semana ?
 		`: ${bot.segToHour(((uData.investTime + semana) - currTime) / 1000)}` :
@@ -123,7 +94,7 @@ exports.run = async (bot, message, args) => {
 	if (uData._goggles > currTime && !(hora > 4 && hora < 20))
 		atkPower += 3
 
-	if (defPower != 0 && uData.hospitalizado > currTime)
+	if (defPower !== 0 && uData.hospitalizado > currTime)
 		defPower -= 5
 	if (uData._colete > currTime)
 		defPower += 2
@@ -134,24 +105,24 @@ exports.run = async (bot, message, args) => {
 	if (uData._exoesqueleto > currTime)
 		defPower += 5
 
-	if (uGang && uGang.base == 'bunker')
+	if (uGang && uGang.base === 'bunker')
 		defPower += 0.5 * uGang.baseLevel
 
-	if (uData.classe == 'mendigo') {
-		if (atkPower * 0.9 == Math.floor(atkPower * 0.9))
+	if (uData.classe === 'mendigo') {
+		if (atkPower * 0.9 === Math.floor(atkPower * 0.9))
 			atkPower = (atkPower * 0.9)
 		else
 			atkPower = (atkPower * 0.9).toFixed(1)
 
-	} else if (uData.classe == 'assassino') {
-		if (atkPower * 1.1 == Math.floor(atkPower * 1.1))
+	} else if (uData.classe === 'assassino') {
+		if (atkPower * 1.1 === Math.floor(atkPower * 1.1))
 			atkPower = (atkPower * 1.1)
 		else
 			atkPower = (atkPower * 1.1).toFixed(1)
 	}
 
-	if (uData.classe == 'assassino' || uData.classe == 'empresario') {
-		if (defPower * 0.9 == Math.floor(defPower * 0.9))
+	if (uData.classe === 'assassino' || uData.classe === 'empresario') {
+		if (defPower * 0.9 === Math.floor(defPower * 0.9))
 			defPower = (defPower * 0.9)
 		else
 			defPower = (defPower * 0.9).toFixed(1)
@@ -170,9 +141,9 @@ exports.run = async (bot, message, args) => {
 	if (uData.gangID != null) {
 		let cargo = 'Membro'
 		let uGang = bot.gangs.get(uData.gangID)
-		if (uGang.membros.find(user => user.cargo == 'lider') && uGang.membros.find(user => user.cargo == 'lider').id == alvo)
+		if (uGang.membros.find(user => user.cargo === 'lider') && uGang.membros.find(user => user.cargo === 'lider').id == alvo)
 			cargo = "Líder"
-		else if (uGang.membros.find(user => user.cargo == 'vice') && uGang.membros.find(user => user.cargo == 'vice').id == alvo)
+		else if (uGang.membros.find(user => user.cargo === 'vice') && uGang.membros.find(user => user.cargo === 'vice').id == alvo)
 			cargo = "Vice-Líder"
 		invOpen.setAuthor(`${cargo} de ${uGang.nome}`, uGang.icone)
 	}
@@ -181,9 +152,9 @@ exports.run = async (bot, message, args) => {
 	Object.entries(bot.guns).forEach(([id_arma, arma]) => {
 		Object.entries(uData).forEach(([key, value]) => {
 			let emoji
-			if (arma.data == 'ovogranada') {
+			if (arma.data === 'ovogranada') {
 				if (key.includes("_") && value > 0) {
-					if (key.substring(1) == arma.data) {
+					if (key.substring(1) === arma.data) {
 						emoji = bot.config[arma.emote]
 						if ((textGuns + emoji).length < 225)
 							textGuns += `${emoji} `
@@ -199,7 +170,7 @@ exports.run = async (bot, message, args) => {
 
 			} else {
 				if (key.includes("_") && value > currTime) {
-					if (key.substring(1) == arma.data) {
+					if (key.substring(1) === arma.data) {
 						emoji = bot.config[arma.emote]
 						if ((textGuns + emoji).length < 225)
 							textGuns += `${emoji} `
@@ -215,18 +186,18 @@ exports.run = async (bot, message, args) => {
 			}
 		})
 	})
-	if (uData._ovo > 0) {
-		textGuns3 += bot.config.ovo
-		invOpen.addField(`${bot.config.ovo} Presentes de natal`, uData._ovo.toLocaleString().replace(/,/g, "."), true)
-	}
+	// if (uData._ovo > 0) {
+	// 	textGuns3 += bot.config.ovo
+	// 	invOpen.addField(`${bot.config.ovo} Presentes de natal`, uData._ovo.toLocaleString().replace(/,/g, "."), true)
+	// }
 	if (uData._flor > 0) {
-		textGuns3 != '' ? textGuns3 += bot.config.flor : (textGuns2 != '' ? textGuns2 += bot.config.flor : textGuns += bot.config.flor)
+		textGuns3 !== '' ? textGuns3 += bot.config.flor : (textGuns2 !== '' ? textGuns2 += bot.config.flor : textGuns += bot.config.flor)
 		invOpen.addField(`${bot.config.flor} Flores`, uData._flor.toLocaleString().replace(/,/g, "."), true)
 	}
 
-	textGuns != "" ? invClosed.addField(textGuns, "\u200b󠀀󠀀", true) : textGuns = ''
-	textGuns2 != "" ? invClosed.addField(textGuns2, "\u200b󠀀󠀀", true) : textGuns2 = ''
-	textGuns3 != "" ? invClosed.addField(textGuns3, "\u200b󠀀󠀀", true) : textGuns3 = ''
+	textGuns !== "" ? invClosed.addField(textGuns, "\u200b󠀀󠀀", true) : textGuns = ''
+	textGuns2 !== "" ? invClosed.addField(textGuns2, "\u200b󠀀󠀀", true) : textGuns2 = ''
+	textGuns3 !== "" ? invClosed.addField(textGuns3, "\u200b󠀀󠀀", true) : textGuns3 = ''
 
 	let textSituation = `${bot.config.vadiando} Vadiando`
 	if (uData.emRoubo.tempo > currTime && uData.emRoubo.isAlvo)
@@ -250,12 +221,12 @@ exports.run = async (bot, message, args) => {
 	else if (uData.hospitalizado > currTime)
 		textSituation = `${bot.config.hospital} Hospitalizado por mais ${bot.segToHour((uData.hospitalizado - currTime) / 1000)}`
 
-	if (uData.roubar > currTime && uData.preso < currTime)
+	if (uData.roubo > currTime && uData.preso < currTime)
 		textSituation += ` e ${bot.config.police} Procurado`
 	if (uData.jobTime < currTime && uData.job)
 		textSituation += ` e ${bot.config.bulldozer} pode receber salário`
 	if (bot.isPlayerViajando(uData))
-		textSituation = `${bot.config.aviao} Viajando por mais ${bot.segToHour((bot.casais.get(uData.casamentoID, 'viagem') - currTime)/1000)}`
+		textSituation = `${bot.config.aviao} Viajando por mais ${bot.segToHour((bot.casais.get(uData.casamentoID, 'viagem') - currTime) / 1000)}`
 	invOpen.addField("\u200b󠀀󠀀", textSituation)
 
 	/*
@@ -263,6 +234,7 @@ exports.run = async (bot, message, args) => {
 	> O bot irá adicionar botões à mensagem do inventário. Se o usuário que chamou o comando clicar no botão, a mensagem
 	 será editada para mostrar o segundo embed, o botão será trocado para fechar o inv.
 	*/
+	const rowActions = new Discord.MessageActionRow()
 	const rowAbrir = new Discord.MessageActionRow()
 		.addComponents(new Discord.MessageButton()
 			.setStyle('SECONDARY')
@@ -277,40 +249,136 @@ exports.run = async (bot, message, args) => {
 			.setEmoji(emoteFechar)
 			.setCustomId(message.id + message.author.id + 'fechar'))
 
+	const buttonUI = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		.setLabel('User info')
+		.setEmoji(uData.classe != null ? bot.classes[uData.classe].emote : '<:CrossRoadsLogo:757021182020157571>')
+		.setCustomId(message.id + message.author.id + 'userinfo')
+
+	const buttonTemp = new Discord.MessageButton()
+		.setStyle('PRIMARY')
+		.setLabel('Final da temporada 6')
+		.setCustomId(message.id + message.author.id + 'temp')
+
+	rowAbrir.addComponents(buttonUI)
+	rowFechar.addComponents(buttonUI)
+
+	if (uGang) {
+		let boneco = uGang.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang.boneco]
+		const buttonGang = new Discord.MessageButton()
+			.setStyle('SECONDARY')
+			// .setLabel(`Gangue ${uGang.tag !== '' ? `[${uGang.tag}]` : ''} ${uGang.nome}`)
+			.setLabel(`Gangue`)
+			.setEmoji(boneco)
+			.setDisabled(!bot.isComandoUsavelViagem(message, 'gang'))
+			.setCustomId(message.id + message.author.id + 'gang')
+
+		rowAbrir.addComponents(buttonGang)
+		rowFechar.addComponents(buttonGang)
+	}
+
+	if (alvo === message.author.id) {
+		if (uData.invest != null) {
+			const buttonInvest = new Discord.MessageButton()
+				.setStyle('SECONDARY')
+				// .setLabel(bot.investimentos[uData.invest].desc)
+				.setLabel('Investimento')
+				.setEmoji(bot.config.propertyG)
+				.setDisabled(!bot.isComandoUsavelViagem(message, 'investir'))
+				.setCustomId(message.id + message.author.id + 'invest')
+
+			rowAbrir.addComponents(buttonInvest)
+			rowFechar.addComponents(buttonInvest)
+		}
+		rowAbrir.addComponents(buttonTemp)
+		rowFechar.addComponents(buttonTemp)
+
+	} else {
+		const buttonRoubar = new Discord.MessageButton()
+			.setStyle('SECONDARY')
+			.setLabel('Roubar')
+			.setEmoji(bot.config.roubar)
+			.setDisabled(!bot.isComandoUsavelViagem(message, 'roubar'))
+			.setCustomId(message.id + message.author.id + 'roubar')
+
+		const buttonEspancar = new Discord.MessageButton()
+			.setStyle('SECONDARY')
+			.setLabel('Espancar')
+			.setEmoji(bot.config.espancar)
+			.setDisabled(!bot.isComandoUsavelViagem(message, 'espancar'))
+			.setCustomId(message.id + message.author.id + 'espancar')
+
+		const buttonEsmola = new Discord.MessageButton()
+			.setStyle('SECONDARY')
+			.setLabel('Dar esmola')
+			.setEmoji(bot.config.coin)
+			.setDisabled(!bot.isComandoUsavelViagem(message, 'esmola'))
+			.setCustomId(message.id + message.author.id + 'esmola')
+
+		rowActions.addComponents(buttonRoubar).addComponents(buttonEspancar).addComponents(buttonEsmola)
+	}
 
 	let msg = await message.channel.send({
 		embeds: [invClosed],
-		components: [rowAbrir],
-	}).catch(err => console.log("Não consegui enviar mensagem `inv`"));
+		components: rowActions.components.length === 0 ? [rowAbrir] : [rowAbrir, rowActions]
+	}).catch(() => console.log("Não consegui enviar mensagem `inv`"))
 
 
 	const filter = (button) => [
 		message.id + message.author.id + 'abrir',
 		message.id + message.author.id + 'fechar',
+		message.id + message.author.id + 'invest',
+		message.id + message.author.id + 'userinfo',
+		message.id + message.author.id + 'roubar',
+		message.id + message.author.id + 'espancar',
+		message.id + message.author.id + 'esmola',
+		message.id + message.author.id + 'gang',
+		message.id + message.author.id + 'temp',
 	].includes(button.customId) && button.user.id === message.author.id
 
 	const collector = message.channel.createMessageComponentCollector({
 		filter,
 		time: 90000,
-	});
+	})
 
 	collector.on('collect', async b => {
 		await b.deferUpdate()
-		if (b.customId == message.id + message.author.id + 'abrir') {
-			if (msg)
-				msg.edit({
-					embeds: [invOpen],
-					components: [rowFechar]
-				})
+		if (b.customId === message.id + message.author.id + 'abrir') {
+			msg.edit({
+				embeds: [invOpen],
+				components: rowActions.components.length === 0 ? [rowFechar] : [rowFechar, rowActions]
+			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
 
-		} else if (b.customId == message.id + message.author.id + 'fechar') {
-			if (msg)
-				msg.edit({
-					embeds: [invClosed],
-					components: [rowAbrir]
-				})
+		} else if (b.customId === message.id + message.author.id + 'fechar') {
+			msg.edit({
+				embeds: [invClosed],
+				components: rowActions.components.length === 0 ? [rowAbrir] : [rowAbrir, rowActions]
+			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
 
+		} else if (b.customId === message.id + message.author.id + 'invest')
+			bot.commands.get('investir').run(bot, message, args)
+		else if (b.customId === message.id + message.author.id + 'userinfo')
+			bot.commands.get('userinfo').run(bot, message, [alvo])
+		else if (b.customId === message.id + message.author.id + 'roubar')
+			bot.commands.get('roubar').run(bot, message, [alvo])
+		else if (b.customId === message.id + message.author.id + 'espancar')
+			bot.commands.get('espancar').run(bot, message, [alvo])
+		else if (b.customId === message.id + message.author.id + 'esmola')
+			bot.commands.get('esmola').run(bot, message, [alvo])
+		else if (b.customId === message.id + message.author.id + 'gang')
+			bot.commands.get('gang').run(bot, message, [uGang?.nome])
+		else if (b.customId === message.id + message.author.id + 'temp') {
+			const embedTemp = new Discord.MessageEmbed()
+				.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
+				.setDescription("Final da Temporada 6")
+				.addField("A Temporada 6 encerrará dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
+				.addField("A Temporada 7 iniciará dia 31/01!", `Um reset total acontecerá, fique ligado!`)
+				.setColor(bot.colors.admin)
+				.setFooter(`Atenciosamente, Jacobi`)
+			message.channel.send({embeds: [embedTemp]})
+				.catch(() => console.log("Não consegui enviar mensagem `comunicado`"))
 		}
+
 		// else if (reaction.emoji.name === '📢') {
 		// 	const embed = new Discord.MessageEmbed()
 		// 		.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
@@ -329,15 +397,15 @@ exports.run = async (bot, message, args) => {
 		// }
 	})
 
-	collector.on('end', reaction => {
+	collector.on('end', () => {
 		if (msg)
 			msg.edit({
 				components: []
-			}).catch(err => console.log("Não consegui editar mensagem `inv`"));
+			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
 	})
 
 
 }
 exports.config = {
 	alias: ['i', 'inventario', 'mochila', 'bag']
-};
+}

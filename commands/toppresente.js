@@ -1,5 +1,7 @@
 const Discord = require("discord.js");
 exports.run = async (bot, message, args) => {
+	if (!bot.isAdmin(message.author.id)) return
+
 	let top = []
 	let topGlobal = []
 	let isID = false
@@ -39,15 +41,17 @@ exports.run = async (bot, message, args) => {
 			topGlobal.forEach((user, i) => {
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
 				let mod = user.id == message.author.id ? "__" : ""
-				topGlobalString += `\`${i + start + 1}.\` ${emote} ${mod}**${user.nick}**${mod} ${user.presentes.toLocaleString().replace(/,/g, ".")}\n`
-				topGlobalStringID += `\`${i + start + 1}.\` ${emote}  ${mod}**${user.nick}**${mod} ${user.id}\n`
+				let viagem = bot.isPlayerViajando(user) ? `${bot.config.aviao} ` : ''
+				topGlobalString += `\`${i + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${user.presentes.toLocaleString().replace(/,/g, ".")}\n`
+				topGlobalStringID += `\`${i + start + 1}.\` ${viagem}${emote}  ${mod}**${user.nick}**${mod} ${user.id}\n`
 			})
 
 			if (userComando) {
 				let user = bot.data.get(userComando.id)
 				const i = top.indexOf(userComando)
+				let viagem = bot.isPlayerViajando(user) ? `${bot.config.aviao} ` : ''
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
-				topGlobalString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${user._ovo.toLocaleString().replace(/,/g, ".")}\n`;
+				topGlobalString += `\`${i + 1}.\` ${viagem}${emote} __**${user.username}**__ ${user._ovo.toLocaleString().replace(/,/g, ".")}\n`;
 			}
 
 			resultado.setDescription(isID ? topGlobalStringID : topGlobalString, true)
@@ -62,7 +66,7 @@ exports.run = async (bot, message, args) => {
 
 		if (top.length <= 10) return
 
-		msg.react('➡️').then(msg.react('🆔')).catch(err => console.log("Não consegui reagir mensagem `toppresente`"))
+		msg.react('➡️').then(msg.react('🆔')).catch(() => console.log("Não consegui reagir mensagem `toppresente`"))
 
 		const filter = (reaction, user) => ['⬅️', '➡️', '🆔'].includes(reaction.emoji.name) && user.id === message.author.id
 		const collector = msg.createReactionCollector({
@@ -84,19 +88,19 @@ exports.run = async (bot, message, args) => {
 
 				msg.edit({
 					embeds: [generateEmbed(currentIndex)]
-				}).catch(err => console.log("Não consegui editar mensagem `toppresente`"))
+				}).catch(() => console.log("Não consegui editar mensagem `toppresente`"))
 
 				if (currentIndex !== 0)
-					await msg.react('⬅️').catch(err => console.log("Não consegui reagir mensagem `toppresente`"))
+					await msg.react('⬅️').catch(() => console.log("Não consegui reagir mensagem `toppresente`"))
 				if (currentIndex + 10 < top.length)
-					msg.react('➡️').catch(err => console.log("Não consegui reagir mensagem `toppresente`"))
-				msg.react('🆔').catch(err => console.log("Não consegui reagir mensagem `toppresente`"))
-			}).catch(err => console.log("Não consegui remover as reações mensagem `toppresente`"))
+					msg.react('➡️').catch(() => console.log("Não consegui reagir mensagem `toppresente`"))
+				msg.react('🆔').catch(() => console.log("Não consegui reagir mensagem `toppresente`"))
+			}).catch(() => console.log("Não consegui remover as reações mensagem `toppresente`"))
 		})
-		collector.on('end', reaction => {
-			if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `toppresente`"))
+		collector.on('end', () => {
+			if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `toppresente`"))
 		})
-	}).catch(err => console.log("Não consegui enviar mensagem `toppresente`"))
+	}).catch(() => console.log("Não consegui enviar mensagem `toppresente`"))
 };
 //--
 exports.config = {

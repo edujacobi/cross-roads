@@ -5,7 +5,7 @@ exports.run = async (bot, message, args) => {
 	const MULT = uData.invest ? bot.investimentos[uData.invest].id : 1
 	const isVip = uData.vipTime > currTime
 	let daily = isVip ? 750 * MULT : 500 * MULT
-	const evento = true
+	const evento = false
 	const dia = 86040000
 
 	let uCasamento = bot.casais.get(uData.casamentoID)
@@ -18,8 +18,8 @@ exports.run = async (bot, message, args) => {
 		uData.moni += parseInt(daily)
 		if (casado) uData._flor += flores
 
-		let ovo = isVip ? 3 : 1
-		uData._ovo += ovo
+		// let ovo = isVip ? 3 : 1
+		// uData._ovo += ovo
 
 		bot.data.set(message.author.id, uData)
 

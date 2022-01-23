@@ -1,5 +1,5 @@
 exports.run = async (bot, message, args) => {
-	const Discord = require('discord.js');
+	const Discord = require('discord.js')
 	const hora = 3600000
 	let currTime = new Date().getTime()
 	let target = message.mentions.members.first()
@@ -62,12 +62,12 @@ exports.run = async (bot, message, args) => {
 		alvo = user.id
 	})
 
-	if (message.author.id == alvo)
+	if (message.author.id === alvo)
 		return bot.createEmbed(message, `Você não pode dar esmola para si mesmo ${bot.config.coin}`, null, 'GREEN')
 
 	if (uData.moni < esmola)
 		return bot.createEmbed(message, `Você não tem dinheiro suficiente para dar esmola ${bot.config.coin}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`)
-	
+
 	if (bot.isAlvoEmRouboOuEspancamento(message, tData))
 		return
 
@@ -76,7 +76,7 @@ exports.run = async (bot, message, args) => {
 
 			uData.esmolaEntregueHoje = currTime + hora
 
-			tData.esmolaRecebidaHoje = tData.classe == 'mendigo' ? tData.esmolaRecebidaHoje = currTime + (hora / 2) : tData.esmolaRecebidaHoje = currTime + hora
+			tData.esmolaRecebidaHoje = tData.classe === 'mendigo' ? tData.esmolaRecebidaHoje = currTime + (hora / 2) : tData.esmolaRecebidaHoje = currTime + hora
 
 			uData.qtEsmolasDadas += esmola
 			tData.qtEsmolasRecebidas += esmola
@@ -84,10 +84,10 @@ exports.run = async (bot, message, args) => {
 			uData.moni -= esmola
 			tData.moni += esmola
 
-			if (message.author.id == bot.config.adminID) //Jacobi
+			if (message.author.id === bot.config.adminID) //Jacobi
 				uData.esmolaEntregueHoje = currTime
 
-			if (alvo == '526203502318321665') //Bot
+			if (alvo === '526203502318321665') //Bot
 				tData.esmolaRecebidaHoje = currTime
 
 			bot.data.set(message.author.id, uData)
@@ -97,11 +97,10 @@ exports.run = async (bot, message, args) => {
 				.setColor('GREEN')
 				.setDescription(`**${bot.data.get(message.author.id, "username")}** do servidor ${message.guild.name} te deu uma esmola de R$ ${esmola} ${bot.config.coin}`)
 
-			bot.users.fetch(alvo).then(user => user.send({
-				embeds: [msgEsmola]
-			}).catch(err => console.log(`Não consegui mandar mensagem privada para ${tData.username} (${alvo})`)))
+			bot.users.fetch(alvo).then(user => user.send({embeds: [msgEsmola]})
+				.catch(() => console.log(`Não consegui mandar mensagem privada para ${tData.username} (${alvo})`)))
 
-			return bot.createEmbed(message, `Você doou **R$ ${esmola}** para ${tData.username} ${bot.config.coin}`, `${alvo == bot.user.id ? "Obrigado! • " : ""}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
+			return bot.createEmbed(message, `Você doou **R$ ${esmola}** para ${tData.username} ${bot.config.coin}`, `${alvo === bot.user.id ? "Obrigado! • " : ""}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
 
 		} else
 			return bot.createEmbed(message, `${tData.username} deve esperar ${bot.segToHour((tData.esmolaRecebidaHoje - currTime) / 1000)} para receber uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
@@ -111,4 +110,4 @@ exports.run = async (bot, message, args) => {
 }
 exports.config = {
 	alias: ['doar', 'esm', 'alms']
-};
+}

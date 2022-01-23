@@ -81,7 +81,9 @@ const badges = {
 	"bilionario": "<:badge_bilionario:799043221270691851> ",
 
 	"evento_natal_2020": "<:badge_natal_2020:912837287539269672> ",	//"<:badge_natal_2020:799043225536561182> ",
+	"evento_natal_2021": "<:badge_natal_2021:925036708720947200> ",
 	"evento_halloween_2021" : "<:badge_halloween_2021:904559838992932884> ",
+	"evento_natal_galo_2021" : "<:badge_papai_galoel:923685309827399700> ",
 	"campeao_canja": "<:Campeao_Canja:825763812506075197> ",
 	"ovos_dourados": "<:badge_Ovos_Dourados:829907391519916063> ",
 	"galoelho": "<:badge_Galoelho:830022962497060884> ",
@@ -89,7 +91,7 @@ const badges = {
 	"coroamuruDerrotei": "<:EuDerroteiCoroamuru:852733290616062002> ",
 	"mandrake": "<:Mandrake:893958240038166540> ",
 
-	"dev": "<:dev:801248050071994418> ",
+	"dev": "<:Desenvolvedor:925465898414899241> ",//"<:dev:801248050071994418> ",
 	"mod": "<:mod:823251404742721578> ",
 }
 

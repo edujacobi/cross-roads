@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 
 exports.run = async (bot, message, args) => {
 	let option = args[0]
@@ -14,30 +14,30 @@ exports.run = async (bot, message, args) => {
 			.setDescription("Todos os itens tem duração de 72 horas!\nVocê pode multiplicar a duração usando `;loja <id> <multiplicador>`")
 			.setColor('GREEN')
 			.setFooter(`${uData.username} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
-			.setTimestamp();
+			.setTimestamp()
 
 		Object.entries(bot.guns).forEach(([key, value]) => {
 			if (!['minigun', 'jetpack', 'bazuca', 'exoesqueleto', 'ovogranada'].includes(key)) {
 				let ATK = value.atk
 				let DEF = value.def
 				let emote = bot.config[value.emote]
-				if (ATK && ATK.toString().indexOf('noite') == -1) {
-					if (uData.classe == 'assassino') {
-						if (ATK * 1.1 == Math.floor(ATK * 1.1))
+				if (ATK && ATK.toString().indexOf('noite') === -1) {
+					if (uData.classe === 'assassino') {
+						if (ATK * 1.1 === Math.floor(ATK * 1.1))
 							ATK = ATK * 1.1
 						else
 							ATK = (ATK * 1.1).toFixed(1)
 
-					} else if (uData.classe == 'mendigo') {
-						if (ATK * 0.9 == Math.floor(ATK * 0.9))
+					} else if (uData.classe === 'mendigo') {
+						if (ATK * 0.9 === Math.floor(ATK * 0.9))
 							ATK = ATK * 0.9
 						else
 							ATK = (ATK * 0.9).toFixed(1)
 					}
 				}
-				if (DEF && DEF.toString().indexOf('noite') == -1) {
-					if (uData.classe == 'assassino' || uData.classe == 'empresario') {
-						if (DEF * 0.9 == Math.floor(DEF * 0.9))
+				if (DEF && DEF.toString().indexOf('noite') === -1) {
+					if (uData.classe === 'assassino' || uData.classe === 'empresario') {
+						if (DEF * 0.9 === Math.floor(DEF * 0.9))
 							DEF = DEF * 0.9
 						else
 							DEF = (DEF * 0.9).toFixed(1)
@@ -46,20 +46,19 @@ exports.run = async (bot, message, args) => {
 					}
 
 				}
-				embed.addField(`${value.id}: ${emote} ${value.desc}`, `R$ ${(uData.classe == 'mafioso' ? value.preço  : value.preço * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}\n${value.atk != null ? `ATK ${ATK}\n` : ''}${value.def != null ? `DEF ${DEF}\n` : ''}`, true)
+				embed.addField(`${value.id}: ${emote} ${value.desc}`, `R$ ${(uData.classe === 'mafioso' ? value.preço : value.preço * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}\n${value.atk != null ? `ATK ${ATK}\n` : ''}${value.def != null ? `DEF ${DEF}\n` : ''}`, true)
 			}
 		})
-		return message.channel.send({
-			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `loja`"))
+		return message.channel.send({embeds: [embed]})
+			.catch(() => console.log("Não consegui enviar mensagem `loja`"))
 	}
 
-	if (option < 1 || (option % 1 != 0) || option > 15) // 16 = jetpack / 17 = minigun / 18 = bazuca ...
+	if (option < 1 || (option % 1 !== 0) || option > 15) // 16 = jetpack / 17 = minigun / 18 = bazuca ...
 		return bot.createEmbed(message, `O ID deve ser entre 1 e 15 ${bot.config.loja}`, null, 'GREEN')
 
 	let currTime = new Date().getTime()
 
-	if (multiplicador < 1 || (multiplicador % 1 != 0))
+	if (multiplicador < 1 || (multiplicador % 1 !== 0))
 		return bot.createEmbed(message, `O multiplicador informado é inválido ${bot.config.loja}`, null, 'GREEN')
 
 	if (uData.preso > currTime)
@@ -70,30 +69,30 @@ exports.run = async (bot, message, args) => {
 
 	if (bot.isUserEmRouboOuEspancamento(message, uData))
 		return
-		
+
 	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 	Object.values(bot.guns).forEach(gun => {
-		if (parseInt(option) == gun.id) {
-			let preço = uData.classe == 'mafioso' ? gun.preço * multiplicador : gun.preço * multiplicador * (1 + bot.imposto)
+		if (parseInt(option) === gun.id) {
+			let preço = uData.classe === 'mafioso' ? gun.preço * multiplicador : gun.preço * multiplicador * (1 + bot.imposto)
 			if (uData.moni < preço)
-				return bot.msgSemDinheiro(message);
+				return bot.msgSemDinheiro(message)
 
 			if ((uData["_" + gun.data] + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData["_" + gun.data] < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
 				return bot.createEmbed(message, `Você não pode possuir mais que 720 horas de uma mesma arma ${bot.config.loja}`, null, 'GREEN')
 
 			uData.moni -= preço
 			uData.lojaGastos += preço
-			
+
 			let emote = bot.config[gun.emote]
 
-			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} **${gun.desc}**`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN');
-			
+			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} **${gun.desc}**`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
+
 			bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
 
 			Object.entries(uData).forEach(([key_udata, value_udata]) => {
-				if (key_udata == "_" + gun.data && gun.data != 'minigun') {
+				if (key_udata === "_" + gun.data && gun.data !== 'minigun') {
 					value_udata = value_udata > currTime ? value_udata + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
 					uData[key_udata] = value_udata
 				}
@@ -110,8 +109,7 @@ exports.run = async (bot, message, args) => {
 	return bot.data.set(message.author.id, uData)
 
 
-
 }
 exports.config = {
 	alias: ['l', 'shop', 'comprar', 'buy', 'mercado']
-};
+}

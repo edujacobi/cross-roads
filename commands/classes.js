@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	let option = args[0] ? args[0].toString().toLowerCase() : null
 
@@ -14,7 +14,7 @@ exports.run = async (bot, message, args) => {
 			.then(msg => {
 				msg.react('572134588340633611') // aceitar
 					.then(() => msg.react('572134589863034884')) // negar
-					.catch(err => console.log("Não consegui reagir mensagem `classes`"))
+					.catch(() => console.log("Não consegui reagir mensagem `classes`"))
 
 				let filter = (reaction, user) => ['572134588340633611', '572134589863034884'].includes(reaction.emoji.id) && user.id === message.author.id
 
@@ -53,7 +53,7 @@ exports.run = async (bot, message, args) => {
 									.setFooter(uData.username, message.member.user.avatarURL())
 									.setTimestamp()
 								]
-							}).catch(err => console.log("Não consegui editar mensagem `classes`"))
+							}).catch(() => console.log("Não consegui editar mensagem `classes`"))
 
 						} else if (reaction.first()._emoji.id === '572134589863034884') {
 							return msg.edit({
@@ -63,12 +63,12 @@ exports.run = async (bot, message, args) => {
 									.setFooter(uData.username, message.member.user.avatarURL())
 									.setTimestamp()
 								]
-							}).catch(err => console.log("Não consegui editar mensagem `classes`"))
+							}).catch(() => console.log("Não consegui editar mensagem `classes`"))
 						}
-					}).catch(err => console.log("Não consegui remover as reações mensagem `classes`"))
+					}).catch(() => console.log("Não consegui remover as reações mensagem `classes`"))
 
 				}).catch(() => {
-					if (msg) msg.reactions.removeAll().catch(err => console.log("Não consegui remover as reações mensagem `classes`"))
+					if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `classes`"))
 					return msg.edit({
 						embeds: [new Discord.MessageEmbed()
 							.setColor('GREEN')
@@ -76,7 +76,7 @@ exports.run = async (bot, message, args) => {
 							.setFooter(uData.username, message.member.user.avatarURL())
 							.setTimestamp()
 						]
-					}).catch(err => console.log("Não consegui editar mensagem `classes`"))
+					}).catch(() => console.log("Não consegui editar mensagem `classes`"))
 				})
 			})
 
@@ -91,7 +91,7 @@ exports.run = async (bot, message, args) => {
 			empresário: 0,
 			assassino: 0,
 			mendigo: 0
-		};
+		}
 		await bot.data.forEach(user => {
 			if (user.classe == 'ladrao')
 				classesEscolhidas.ladrão++
@@ -105,7 +105,7 @@ exports.run = async (bot, message, args) => {
 				classesEscolhidas.assassino++
 			if (user.classe == 'mendigo')
 				classesEscolhidas.mendigo++
-		});
+		})
 
 		let total = classesEscolhidas.ladrão + classesEscolhidas.advogado + classesEscolhidas.mafioso +
 			classesEscolhidas.empresário + classesEscolhidas.mendigo
@@ -122,7 +122,7 @@ exports.run = async (bot, message, args) => {
 
 		message.channel.send({
 			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `classes top`"))
+		}).catch(() => console.log("Não consegui enviar mensagem `classes top`"))
 
 	} else {
 		const embed = new Discord.MessageEmbed()
@@ -130,19 +130,22 @@ exports.run = async (bot, message, args) => {
 			.setFooter(`${bot.user.username} • Para trocar sua classe, use ;classe alterar`, bot.user.avatarURL())
 			.setColor('GREEN')
 			.setTimestamp()
+
+		let pos = '<:small_green_triangle:801611850491363410>'
+		let neg = '🔻'
+
 		Object.values(bot.classes).forEach(classe => {
 			let emote = bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == classe.emote)
-			embed.addField(`${emote} ${classe.desc}`, `**Positivo**\n${classe.buff}\n**Negativo**\n${classe.debuff}`, true)
+			embed.addField(`${emote} ${classe.desc}`, `${pos} **Positivo**\n${classe.buff}\n${neg} **Negativo**\n${classe.debuff}`, true)
 		})
-		embed.addField("\u200b", "\u200b", true)
+		// embed.addField("\u200b", "\u200b", true)
 
-		message.channel.send({
-			embeds: [embed]
-		}).catch(err => console.log("Não consegui enviar mensagem `classes`"))
+		message.channel.send({embeds: [embed]})
+			.catch(() => console.log("Não consegui enviar mensagem `classes`"))
 
 	}
-};
+}
 
 exports.config = {
 	alias: ['classe', 'personagem', 'ladrao', 'mafioso', 'empresario', 'advogado', 'assassino', 'mendigo']
-};
+}

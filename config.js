@@ -1,7 +1,5 @@
 const config = {
-
-
-	"token": "my-token",
+	
 	"prefix": ";",
 	"adminID": "332228051871989761",
 
@@ -37,6 +35,7 @@ const config = {
 
 	// outros
 	"flor": "<:Flor:879107094010290266>",
+	"namoro": '<:girlfriend:799053368189911081>',
 	"whey": "<:Whey_Protein:825828797265739798>",
 	"superWhey": '<:Super_Whey:829906315434393631>',
 	//"tshirt": "<:tshirt:799040747172134963>",
@@ -83,4 +82,4 @@ const config = {
 
 }
 
-module.exports = config;
+module.exports = config

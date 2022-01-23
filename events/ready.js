@@ -19,15 +19,16 @@ module.exports = async bot => {
 			type: "LISTENING"
 		});
 		setTimeout(() => {
-			bot.user.setActivity(`Temporada 6`, {
+			bot.user.setActivity(`Temporada 6 acabará dia 23/01!`, {
 				type: "PLAYING"
 			});
-		}, hora / 2)
-	}, hora)
+		}, hora)
+	}, hora * 2)
 
 	setInterval(() => {
 		bot.decrescimoNivelCasal()
 	}, hora * 6)
+	
 
 	setInterval(() => {
 		// bot.putMoneyCassino()
@@ -46,7 +47,13 @@ module.exports = async bot => {
 		.setColor('GREEN') // bot.colors.background // 
 		.setTimestamp();
 
-	bot.channels.cache.get('848232046387396628').send({
-		embeds: [embed]
-	})
+	bot.channels.cache.get('848232046387396628')?.send({embeds: [embed]})
+
+	// bot.shard.broadcastEval(`bot.channels.cache.get('848232046387396628')?.send({embeds: [embed]})`)
+
+	// bot.shard.broadcastEval(`
+    //     (async () => {
+    //         await bot.channels.cache.get('848232046387396628')?.send({ embeds: [${JSON.stringify(embed)}] });
+    //     })();
+    // `);
 };

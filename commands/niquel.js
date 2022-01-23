@@ -4,7 +4,8 @@ exports.run = async (bot, message, args) => {
 	let time = new Date().getTime()
 	let uData = bot.data.get(message.author.id)
 	let multiplicador = args[0] ? parseInt(args[0]) : 1
-	const MAX = 10
+	const MULT_INVEST = uData.invest ? bot.investimentos[uData.invest].id : 1
+	const MAX = 5 * MULT_INVEST
 	//	if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return message.channel.send('Comando em manutenção')
 
 	// return bot.createEmbed(message, `🎰 As Máquinas Caça-níqueis estão desativadas durante a primeira semana de temporada`)
@@ -75,7 +76,7 @@ exports.run = async (bot, message, args) => {
 			await msg.edit({
 				embeds: [embed],
 				components: [row]
-			}).catch(err => console.log("Não consegui editar mensagem `niquel`"))
+			}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
 
 			uData = bot.data.get(message.author.id)
 
@@ -112,7 +113,7 @@ exports.run = async (bot, message, args) => {
 				return r.editReply({
 					embeds: [embedSemFicha],
 					components: []
-				}).catch(err => console.log("Não consegui editar mensagem `niquel`"))
+				}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
 			}
 
 			uData.ficha -= 1 * multiplicador
@@ -143,13 +144,13 @@ exports.run = async (bot, message, args) => {
 			if (visor1 == visor2 && visor2 == visor3) {
 				let premio = 150 * multiplicador
 				if (visor1 == bot.config.propertyR)
-					premio = 40 * multiplicador
+					premio = 50 * multiplicador
 
 				else if (visor1 == bot.config.propertyG)
-					premio = 250 * multiplicador
+					premio = 300 * multiplicador
 
 				else if (visor1 == bot.config.cash)
-					premio = 400 * multiplicador
+					premio = 500 * multiplicador
 
 				uData.betW += 1
 				uData.ficha += premio
@@ -185,7 +186,7 @@ exports.run = async (bot, message, args) => {
 			if (multiplicador > 1)
 				embed.setDescription(`**Multiplicador: ${multiplicador}x**`)
 
-			await wait(1000)			
+			await wait(500)			
 
 			button.setDisabled(false)
 				.setLabel("Jogar")
@@ -196,10 +197,10 @@ exports.run = async (bot, message, args) => {
 			await r.editReply({
 				embeds: [embed],
 				components: [row]
-			}).catch(err => console.log("Não consegui editar mensagem `niquel`"))
+			}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
 		})
 
-		collector.on('end', async response => {
+		collector.on('end', async () => {
 			const embed = new Discord.MessageEmbed()
 				.addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝`)
 				.setColor(bot.colors.darkGrey)
@@ -212,7 +213,7 @@ exports.run = async (bot, message, args) => {
 					embeds: [embed],
 					components: []
 				})
-				.catch(err => console.log("Não consegui editar mensagem `niquel`"))
+				.catch(() => console.log("Não consegui editar mensagem `niquel`"))
 		})
 
 	})

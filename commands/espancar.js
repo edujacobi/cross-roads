@@ -99,8 +99,8 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 	if (uData.preso > currTime && targetD.preso < currTime)
 		return bot.msgPreso(message, uData)
 
-	if (targetD.classe == undefined)
-		return bot.createEmbed(message, `**${targetD.username}** não está ativo na temporada e não pode ser espancado ${bot.config.espancar}`, null, bot.colors.espancar)
+	// if (targetD.classe == undefined)
+	// 	return bot.createEmbed(message, `**${targetD.username}** não está ativo na temporada e não pode ser espancado ${bot.config.espancar}`, null, bot.colors.espancar)
 
 	if (bot.isUserEmRouboOuEspancamento(message, uData))
 		return
@@ -137,6 +137,12 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 
 	if (targetD.fugindo > currTime)
 		return bot.createEmbed(message, `**${targetD.username}** está tentando fugir da prisão. Aguarde um momento ${bot.config.police}`, 'Paciência!', bot.colors.espancar)
+	
+	if (alvo == uData.conjuge)
+		return bot.createEmbed(message, `Você não pode espancar o seu cônjuge ${bot.config.espancar}`, null, bot.colors.espancar)
+	
+	if (bot.isPlayerViajando(targetD))
+		return bot.msgPlayerViajando(message, targetD, targetD.username)
 
 	let atkPower = 0
 	let armaATK = ''

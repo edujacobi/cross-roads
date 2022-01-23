@@ -5,57 +5,16 @@ module.exports = bot => {
 	bot.moderators = ['145466251496390656', '843955033543540756', '606290632725626940', '555414232989040661', '731765213237346357', '274726815476744192']
 
 	bot.palavrasBanidas = [
-		'arrombado',
-		'viado',
-		'fdp',
-		'buceta',
-		'puta',
-		'caralh',
-		'filhadaputagem',
-		'filhodaputa',
-		'nazista',
-		'fudido',
-		'verme',
-		'cuzin',
-		'fuder',
-		'biscate',
-		'meretriz',
-		'retardado',
-		'prostituta',
-		'vsf',
-		'vsfd',
-		'estrupar',
-		'estripar',
-		'estuprar',
-		'vadia',
-		'piranha',
-		'cadela',
-		'vagabunda',
-		'mongol',
-		'piroca',
-		'fodasse',
-		'fds',
-		'tnc',
-		'bct',
-		'buseta',
-		'bucetinha',
-		'arrombada',
-		'puto',
-		'bucetao',
-		'buceta',
-		'pinto',
-		'xereca',
-		'hitler',
-		'penis',
+		'arrombado', 'viado', 'fdp', 'buceta', 'puta', 'caralh', 'filhadaputagem', 'filhodaputa', 'nazista',
+		'fudido', 'verme', 'cuzin', 'fuder', 'biscate', 'meretriz', 'retardado', 'prostituta', 'vsf',
+		'vsfd', 'estrupar', 'estripar', 'estuprar', 'vadia', 'piranha', 'cadela', 'vagabunda', 'mongol', 'piroca',
+		'fodasse', 'fds', 'tnc', 'bct', 'buseta', 'bucetinha', 'arrombada', 'puto', 'bucetao', 'buceta', 'pinto',
+		'xereca', 'hitler', 'penis',
 	]
 
-	bot.isAdmin = id => {
-		return id == bot.config.adminID
-	}
+	bot.isAdmin = id => id === bot.config.adminID
 
-	bot.isMod = id => {
-		return bot.moderators.includes(id)
-	}
+	bot.isMod = id => bot.moderators.includes(id)
 
 	bot.getRandom = (min, max) => {
 		min = Math.ceil(min)
@@ -78,42 +37,49 @@ module.exports = bot => {
 	}
 
 	bot.segToHour = segundos => {
-		return `${segundos > 3600 ? `${Math.floor(segundos / 3600)} ${segundos < 7200 ? `hora` : `horas`}${segundos % 3600 == 0 ? '' : ` e ${Math.floor((segundos / 60) % 60)} minutos`}` : Math.floor(segundos) < 60 ? `${Math.floor(segundos)} segundos` : `${Math.floor(segundos / 60)} minutos`}`
+		return `${segundos > 3600 ? `${Math.floor(segundos / 3600)} ${segundos < 7200 ? `hora` : `horas`}${segundos % 3600 === 0 ? '' : ` e ${Math.floor((segundos / 60) % 60)} minutos`}` : Math.floor(segundos) < 60 ? `${Math.floor(segundos)} segundos` : `${Math.floor(segundos / 60)} minutos`}`
 	}
 
 	bot.findUser = (message, args) => {
+		/*
+		Para ver inventário sem pingar (funciona para outros servidores)
+		 Se não tiver uma menção, ele irá pegar a string fornecida (espera-se o username do usuário) e irá procurar
+		 em todo o banco de dados se há alguém com o user. Caso houver mais de um usuário com o mesmo username, ele
+		 informará uma lista dos usuários junto de suas tags (username + discriminator). Se informar a tag ou id, 
+		 o usuário será selecionado corretamente
+		*/
 		let targetMention = message.mentions.members.first()
 		let targetNoMention
 		if (args[0] && !targetMention) {
 			// se não mencionou mas quer ver inv de outro user
-
 			let name = args.join(' ').toLowerCase()
 
-			bot.data.forEach((item, id) => {
-				if ((bot.data.has(id, 'username') && item.username.toLowerCase() == name) || id.toString() == name) targetNoMention = id
+			bot.data.forEach((user, id) => {
+				if (user.username?.toLowerCase() === name || id.toString() === name)
+					targetNoMention = id
 			})
 
-			if (!targetNoMention) return bot.createEmbed(message, 'Usuário não encontrado.')
+			if (!targetNoMention)
+				return bot.createEmbed(message, 'Usuário não encontrado.')
 		}
 
 		let alvo = targetNoMention ? targetNoMention : targetMention ? targetMention.id : message.author.id
 
 		let uData = bot.data.get(alvo)
 
-		if (!uData || uData.username == undefined) return bot.createEmbed(message, 'Este usuário não possui um inventário')
+		if (!uData || uData.username === undefined)
+			return bot.createEmbed(message, 'Este usuário não possui um inventário')
 
-		return {
-			uData,
-			alvo,
-		}
+		return {uData, alvo}
 	}
 
 	bot.decrescimoNivelCasal = async () => {
 		bot.casais.forEach((casal, id) => {
 			if (casal.conjuges) {
 				casal.nivel -= casal.ultimoDecrescimo
-				casal.ultimoDecrescimo += 1
-				if (casal.nivel < 0) casal.nivel = 0
+				casal.ultimoDecrescimo += casal.viagem > Date.now() ? 0 : 1
+				if (casal.nivel < 0)
+					casal.nivel = 0
 				bot.casais.set(id, casal)
 			}
 		})
@@ -264,16 +230,16 @@ module.exports = bot => {
 
 		bot.data.forEach((user, id) => {
 			if (user.invest != null && user.preso < currTime && user.hospitalizado < currTime) {
-				if (user.morto > currTime) user.investLast = currTime
+				if (bot.isPlayerMorto(user)) user.investLast = currTime
 
 				let horas = user.investTime + semana > currTime ? currTime - user.investLast : user.investTime + semana - user.investLast
 				// se investimento ainda não passou de uma semana, então horas = tempo atual - ultimo saque, senão horas = investTime + semana - investLast
 
 				let praSacar = Math.round((horas / hora) * bot.investimentos[user.invest].lucro)
 
-				if (user.classe == 'mafioso') praSacar = Math.round(praSacar * 0.9)
+				if (user.classe === 'mafioso') praSacar = Math.round(praSacar * 0.9)
 
-				if (user.classe == 'empresario') praSacar = Math.round(praSacar * 1.05)
+				if (user.classe === 'empresario') praSacar = Math.round(praSacar * 1.05)
 
 				if (currTime < user.investTime + semana) {
 					//se o investimento ainda não completou uma semana
@@ -281,26 +247,30 @@ module.exports = bot => {
 
 					if (user.investNotification)
 						bot.users.fetch(id).then(user_send => {
-							user_send.send(`Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} de seu investimento **${bot.investimentos[user.invest].desc}** ${bot.config.propertyG}`).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
+							user_send.send(`Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} de seu investimento **${bot.investimentos[user.invest].desc}** ${bot.config.propertyG}`)
+								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
-					user.moni += parseInt(praSacar)
-					user.investGanhos += parseInt(praSacar)
+					user.moni += praSacar
+					user.investGanhos += praSacar
 					user.investLast = currTime
+
 				} else if (user.invest != null) {
 					// se já passou uma semana
 					//linhaInvest = `Seu investimento **${bot.investimentos[user.invest].desc}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} dele ${bot.config.propertyR}`
 					let invest = bot.investimentos[user.invest].desc
 					if (user.investNotification) {
 						bot.users.fetch(id).then(user_send => {
-							user_send.send(`Seu investimento **${invest}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} dele ${bot.config.propertyR}`).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
+							user_send.send(`Seu investimento **${invest}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} dele ${bot.config.propertyR}`)
+								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
 					} else {
 						bot.users.fetch(id).then(user_send => {
-							user_send.send(`Seu investimento **${invest}** acabou ${bot.config.propertyR}`).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
+							user_send.send(`Seu investimento **${invest}** acabou ${bot.config.propertyR}`)
+								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
 					}
-					user.moni += parseInt(praSacar)
-					user.investGanhos += parseInt(praSacar)
+					user.moni += praSacar
+					user.investGanhos += praSacar
 					user.investLast = 0
 					user.invest = null
 					user.investTime = 0
@@ -332,7 +302,7 @@ module.exports = bot => {
 		bot.galos.forEach((galo, id) => {
 			if (galo.emRinha) {
 				bot.users.fetch(id).then(user_send => {
-					user_send.send(`O Cross Roads foi reiniciado durante sua rinha e ela foi cancelada ${bot.config.galo}`).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`))
+					user_send.send(`O Cross Roads foi reiniciado durante sua rinha e ela foi cancelada ${bot.config.galo}`).catch(() => console.log(`Não consegui mandar mensagem privada para ${bot.data.get(id, 'username')} (${id})`))
 				})
 				bot.galos.set(id, false, 'emRinha')
 			}
@@ -350,280 +320,193 @@ module.exports = bot => {
 		let textoBadge = ''
 
 		// BADGES ------------------------------------
-		if (['332228051871989761', '592022325835202600'].includes(userId))
-			//DEV
+		if (['332228051871989761', '592022325835202600'].includes(userId)) //DEV
 			textoBadge += bot.badges.dev
-		if (bot.moderators.includes(userId))
-			//MOD
+		if (bot.moderators.includes(userId)) //MOD
 			textoBadge += bot.badges.mod
-		if (bot.data.get(userId, 'vipTime') > new Date().getTime())
-			// VIP
+		if (bot.data.get(userId, 'vipTime') > new Date().getTime()) // VIP
 			textoBadge += bot.badges.vip
 
-		// TEMPORADA 1 -------------------------------
 		if (!isInv) {
-			if (userId == '215955539274760192')
-				//Top 1 Grana Temporada 1
+			// TEMPORADA 1 -------------------------------
+			if (userId === '215955539274760192') //Top 1 Grana Temporada 1
 				textoBadge += bot.badges.topGrana1_s1
-			if (userId == '384811752245690368')
-				//Top 2 Grana Temporada 1
+			if (userId === '384811752245690368') //Top 2 Grana Temporada 1
 				textoBadge += bot.badges.topGrana2_s1
-			if (userId == '621480481975959562')
-				//Top 3 Grana Temporada 1
+			if (userId === '621480481975959562') //Top 3 Grana Temporada 1
 				textoBadge += bot.badges.topGrana3_s1
 
 			// TEMPORADA 2 -------------------------------
-			if (userId == '660136362514579468')
-				//Top 1 Grana Temporada 2
+			if (userId === '660136362514579468') //Top 1 Grana Temporada 2
 				textoBadge += bot.badges.topGrana1_s2
-			if (userId == '592022325835202600')
-				//Top 2 Grana Temporada 2
+			if (userId === '592022325835202600') //Top 2 Grana Temporada 2
 				textoBadge += bot.badges.topGrana2_s2
-			if (userId == '215955539274760192')
-				//Top 3 Grana Temporada 2
+			if (userId === '215955539274760192') //Top 3 Grana Temporada 2
 				textoBadge += bot.badges.topGrana3_s2
-			if (userId == '695078054497878028')
-				//Top Pancada - Home Run
+			if (userId === '695078054497878028') //Top Pancada - Home Run
 				textoBadge += bot.badges.homerun_s2
-			if (userId == '636327778337423391')
-				//Top Fugas - Fujão
+			if (userId === '636327778337423391') //Top Fugas - Fujão
 				textoBadge += bot.badges.fujao_s2
-			if (userId == '712070601845506143')
-				//Top Win rate cassino - Sortudo
+			if (userId === '712070601845506143') //Top Win rate cassino - Sortudo
 				textoBadge += bot.badges.sortudo_s2
 
 			// TEMPORADA 3 -------------------------------
-			if (userId == '726587303476330577')
-				//Top 1 Grana Temporada 3
+			if (userId === '726587303476330577') //Top 1 Grana Temporada 3
 				textoBadge += bot.badges.topGrana1_s3
-			if (userId == '565928906356424705')
-				//Top 2 Grana Temporada 3
+			if (userId === '565928906356424705') //Top 2 Grana Temporada 3
 				textoBadge += bot.badges.topGrana2_s3
-			if (userId == '450421081120047105')
-				//Top 3 Grana Temporada 3
+			if (userId === '450421081120047105') //Top 3 Grana Temporada 3
 				textoBadge += bot.badges.topGrana3_s3
-			if (userId == '517013970310397974')
-				//Top Pancada - EsmagaCrânio
+			if (userId === '517013970310397974') //Top Pancada - EsmagaCrânio
 				textoBadge += bot.badges.esmagaCranio_s3
-			if (userId == '305096107954798602')
-				//Top espancado - Morto Muito Louco
+			if (userId === '305096107954798602') //Top espancado - Morto Muito Louco
 				textoBadge += bot.badges.mortoMuitoLouco_s3
-			if (userId == '555414232989040661')
-				//Top Fugas - Fujão
+			if (userId === '555414232989040661') //Top Fugas - Fujão
 				textoBadge += bot.badges.fujao_s3
-			if (userId == '747135934100668476')
-				//Top Win rate cassino - Sortudo
+			if (userId === '747135934100668476') //Top Win rate cassino - Sortudo
 				textoBadge += bot.badges.sortudo_s3
-			if (userId == '517013970310397974')
-				//Top ganhos cassino - Trader Elite
+			if (userId === '517013970310397974') //Top ganhos cassino - Trader Elite
 				textoBadge += bot.badges.traderElite_s3
-			if (userId == '145466251496390656')
-				//Top Roubos qt - Mão Boba
+			if (userId === '145466251496390656') //Top Roubos qt - Mão Boba
 				textoBadge += bot.badges.maoBoba_s3
-			if (userId == '555414232989040661')
-				//Top Roubos vl - Bolso Largo
+			if (userId === '555414232989040661') //Top Roubos vl - Bolso Largo
 				textoBadge += bot.badges.bolsoLargo_s3
-			if (userId == '487046604147392521')
-				//Top Win rate galo - Top Galo
+			if (userId === '487046604147392521') //Top Win rate galo - Top Galo
 				textoBadge += bot.badges.topGalo_s3
-			if (userId == '786127589122768917')
-				//Top roubado - Alvo Ambulante
+			if (userId === '786127589122768917') //Top roubado - Alvo Ambulante
 				textoBadge += bot.badges.alvoAmbulante_s3
-			if (userId == '731765213237346357')
-				//Top esmola - Filantropo
+			if (userId === '731765213237346357') //Top esmola - Filantropo
 				textoBadge += bot.badges.filantropo_s3
-			if (userId == '517013970310397974')
-				//Top investidor - Investidor
+			if (userId === '517013970310397974') //Top investidor - Investidor
 				textoBadge += bot.badges.investidor_s3
-			if (userId == '517013970310397974')
-				//Top trabalhador - Workaholic
+			if (userId === '517013970310397974') //Top trabalhador - Workaholic
 				textoBadge += bot.badges.workaholic_s3
-			if (userId == '533848042387013648')
-				//Top gastador - Patricinha
+			if (userId === '533848042387013648') //Top gastador - Patricinha
 				textoBadge += bot.badges.patricinha_s3
-			if (userId == '555414232989040661')
-				//Top suborno - Deputado
+			if (userId === '555414232989040661') //Top suborno - Deputado
 				textoBadge += bot.badges.deputado_s3
-			if (userId == '675378704469196800')
-				//Top hospital doente - Hipocondriaco
+			if (userId === '675378704469196800') //Top hospital doente - Hipocondriaco
 				textoBadge += bot.badges.hipocondriaco_s3
 
 			// TEMPORADA 4 -------------------------------
-			if (userId == '479611442824216576')
-				//Top 1 Grana Temporada 4
+			if (userId === '479611442824216576') //Top 1 Grana Temporada 4
 				textoBadge += bot.badges.topGrana1_s4
-			if (userId == '773017599121686570')
-				//Top 2 Grana Temporada 4
+			if (userId === '773017599121686570') //Top 2 Grana Temporada 4
 				textoBadge += bot.badges.topGrana2_s4
-			if (userId == '761236646116982844')
-				//Top 3 Grana Temporada 4
+			if (userId === '761236646116982844') //Top 3 Grana Temporada 4
 				textoBadge += bot.badges.topGrana3_s4
-			if (userId == '516023056095772674')
-				//Top Pancada - EsmagaCrânio
+			if (userId === '516023056095772674') //Top Pancada - EsmagaCrânio
 				textoBadge += bot.badges.esmagaCranio_s4
-			if (userId == '698361824340344965')
-				//Top Fugas - Fujão
+			if (userId === '698361824340344965') //Top Fugas - Fujão
 				textoBadge += bot.badges.fujao_s4
-			if (userId == '406554359862788100')
-				//Top Win rate cassino - Sortudo
+			if (userId === '406554359862788100') //Top Win rate cassino - Sortudo
 				textoBadge += bot.badges.sortudo_s4
-			if (userId == '145466251496390656')
-				//Top ganhos cassino - Trader Elite
+			if (userId === '145466251496390656') //Top ganhos cassino - Trader Elite
 				textoBadge += bot.badges.traderElite_s4
-			if (userId == '698361824340344965')
-				//Top Roubos qt - Mão Boba
+			if (userId === '698361824340344965') //Top Roubos qt - Mão Boba
 				textoBadge += bot.badges.maoBoba_s4
-			if (userId == '698361824340344965')
-				//Top Roubos vl - Bolso Largo
+			if (userId === '698361824340344965') //Top Roubos vl - Bolso Largo
 				textoBadge += bot.badges.bolsoLargo_s4
-			if (userId == '667909521682989056')
-				//Top Win rate galo - Top Galo
+			if (userId === '667909521682989056') //Top Win rate galo - Top Galo
 				textoBadge += bot.badges.topGalo_s4
-			if (userId == '490281882697728010')
-				//Top esmola - Filantropo
+			if (userId === '490281882697728010') //Top esmola - Filantropo
 				textoBadge += bot.badges.filantropo_s4
-			if (userId == '761236646116982844')
-				//Top investidor - Investidor
+			if (userId === '761236646116982844') //Top investidor - Investidor
 				textoBadge += bot.badges.investidor_s4
-			if (userId == '724639028636287049')
-				//Top trabalhador - Workaholic
+			if (userId === '724639028636287049') //Top trabalhador - Workaholic
 				textoBadge += bot.badges.workaholic_s4
-			if (userId == '555414232989040661')
-				//Top gastador - Patricinha
+			if (userId === '555414232989040661') //Top gastador - Patricinha
 				textoBadge += bot.badges.patricinha_s4
-			if (userId == '698361824340344965')
-				//Top suborno - Deputado
+			if (userId === '698361824340344965') //Top suborno - Deputado
 				textoBadge += bot.badges.deputado_s4
-			if (userId == '145466251496390656')
-				//Top hospital doente - Hipocondriaco
+			if (userId === '145466251496390656') //Top hospital doente - Hipocondriaco
 				textoBadge += bot.badges.hipocondriaco_s4
-			if (userId == '698361824340344965')
-				//Top vasculhamentos - Xeroque Holmes
+			if (userId === '698361824340344965') //Top vasculhamentos - Xeroque Holmes
 				textoBadge += bot.badges.xeroqueHolmes_s4
 		}
 
 		// TEMPORADA 5 -------------------------------
-		if (userId == '565928906356424705')
-			//Top 1 Grana Temporada 5
+		if (userId === '565928906356424705') //Top 1 Grana Temporada 5
 			textoBadge += bot.badges.topGrana1_s5
-		if (userId == '743494282308223156')
-			//Top 2 Grana Temporada 5
+		if (userId === '743494282308223156') //Top 2 Grana Temporada 5
 			textoBadge += bot.badges.topGrana2_s5
-		if (userId == '367423139132604416')
-			//Top 3 Grana Temporada 5
+		if (userId === '367423139132604416') //Top 3 Grana Temporada 5
 			textoBadge += bot.badges.topGrana3_s5
-		if (userId == '606290632725626940')
-			//Top Pancada - EsmagaCrânio
+		if (userId === '606290632725626940') //Top Pancada - EsmagaCrânio
 			textoBadge += bot.badges.esmagaCranio_s5
-		if (userId == '481618309851250688')
-			//Top Fugas - Fujão
+		if (userId === '481618309851250688') //Top Fugas - Fujão
 			textoBadge += bot.badges.fujao_s5
-		if (userId == '880983727885406248')
-			//Top Win rate cassino - Sortudo
+		if (userId === '880983727885406248') //Top Win rate cassino - Sortudo
 			textoBadge += bot.badges.sortudo_s5
-		if (userId == '145466251496390656')
-			//Top ganhos cassino - Trader Elite
+		if (userId === '145466251496390656') //Top ganhos cassino - Trader Elite
 			textoBadge += bot.badges.traderElite_s5
-		if (userId == '731765213237346357')
-			//Top Roubos qt - Mão Boba
+		if (userId === '731765213237346357') //Top Roubos qt - Mão Boba
 			textoBadge += bot.badges.maoBoba_s5
-		if (userId == '593444673297580042')
-			//Top Roubos vl - Bolso Largo
+		if (userId === '593444673297580042') //Top Roubos vl - Bolso Largo
 			textoBadge += bot.badges.bolsoLargo_s5
-		if (userId == '726587303476330577')
-			//Top Win rate galo - Top Galo
+		if (userId === '726587303476330577') //Top Win rate galo - Top Galo
 			textoBadge += bot.badges.topGalo_s5
-		if (userId == '145466251496390656')
-			//Top esmola - Filantropo
+		if (userId === '145466251496390656') //Top esmola - Filantropo
 			textoBadge += bot.badges.filantropo_s5
-		if (userId == '566417328586096655')
-			//Top investidor - Investidor
+		if (userId === '566417328586096655') //Top investidor - Investidor
 			textoBadge += bot.badges.investidor_s5
-		if (userId == '565928906356424705')
-			//Top trabalhador - Workaholic
+		if (userId === '565928906356424705') //Top trabalhador - Workaholic
 			textoBadge += bot.badges.workaholic_s5
-		if (userId == '566417328586096655')
-			//Top gastador - Patricinha
+		if (userId === '566417328586096655') //Top gastador - Patricinha
 			textoBadge += bot.badges.patricinha_s5
-		if (userId == '593444673297580042')
-			//Top suborno - Deputado
+		if (userId === '593444673297580042') //Top suborno - Deputado
 			textoBadge += bot.badges.deputado_s5
-		if (userId == '555414232989040661')
-			//Top hospital doente - Hipocondriaco
+		if (userId === '555414232989040661') //Top hospital doente - Hipocondriaco
 			textoBadge += bot.badges.hipocondriaco_s5
-		if (userId == '731765213237346357')
-			//Top vasculhamentos - Xeroque Holmes
+		if (userId === '731765213237346357') //Top vasculhamentos - Xeroque Holmes
 			textoBadge += bot.badges.xeroqueHolmes_s5
-		if (
-			[
-				'646778544512565248',
-				'740753560706220153',
-				'859916007853785128',
-				'533848042387013648',
-				'334086157686013952',
-				'684897590529359918',
-				'145466251496390656',
-				'726587303476330577',
-				'508730960469164047',
-				'708669255343800321',
-				'776684955362656286',
-				'578192731256389633',
-				'342505762624503808',
-				'671843186649333791',
-				'370042915373973505',
-				'818674190756347924',
-				'882698935838322739',
-				'495412204703580160',
-				'784245228029870162',
-				'561191619311697921',
-			].includes(userId)
-		)
+		if ([
+			'646778544512565248', '740753560706220153',
+			'859916007853785128', '533848042387013648',
+			'334086157686013952', '684897590529359918',
+			'145466251496390656', '726587303476330577',
+			'508730960469164047', '708669255343800321',
+			'776684955362656286', '578192731256389633',
+			'342505762624503808', '671843186649333791',
+			'370042915373973505', '818674190756347924',
+			'882698935838322739', '495412204703580160',
+			'784245228029870162', '561191619311697921',
+		].includes(userId))
 			textoBadge += bot.badges.topGangue_s5
 
 		// OUTROS ------------------------------------
 
-		if (['332228051871989761', '493121335749246989', '843955033543540756', '517013970310397974', '390655016307916812'].includes(userId)) textoBadge += bot.badges.evento_natal_2020
-
-		if (bot.data.has(userId, 'badgePascoa2020_dourado') && bot.data.get(userId, 'badgePascoa2020_dourado') == true) textoBadge += bot.badges.ovos_dourados
-
-		if (['740753560706220153', '145466251496390656', '352125425901895687', '859916007853785128', '400425520182853647'].includes(userId)) textoBadge += bot.badges.coroamuruDerrotei
-
-		if (bot.data.has(userId, 'badgeHalloween2021') && bot.data.get(userId, 'badgeHalloween2021') == true) textoBadge += bot.badges.evento_halloween_2021
-
-		if (
-			[
-				'846441465529630740',
-				'715351546363379792',
-				'508730960469164047',
-				'761236646116982844',
-				'338191478637592577',
-				'654365946219200512',
-				'565928906356424705',
-				'636327778337423391',
-				'650893454519435264',
-				'592022325835202600',
-				'215955539274760192',
-				'405930523622375424',
-				'316962994737119232',
-				'274726815476744192',
-				'332228051871989761',
-				'335407447181230080',
-				'462252828832956416',
-				'843955033543540756',
-				'697549215475433552',
-				'493121335749246989',
-				'517013970310397974',
-				'555414232989040661',
-				'145466251496390656',
-				'516023056095772674',
-				'729036810826678317',
-			].includes(userId)
-		)
+		if ([
+			'846441465529630740', '715351546363379792', '508730960469164047',
+			'761236646116982844', '338191478637592577', '654365946219200512',
+			'565928906356424705', '636327778337423391', '650893454519435264',
+			'592022325835202600', '215955539274760192', '405930523622375424',
+			'316962994737119232', '274726815476744192', '332228051871989761',
+			'335407447181230080', '462252828832956416', '843955033543540756',
+			'697549215475433552', '493121335749246989', '517013970310397974',
+			'555414232989040661', '145466251496390656', '516023056095772674',
+			'729036810826678317', '372142137594347531']
+			.includes(userId))
 			textoBadge += bot.badges.cataBug
 
-		if (['460196598539092025', '660136362514579468', '650893454519435264', '332228051871989761', '555414232989040661', '667107441149870090', '732499761013325840', '593444673297580042', '727924880380526592', '562709955661135922'].includes(userId)) textoBadge += bot.badges.bilionario
+		if ([
+			'460196598539092025', '660136362514579468', '650893454519435264',
+			'332228051871989761', '555414232989040661', '667107441149870090',
+			'732499761013325840', '593444673297580042', '727924880380526592',
+			'562709955661135922']
+			.includes(userId)) textoBadge += bot.badges.bilionario
 
-		if (textoBadge == '') return ''
+		if (['332228051871989761', '493121335749246989', '843955033543540756', '517013970310397974', '390655016307916812'].includes(userId)) textoBadge += bot.badges.evento_natal_2020 // 12/2020
+
+		if (bot.data.has(userId, 'badgePascoa2020_dourado') && bot.data.get(userId, 'badgePascoa2020_dourado') === true) textoBadge += bot.badges.ovos_dourados // 04/2021
+
+		if (['740753560706220153', '145466251496390656', '352125425901895687', '859916007853785128', '400425520182853647'].includes(userId)) textoBadge += bot.badges.coroamuruDerrotei // 06/2021
+
+		if (bot.data.has(userId, 'badgeHalloween2021') && bot.data.get(userId, 'badgeHalloween2021') === true) textoBadge += bot.badges.evento_halloween_2021 // 10/2021
+
+		if (bot.data.has(userId, 'badgeNatal2021') && bot.data.get(userId, 'badgeNatal2021') === true) textoBadge += bot.badges.evento_natal_2021 // 12/2021
+
+		if (textoBadge === '') return ''
 
 		return textoBadge + '\n'
 	}
@@ -633,16 +516,18 @@ module.exports = bot => {
 		let hora = new Date().getHours()
 		let diaUltimoSorteio = bot.bilhete.get('diaUltimoSorteio')
 
-		if (hora >= 18 && hoje != diaUltimoSorteio) {
+		if (hora >= 18 && hoje !== diaUltimoSorteio) {
 			let total = Math.round((bot.bilhete.get('acumulado') / 3) * 2)
+			// let total = bot.bilhete.get('acumulado')
 			let cassino = Math.round(bot.bilhete.get('acumulado') / 3)
+			// let cassino = 0
 			let participantes = []
 
 			bot.bilhete.forEach((user, id) => {
-				if (id == parseInt(id)) participantes.push(id)
+				if (id === parseInt(id)) participantes.push(id)
 			})
 
-			if (participantes.length == 0) {
+			if (participantes.length === 0) {
 				bot.bilhete.set('diaUltimoSorteio', hoje)
 				return
 			}
@@ -668,15 +553,13 @@ module.exports = bot => {
 				.setTitle(`🎟️ Bilhete premiado`)
 				.setColor(bot.colors.darkGrey)
 				.setDescription(`O vencedor do sorteio de ${dias[hoje]} é **${uData.username}**, que levou para casa R$ ${total.toLocaleString().replace(/,/g, '.')}!`)
+				// .setDescription(`O vencedor da MEGA DA VIRADA é **${uData.username}**, que levou para casa R$ ${total.toLocaleString().replace(/,/g, '.')}!`)
 				.setFooter(`Bilhete vencedor: #${bot.bilhete.get(numeroVencedor, 'numero')}`)
 
 			participantes.forEach(id => {
 				bot.users.fetch(id).then(user =>
-					user
-						.send({
-							embeds: [embedLose],
-						})
-						.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`))
+					user.send({embeds: [embedLose]})
+						.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`))
 				)
 			})
 
@@ -687,11 +570,8 @@ module.exports = bot => {
 				.setFooter(`Bilhete vencedor: #${bot.bilhete.get(numeroVencedor, 'numero')}`)
 
 			bot.users.fetch(numeroVencedor).then(user =>
-				user
-					.send({
-						embeds: [embedWin],
-					})
-					.catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${numeroVencedor})`))
+				user.send({embeds: [embedWin]})
+					.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${numeroVencedor})`))
 			)
 
 			const log = new Discord.MessageEmbed()
@@ -707,14 +587,12 @@ module.exports = bot => {
 			bot.bilhete.set('lastWinner', ganhador)
 			bot.bilhete.set('acumulado', 0)
 
-			return bot.channels.cache.get('848232046387396628').send({
-				embeds: [log],
-			})
+			return bot.channels.cache.get('848232046387396628').send({embeds: [log],})
 		}
 	}
 
 	bot.clean = async (bot, text) => {
-		if (text && text.constructor.name == 'Promise') text = await text
+		if (text && text.constructor.name === 'Promise') text = await text
 
 		if (typeof evaled !== 'string')
 			text = require('util').inspect(text, {
@@ -734,7 +612,7 @@ module.exports = bot => {
 			const props = require(`../commands/${commandName}`)
 			if (props.init) props.init(bot)
 
-			cmd = commandName.substring(0, commandName.length - 3)
+			let cmd = commandName.substring(0, commandName.length - 3)
 			bot.commands.set(cmd, props)
 			console.log('comando ' + commandName + ' carregado')
 			return false
@@ -761,6 +639,7 @@ module.exports = bot => {
 			.setAuthor(`${bot.data.get(message.author.id, 'username')} (${message.author.id})`, message.author.avatarURL())
 			.setTimestamp()
 			.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
+
 		bot.channels.cache.get('848232046387396628').send({
 			embeds: [logMessage],
 		})
