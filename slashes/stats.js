@@ -10,9 +10,9 @@ exports.run = async (bot, interaction) => {
 			count_online += 1
 	}
 
-	minToMonths = (minutos) => {
+	let minToMonths = (minutos) => {
 		return `${Math.floor(minutos / 1440)} dias ${(minutos > 60 ? `e ${Math.floor((minutos / 24) % 24)} ${(minutos < 120 ? `hora` : `horas`)}` : "")}`
-	};
+	}
 
 	let avatar
 
