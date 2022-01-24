@@ -174,7 +174,7 @@ async function roubarLugar(bot, message, lugar, uData) {
 		conjuge = bot.data.get(uData.conjuge)
 	})
 
-	let sucesso = (chance < lugar.sucesso ? true : false)
+	let sucesso = (chance < lugar.sucesso)
 
 	await wait(10000 + (5000 * lugar.id))
 
@@ -254,7 +254,7 @@ async function roubarLugar(bot, message, lugar, uData) {
 
 	} else {
 		uData.roubosL++
-		let multiplo = uData.classe == 'ladrao' ? 1.1 : (uData.classe == 'advogado' ? 0.85 : 1)
+		let multiplo = uData.classe === 'ladrao' ? 1.1 : (uData.classe === 'advogado' ? 0.85 : 1)
 		let tempo_preso = (lugar.id * 20) * (multiplo * multiplicador_evento_tempo_preso)
 		uData.preso = currTime + Math.floor(tempo_preso * 60 * 1000)
 

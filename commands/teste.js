@@ -12,7 +12,7 @@ exports.run = async (bot, message, args) => {
 // 	// bot.banco.set('cassino', 200000)
 // 	// // bot.createEmbed(message, `R$ 200.000.000 foram transferidos do ${bot.config.cash} Banco para o caixa do ${bot.config.mafiaCasino} Cassino`)
 
-// 	// bot.gangs.clear()
+	bot.gangs.clear()
 
 // 	// bot.bilhete.clear()
 // 	// bot.bilhete.set('diaUltimoSorteio', 6)
@@ -82,96 +82,95 @@ exports.run = async (bot, message, args) => {
 			// bot.data.delete(id, 'galoL')
 			// bot.data.delete(id, 'tempoRinha')
 			// bot.data.delete(id, 'presente')
-			// user.moni = 0
-			// user.ficha = 0
-			// user.weekly = 0
-			// user.day = 0
-			// user._knife = 0
-			// user._colt45 = 0
-			// user._tec9 = 0
-			// user._rifle = 0
-			// user._shotgun = 0
-			// user._mp5 = 0
-			// user._ak47 = 0
-			// user._m4 = 0
-			// user._sniper = 0
-			// user._rpg = 0
-			// user._goggles = 0
-			// user._exoesqueleto = 0
-			// user._katana = 0
-			// user._colete = 0
-			// user._colete_p = 0
-			// user._jetpack = 0
-			// user._minigun = 0
-			// user._bazuca = 0
-			// user._ovo = 0
-			// user._ovogranada = 0
-			// user.job = null
-			if (user.job == null)
-				user.jobTime = 0
-			// user.roubo = 0
-			// user.preso = 0
-			// user.fuga = 0
-			// user.qtEsmolasDadas = 0
-			// user.qtEsmolasRecebidas = 0
-			// user.esmolaEntregueHoje = 0
-			// user.esmolaRecebidaHoje = 0
-			// user.betJ = 0
-			// user.betW = 0
-			// user.betL = 0
-			// user.roubosW = 0
-			// user.roubosL = 0
-			// user.valorRoubado = 0
-			// user.qtFugas = 0
-			// user.qtRoubado = 0
-			// user.jobGanhos = 0
-			// user.lojaGastos = 0
-			// user.invest = null
-			// user.investTime = 0
-			// user.investNotification = null
-			// user.investGanhos = 0
-			// user.espancarW = 0
-			// user.espancarL = 0
-			// user.hospitalizado = 0
-			// user.espancar = 0
-			// user.vasculhar = 0
-			// user.vasculharAchou = 0
-			// user.qtHospitalizado = 0
-			// user.hospitalGastos = 0
-			// user.cassinoGanhos = 0
-			// user.cassinoPerdidos = 0
-			// user.prisaoGastos = 0
-			// user.depositoGang = 0
-			// user.emRoubo = {
-			// 	tempo: 0,
-			// 	user: null,
-			// 	isAlvo: false
-			// }
-			// user.emEspancamento = {
-			// 	tempo: 0,
-			// 	user: null,
-			// 	isAlvo: false
-			// }
-			// // user.morto = 0
-			// user._celular = 0
-			// user.celularSmsBlock = false
-			// user.celularPego = 0
-			// user.celularCredito = 0
-			// user.nickAlterado = false
-			// user.gangID = null
-			// user.classeAlterada = 0
+			user.moni = 0
+			user.ficha = 0
+			user.weekly = 0
+			user.day = 0
+			user._knife = 0
+			user._colt45 = 0
+			user._tec9 = 0
+			user._rifle = 0
+			user._shotgun = 0
+			user._mp5 = 0
+			user._ak47 = 0
+			user._m4 = 0
+			user._sniper = 0
+			user._rpg = 0
+			user._goggles = 0
+			user._exoesqueleto = 0
+			user._katana = 0
+			user._colete = 0
+			user._colete_p = 0
+			user._jetpack = 0
+			user._minigun = 0
+			user._bazuca = 0
+			user._ovo = 0
+			user._ovogranada = 0
+			user._flor = 0
+			user.job = null
+			user.jobTime = 0
+			user.roubo = 0
+			user.preso = 0
+			user.fuga = 0
+			user.qtEsmolasDadas = 0
+			user.qtEsmolasRecebidas = 0
+			user.esmolaEntregueHoje = 0
+			user.esmolaRecebidaHoje = 0
+			user.betJ = 0
+			user.betW = 0
+			user.betL = 0
+			user.roubosW = 0
+			user.roubosL = 0
+			user.valorRoubado = 0
+			user.qtFugas = 0
+			user.qtRoubado = 0
+			user.jobGanhos = 0
+			user.lojaGastos = 0
+			user.invest = null
+			user.investTime = 0
+			user.investNotification = null
+			user.investGanhos = 0
+			user.espancarW = 0
+			user.espancarL = 0
+			user.hospitalizado = 0
+			user.espancar = 0
+			user.vasculhar = 0
+			user.vasculharAchou = 0
+			user.qtHospitalizado = 0
+			user.hospitalGastos = 0
+			user.cassinoGanhos = 0
+			user.cassinoPerdidos = 0
+			user.prisaoGastos = 0
+			user.depositoGang = 0
+			user.fugindo = 0
+			user.emRoubo = {
+				tempo: 0,
+				user: null,
+				isAlvo: false
+			}
+			user.emEspancamento = {
+				tempo: 0,
+				user: null,
+				isAlvo: false
+			}
+			// user.morto = 0
+			user._celular = 0
+			user.celularSmsBlock = false
+			user.celularPego = 0
+			user.celularCredito = 0
+			user.nickAlterado = false
+			user.gangID = null
+			user.classeAlterada = 0
 			// if (user.vipTime > Date.now())
 			// 	user.vipTime += tres_dias * 3
 
-			// if (user.classe != undefined)
-			// 	bot.data.delete(id, 'classe')
-
-			// user.fugindo = 0
-			// user._flor = 0
+			if (user.classe != undefined)
+				bot.data.delete(id, 'classe')
+			
 			// bot.data.set(id, user)
 
 			// if (user.username != undefined && user.username.length > 18)
-			// 		bot.data.delete(id, 'username')
+			// // 		bot.data.delete(id, 'username')
 
 			bot.data.set(id, user)
 		}

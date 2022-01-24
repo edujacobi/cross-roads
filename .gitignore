@@ -4,3 +4,4 @@
 /enmap-backup-14-dez-21.sqlite
 .env
 /enmap-backup-30-dez-21.sqlite
+/.env.testing

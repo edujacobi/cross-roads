@@ -2,7 +2,7 @@
   "name": "cross-roads",
   "version": "1.0.0",
   "description": "Cross Roads Game Discord Bot",
-  "main": "index.js",
+  "main": "bot.js",
   "dependencies": {
     "better-sqlite3": "^7.4.3",
     "bufferutil": "^4.0.1",
@@ -20,7 +20,8 @@
     "piii-filters": "^1.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --unhandled-rejections=warn --expose-gc bot.js"
   },
   "repository": {
     "type": "git",

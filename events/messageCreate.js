@@ -4,8 +4,8 @@ const Piii = require('piii')
 const piiiFilters = require('piii-filters')
 
 module.exports = (bot, message) => {
-	// if (message.author.id != bot.config.adminID && !bot.moderators.includes(message.author.id))
-	// 	return
+	if ((!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id))) && process.env.NODE_ENV === "test")
+		return
 
 	// if (message.author.id !== bot.config.adminID)
 	// 	return

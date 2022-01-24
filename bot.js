@@ -3,7 +3,9 @@ const {Client, Intents, Options} = require('discord.js')
 const {promisify} = require("util")
 const readdir = promisify(require("fs").readdir)
 const {readdirSync} = require("fs")
-require('dotenv/config')
+require('dotenv').config({
+	path: process.env.NODE_ENV === "test" ? ".env.testing" : ".env"
+})
 const Enmap = require("enmap")
 const bot = new Client(
 	{
