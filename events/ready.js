@@ -19,7 +19,7 @@ module.exports = async bot => {
 			type: "LISTENING"
 		});
 		setTimeout(() => {
-			bot.user.setActivity(`Temporada 6 acabará dia 23/01!`, {
+			bot.user.setActivity(`Temporada 7 iniciará dia 31/01!`, {
 				type: "PLAYING"
 			});
 		}, hora)

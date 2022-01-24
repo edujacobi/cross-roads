@@ -229,7 +229,7 @@ module.exports = bot => {
 		let currTime = new Date().getTime()
 
 		bot.data.forEach((user, id) => {
-			if (user.invest != null && user.preso < currTime && user.hospitalizado < currTime) {
+			if (user.username != undefined && user.invest != null && user.preso < currTime && user.hospitalizado < currTime) {
 				if (bot.isPlayerMorto(user)) user.investLast = currTime
 
 				let horas = user.investTime + semana > currTime ? currTime - user.investLast : user.investTime + semana - user.investLast
