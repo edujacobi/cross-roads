@@ -118,7 +118,7 @@ exports.run = async (bot, message, args) => {
 
 			let dia = new Date().getDay()
 			let hora = new Date().getHours()
-			
+
 			let btnSuperWhey = new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Super Whey')
@@ -127,14 +127,14 @@ exports.run = async (bot, message, args) => {
 				.setCustomId(message.id + message.author.id + 'superwhey')
 
 			let precoSuperWhey = uData.classe === 'mafioso' ? 5000000 : (5000000 * (1 + bot.imposto))
-			
+
 			if (user.moni >= precoSuperWhey && !(dia !== 0 && dia !== 6 && !(dia === 5 && hora >= 20)))
 				btnSuperWhey.setDisabled(false)
 
-			if (galo.power >= 70){
+			if (galo.power >= 70) {
 				row.addComponents(btnSuperWhey)
 			}
-			
+
 			row.addComponents(buttonEditar)
 
 			let msg = await message.channel.send({
@@ -860,8 +860,8 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `**${uGalo.nome}** treinará por ${bot.segToHour((trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
 
 	}
-	else if (option === "info") { // ter infos sobre os galos
-		//let uGalo = bot.galos.get(message.author.id)
+	else if (option === "info") {
+		// ter infos sobre os galos
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.galo} Galos`)
 			.setThumbnail("https://cdn.discordapp.com/attachments/529674667414519810/530616556518899722/unknown.png")
@@ -906,102 +906,71 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 		let tGalo = bot.galos.get(alvo.id)
 		let tData = bot.data.get(alvo.id)
 
-		if (!tGalo) {
+		if (!tGalo)
 			return bot.createEmbed(message, `Este usuário não é um jogador ${bot.config.galo}`, null, bot.colors.white)
-		}
-		if (message.author.id === targetMention.id) {
+		if (message.author.id === targetMention.id)
 			return bot.createEmbed(message, `Seu galo não pode lutar com ele mesmo ${bot.config.galo}`, null, bot.colors.white)
-		}
-		if (uGalo.descansar > currTime) {
+		if (uGalo.descansar > currTime)
 			return bot.msgGaloDescansando(message, uGalo)
-		}
-		if (tGalo.descansar > currTime) {
+		if (tGalo.descansar > currTime)
 			return bot.msgGaloDescansando(message, tGalo, tData.username)
-		}
-		if (uGalo.train == 1) {
-			if (uGalo.trainTime > currTime) {
-				return bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
-			}
-			else {
-				return bot.createEmbed(message, `Seu galo terminou o treinamento. Conclua-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
-			}
-		}
-		if (tGalo.train == 1) {
-			if (tGalo.trainTime > currTime) {
-				return bot.createEmbed(message, `O galo de ${tData.username} está treinando por mais ${bot.segToHour((tGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
-			}
-			else {
-				return bot.createEmbed(message, `O galo de ${tData.username} terminou o treinamento. Ele deve concluí-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
-			}
-		}
-		if (uGalo.emRinha) {
+		if (uGalo.train)
+			return uGalo.trainTime > currTime ?
+				bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
+				: bot.createEmbed(message, `Seu galo terminou o treinamento. Conclua-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
+		if (tGalo.train)
+			return tGalo.trainTime > currTime ?
+				bot.createEmbed(message, `O galo de ${tData.username} está treinando por mais ${bot.segToHour((tGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
+				: bot.createEmbed(message, `O galo de ${tData.username} terminou o treinamento. Ele deve concluí-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
+		if (uGalo.emRinha)
 			return bot.createEmbed(message, `Seu galo já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
-		}
-		if (tGalo.emRinha) {
+		if (tGalo.emRinha)
 			return bot.createEmbed(message, `O galo de ${tData.username} já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
-		}
-		if (uData.moni < 1) {
+		if (uData.moni < 1)
 			return bot.msgSemDinheiro(message)
-		}
-		if (tData.moni < 1) {
+		if (tData.moni < 1)
 			return bot.msgSemDinheiro(message, tData.username)
-		}
-		if (uData.preso > currTime) {
+		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
-		}
-		if (bot.isUserEmRouboOuEspancamento(message, uData)) {
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-		}
-		if (tData.preso > currTime) {
+		if (tData.preso > currTime)
 			return bot.msgPreso(message, tData, tData.username)
-		}
-		if (uData.hospitalizado > currTime) {
+		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
-		}
-		if (tData.hospitalizado > currTime) {
+		if (tData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, tData, tData.username)
-		}
-		if (bot.isPlayerViajando(tData)) {
+		if (bot.isPlayerViajando(tData))
 			return bot.msgPlayerViajando(message, tData, tData.username)
-		}
-		if (bot.isUserEmRouboOuEspancamento(message, uData)) {
+		if (bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-		}
-		if (bot.isAlvoEmRouboOuEspancamento(message, tData)) {
+		if (bot.isAlvoEmRouboOuEspancamento(message, tData))
 			return
-		}
-		if (aposta <= 0 || (aposta % 1 != 0)) {
+		if (aposta <= 0 || (aposta % 1 != 0))
 			return bot.msgValorInvalido(message)
-		}
+
 
 		const MIN = 100
 		const MAX = 1000000 //1000000
 
-		if (aposta < MIN) {
+		if (aposta < MIN)
 			return bot.createEmbed(message, `O valor mínimo de aposta na rinha é R$ ${MIN.toLocaleString().replace(/,/g, ".")} ${bot.config.galo}`, null, bot.colors.white)
-		}
-		if (aposta > MAX) {
+		if (aposta > MAX)
 			return bot.createEmbed(message, `O valor máximo de aposta na rinha é R$ ${MAX.toLocaleString().replace(/,/g, ".")} ${bot.config.galo}`, null, bot.colors.white)
-		}
-		if (parseFloat(uData.moni) < aposta) {
+		if (parseFloat(uData.moni) < aposta)
 			return bot.msgDinheiroMenorQueAposta(message)
-		}
-		if (parseFloat(tData.moni) < aposta) {
+		if (parseFloat(tData.moni) < aposta)
 			return bot.msgDinheiroMenorQueAposta(message, tData.username)
-		}
 
-		if (uGalo.nome === '' || uGalo.nome === 'Galo') {
+		if (uGalo.nome === '' || uGalo.nome === 'Galo')
 			uGalo.nome = `Galo de ${uData.username}`
-		}
-		if (tGalo.nome === '' || tGalo.nome === 'Galo') {
+		if (tGalo.nome === '' || tGalo.nome === 'Galo')
 			tGalo.nome = `Galo de ${tData.username}`
-		}
 
 		// if (uData.preso > currTime && uData.celular > currTime)
 
-		if (alvo.id === '526203502318321665') {
+		if (alvo.id === '526203502318321665')
 			return bot.createEmbed(message, `Para desafiar o ${bot.config.caramuru} Caramuru, use \`;galo boss desafiar\``, null, bot.colors.white)
-		}
 
 		let respondeu = false
 
@@ -1023,388 +992,365 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 					errors: ['time']
 				})
 				collector.on('collect', reaction => {
-					respondeu = true
-					if (msg) {
-						msg.reactions.removeAll().then(async () => {
-							if (reaction.emoji.id === '572134588340633611') { //aceitar
-								uData = bot.data.get(message.author.id)
-								tData = bot.data.get(alvo.id)
-								uGalo = bot.galos.get(message.author.id)
-								tGalo = bot.galos.get(alvo.id)
+						respondeu = true
+						if (msg) {
+							msg.reactions.removeAll().then(async () => {
+									if (reaction.emoji.id === '572134588340633611') { //aceitar
+										uData = bot.data.get(message.author.id)
+										tData = bot.data.get(alvo.id)
+										uGalo = bot.galos.get(message.author.id)
+										tGalo = bot.galos.get(alvo.id)
 
-								// bot.galos.set(message.author.id, false, 'emRinha')
-								// bot.galos.set(alvo.id, false, 'emRinha')
+										// bot.galos.set(message.author.id, false, 'emRinha')
+										// bot.galos.set(alvo.id, false, 'emRinha')
 
-								if (uData.moni < 1) {
-									return bot.msgSemDinheiro(message)
-								}
-								if (tData.moni < 1) {
-									return bot.msgSemDinheiro(message, tData.username)
-								}
-								if (uData.preso > currTime) {
-									return bot.msgPreso(message, uData)
-								}
-								if (tData.preso > currTime) {
-									return bot.msgPreso(message, tData, tData.username)
-								}
-								if (uData.hospitalizado > currTime) {
-									return bot.msgHospitalizado(message, uData)
-								}
-								if (tData.hospitalizado > currTime) {
-									return bot.msgHospitalizado(message, tData, tData.username)
-								}
-								if (bot.isPlayerMorto(tData)) {
-									return bot.msgPlayerMorto(message, tData.username)
-								}
-								if (bot.isPlayerViajando(tData)) {
-									return bot.msgPlayerViajando(message, tData, tData.username)
-								}
-								if (parseFloat(uData.moni) < aposta) {
-									return bot.msgDinheiroMenorQueAposta(message)
-								}
-								if (parseFloat(tData.moni) < aposta) {
-									return bot.msgDinheiroMenorQueAposta(message, tData.username)
-								}
-								if (bot.isUserEmRouboOuEspancamento(message, uData)) {
-									return
-								}
-								if (bot.isAlvoEmRouboOuEspancamento(message, tData)) {
-									return
-								}
+										if (uData.moni < 1)
+											return bot.msgSemDinheiro(message)
+										if (tData.moni < 1)
+											return bot.msgSemDinheiro(message, tData.username)
+										if (uData.preso > currTime)
+											return bot.msgPreso(message, uData)
+										if (tData.preso > currTime)
+											return bot.msgPreso(message, tData, tData.username)
+										if (uData.hospitalizado > currTime)
+											return bot.msgHospitalizado(message, uData)
+										if (tData.hospitalizado > currTime)
+											return bot.msgHospitalizado(message, tData, tData.username)
+										if (bot.isPlayerMorto(tData))
+											return bot.msgPlayerMorto(message, tData.username)
+										if (bot.isPlayerViajando(tData))
+											return bot.msgPlayerViajando(message, tData, tData.username)
+										if (parseFloat(uData.moni) < aposta)
+											return bot.msgDinheiroMenorQueAposta(message)
+										if (parseFloat(tData.moni) < aposta)
+											return bot.msgDinheiroMenorQueAposta(message, tData.username)
+										if (bot.isUserEmRouboOuEspancamento(message, uData))
+											return
+										if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+											return
+										if (uGalo.descansar > currTime)
+											return bot.msgGaloDescansando(message, uGalo)
+										if (tGalo.descansar > currTime)
+											return bot.msgGaloDescansando(message, tGalo, tData.username)
+										if (uGalo.train)
+											return uGalo.trainTime > currTime ?
+												bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
+												: bot.createEmbed(message, `Seu galo terminou o treinamento. Conclua-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
+										if (tGalo.train)
+											return tGalo.trainTime > currTime ?
+												bot.createEmbed(message, `O galo de ${tData.username} está treinando por mais ${bot.segToHour((tGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
+												: bot.createEmbed(message, `O galo de ${tData.username} terminou o treinamento. Ele deve concluí-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
+										if (uGalo.emRinha)
+											return bot.createEmbed(message, `Seu galo já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
+										if (tGalo.emRinha)
+											return bot.createEmbed(message, `O galo de ${tData.username} já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
 
-								if (uGalo.descansar > currTime) {
-									return bot.msgGaloDescansando(message, uGalo)
-								}
-								if (tGalo.descansar > currTime) {
-									return bot.msgGaloDescansando(message, tGalo, tData.username)
-								}
-								if (uGalo.train == 1) {
-									if (uGalo.trainTime > currTime) {
-										return bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
-									}
-									else {
-										return bot.createEmbed(message, `Seu galo terminou o treinamento. Conclua-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
-									}
-								}
-								if (tGalo.train == 1) {
-									if (tGalo.trainTime > currTime) {
-										return bot.createEmbed(message, `O galo de ${tData.username} está treinando por mais ${bot.segToHour((tGalo.trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
-									}
-									else {
-										return bot.createEmbed(message, `O galo de ${tData.username} terminou o treinamento. Ele deve concluí-o antes de começar uma rinha ${bot.config.galo}`, null, bot.colors.white)
-									}
-								}
-								if (uGalo.emRinha) {
-									return bot.createEmbed(message, `Seu galo já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
-								}
-								if (tGalo.emRinha) {
-									return bot.createEmbed(message, `O galo de ${tData.username} já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
-								}
+										bot.galos.set(message.author.id, true, 'emRinha')
+										bot.galos.set(alvo.id, true, 'emRinha')
 
-								bot.galos.set(message.author.id, true, 'emRinha')
-								bot.galos.set(alvo.id, true, 'emRinha')
+										const inicioRinha = new Discord.MessageEmbed()
+											.setDescription(`${bot.config.galo} **${tData.username}** aceitou o desafio!`)
+											.setColor(bot.colors.white)
+											.setFooter(`${bot.user.username} • Valendo R$ ${parseInt(aposta).toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
+											.setTimestamp()
 
-								const inicioRinha = new Discord.MessageEmbed()
-									.setDescription(`${bot.config.galo} **${tData.username}** aceitou o desafio!`)
-									.setColor(bot.colors.white)
-									.setFooter(`${bot.user.username} • Valendo R$ ${parseInt(aposta).toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
-									.setTimestamp()
+										message.channel.send({embeds: [inicioRinha]})
+											.catch(() => console.log("Não consegui enviar mensagem `galo rinha`"))
 
-								message.channel.send({embeds: [inicioRinha]})
-									.catch(() => console.log("Não consegui enviar mensagem `galo rinha`"))
+										let randomDesafiante = bot.getRandom(1, 100)
+										let randomDesafiado = bot.getRandom(1, 100)
 
-								let randomDesafiante = bot.getRandom(1, 100)
-								let randomDesafiado = bot.getRandom(1, 100)
+										let desafianteVencedor = (randomDesafiante * uGalo.power) > (randomDesafiado * tGalo.power)
 
-								let desafianteVencedor = (randomDesafiante * uGalo.power) > (randomDesafiado * tGalo.power)
+										let textos_inicio = [
+											`**${uGalo.nome}** começa a luta atacando **${tGalo.nome}** no queixo!`,
+											`**${tGalo.nome}** começa a luta atacando **${uGalo.nome}** no queixo!`,
+											`**${tGalo.nome}** provoca **${uGalo.nome}** chamando ele de galinha!`,
+											`**${uGalo.nome}** provoca **${tGalo.nome}** chamando ele de galinha!`,
+											`**${uGalo.nome}** falou que é filho do ${bot.config.caramuru} **Caramuru**!`,
+											`**${tGalo.nome}** falou que é filho do ${bot.config.caramuru} **Caramuru**!`,
+											`**${uGalo.nome}** disse que quem toma Whey pra subir de nível é pinto pequeno!`,
+											`**${tGalo.nome}** disse que quem toma Whey pra subir de nível é pinto pequeno!`,
+											`**${uGalo.nome}** disse que rinha é igual bumerangue, tudo que vai, volta.`,
+											`**${tGalo.nome}** disse que rinha é igual bumerangue, tudo que vai, volta.`,
+											`**${uGalo.nome}** se vangloria de todas suas cicatrizes!`,
+											`**${tGalo.nome}** se vangloria de todas suas cicatrizes!`,
+											`**${uGalo.nome}** inicia a luta puxando a crista de **${tGalo.nome}**!`,
+											`**${tGalo.nome}** inicia a luta puxando a crista de **${uGalo.nome}**!`,
+											`**${uGalo.nome}** provoca falando que terá canja de **${tGalo.nome}** no jantar!`,
+											`**${tGalo.nome}** provoca falando que terá canja de **${uGalo.nome}** no jantar!`,
+											`**${uGalo.nome}** fala que hoje vai ter tripa do **${tGalo.nome}** com pinga no buteco da esquina!`,
+											`**${tGalo.nome}** fala que hoje vai ter tripa do **${uGalo.nome}** com pinga no buteco da esquina!`,
+											`**${uGalo.nome}** põe tocar um rock paulera pra se motivar!`,
+											`**${tGalo.nome}** põe tocar um rock paulera pra se motivar!`,
+											`É notório que **${uGalo.nome}** está com pena de **${tGalo.nome}**!`,
+											`É notório que **${tGalo.nome}** está com pena de **${uGalo.nome}**!`,
+											`**${uGalo.nome}** cacareja muito alto e **${tGalo.nome}** se sente ameaçado!`,
+											`**${tGalo.nome}** cacareja muito alto e **${uGalo.nome}** se sente ameaçado!`,
+											`**${uGalo.nome}** entra na arena com uma rosa em sua boca!`,
+											`**${tGalo.nome}** entra na arena com uma rosa em sua boca!`,
+											`**${uGalo.nome}** diz: *"Você quer me matar? Você não seria capaz nem de matar meu tédio!"*, mas tudo que podemos escutar é *"có có cóóó"*.`,
+											`**${tGalo.nome}** diz: *"Você quer me matar? Você não seria capaz nem de matar meu tédio!"*, mas tudo que podemos escutar é *"có có cóóó"*.`,
+											`**${uGalo.nome}** diz que será o galo que superará o temido ${bot.config.caramuru} **Caramuru**!`,
+											`**${tGalo.nome}** diz que será o galo que superará o temido ${bot.config.caramuru} **Caramuru**!`,
+											`**${uGalo.nome}** diz: *"Não comece uma luta se você não pode terminá-la"*, mas a arena é tão grande que **${tGalo.nome}** não escutou.`,
+											`**${tGalo.nome}** diz: *"Não comece uma luta se você não pode terminá-la"*, mas a arena é tão grande que **${uGalo.nome}** não escutou.`
+										]
 
-								let textos_inicio = [
-									`**${uGalo.nome}** começa a luta atacando **${tGalo.nome}** no queixo!`,
-									`**${tGalo.nome}** começa a luta atacando **${uGalo.nome}** no queixo!`,
-									`**${tGalo.nome}** provoca **${uGalo.nome}** chamando ele de galinha!`,
-									`**${uGalo.nome}** provoca **${tGalo.nome}** chamando ele de galinha!`,
-									`**${uGalo.nome}** falou que é filho do ${bot.config.caramuru} **Caramuru**!`,
-									`**${tGalo.nome}** falou que é filho do ${bot.config.caramuru} **Caramuru**!`,
-									`**${uGalo.nome}** disse que quem toma Whey pra subir de nível é pinto pequeno!`,
-									`**${tGalo.nome}** disse que quem toma Whey pra subir de nível é pinto pequeno!`,
-									`**${uGalo.nome}** disse que rinha é igual bumerangue, tudo que vai, volta.`,
-									`**${tGalo.nome}** disse que rinha é igual bumerangue, tudo que vai, volta.`,
-									`**${uGalo.nome}** se vangloria de todas suas cicatrizes!`,
-									`**${tGalo.nome}** se vangloria de todas suas cicatrizes!`,
-									`**${uGalo.nome}** inicia a luta puxando a crista de **${tGalo.nome}**!`,
-									`**${tGalo.nome}** inicia a luta puxando a crista de **${uGalo.nome}**!`,
-									`**${uGalo.nome}** provoca falando que terá canja de **${tGalo.nome}** no jantar!`,
-									`**${tGalo.nome}** provoca falando que terá canja de **${uGalo.nome}** no jantar!`,
-									`**${uGalo.nome}** fala que hoje vai ter tripa do **${tGalo.nome}** com pinga no buteco da esquina!`,
-									`**${tGalo.nome}** fala que hoje vai ter tripa do **${uGalo.nome}** com pinga no buteco da esquina!`,
-									`**${uGalo.nome}** põe tocar um rock paulera pra se motivar!`,
-									`**${tGalo.nome}** põe tocar um rock paulera pra se motivar!`,
-									`É notório que **${uGalo.nome}** está com pena de **${tGalo.nome}**!`,
-									`É notório que **${tGalo.nome}** está com pena de **${uGalo.nome}**!`,
-									`**${uGalo.nome}** cacareja muito alto e **${tGalo.nome}** se sente ameaçado!`,
-									`**${tGalo.nome}** cacareja muito alto e **${uGalo.nome}** se sente ameaçado!`,
-									`**${uGalo.nome}** entra na arena com uma rosa em sua boca!`,
-									`**${tGalo.nome}** entra na arena com uma rosa em sua boca!`,
-									`**${uGalo.nome}** diz: *"Você quer me matar? Você não seria capaz nem de matar meu tédio!"*, mas tudo que podemos escutar é *"có có cóóó"*.`,
-									`**${tGalo.nome}** diz: *"Você quer me matar? Você não seria capaz nem de matar meu tédio!"*, mas tudo que podemos escutar é *"có có cóóó"*.`,
-									`**${uGalo.nome}** diz que será o galo que superará o temido ${bot.config.caramuru} **Caramuru**!`,
-									`**${tGalo.nome}** diz que será o galo que superará o temido ${bot.config.caramuru} **Caramuru**!`,
-									`**${uGalo.nome}** diz: *"Não comece uma luta se você não pode terminá-la"*, mas a arena é tão grande que **${tGalo.nome}** não escutou.`,
-									`**${tGalo.nome}** diz: *"Não comece uma luta se você não pode terminá-la"*, mas a arena é tão grande que **${uGalo.nome}** não escutou.`
-								]
+										let textos_luta = [
+											`**${uGalo.nome}** voou por incríveis 2 segundos e deixou **${tGalo.nome}** perplecto!`,
+											`**${tGalo.nome}** ciscou palha no olho de **${uGalo.nome}** e aproveitou para um ataque surpresa!`,
+											`**${uGalo.nome}** arrancou o olho de **${tGalo.nome}**! Por sorte era o olho ruim.`,
+											`**${tGalo.nome}** deu um rasante em **${uGalo.nome}** arrancando várias de suas penas!`,
+											`**${uGalo.nome}** acertou um combo de 5 hits em **${tGalo.nome}**!`,
+											`**${tGalo.nome}** aproveitou que **${uGalo.nome}** olhou para uma galinha da plateia e deu um mortal triplo carpado!`,
+											`**${uGalo.nome}** usou um golpe especial e **${tGalo.nome}** ficou sem entender nada!`,
+											`**${tGalo.nome}** apanha bastante, mas mostra para **${uGalo.nome}** que pau que nasce torto tanto bate até que fura!`,
+											`**${uGalo.nome}** rasga o peito de **${tGalo.nome}** como se fosse manteiga!`,
+											`**${tGalo.nome}** tentou usar *Raio Destruidor da Morte* em **${uGalo.nome}**, mas acaba errando e acerta o juiz.`,
+											`**${uGalo.nome}** tenta acertar um *Fogo Sagrado da Conflagração* em **${tGalo.nome}**, erra por pouco e acerta a plateia!`,
+											`**${tGalo.nome}** está paralizado e não consegue se mover!`,
+											`**${uGalo.nome}** se sente lento e acaba errando diversos ataques.`,
+											`A Polícia Federal adentra no recinto e todos ficam em pânico. Um dos policiais fala: "APOSTO MIL NO **${tGalo.nome.toUpperCase()}**"!`,
+											`Pouco se importando com as regras, **${uGalo.nome}** pega uma ${bot.config.colt45} Colt 45 e atira em **${tGalo.nome}**.`,
+											`**${tGalo.nome}** utiliza um *Z-Move* com **${tData.username}**, causando dano crítico em **${uGalo.nome}**!`,
+											`**${uGalo.nome}** utiliza um *Z-Move* com **${uData.username}** em **${tGalo.nome}**. É super efetivo!`,
+											`**${tGalo.nome}** tenta usar uma técnica especial, mas **${uGalo.nome}** aproveita a abertura e desce a porrada.`,
+											`Após receber diversos golpes, **${uGalo.nome}** está atordoado, mas ainda continua de pé!`,
+											`Mesmo após atacar diversas vezes, **${tGalo.nome}** percebe que seu oponente ainda está de pé!`,
+											`**${uGalo.nome}** usa seu bico afiado para trucidar os membros de **${tGalo.nome}**.`,
+											`**${tGalo.nome}** aproveita a distância e joga diversas penas afiadas em **${uGalo.nome}**!`,
+											`**${uGalo.nome}** gira em círculos e levanta muita poeira. Nâo há como ver nada!`,
+											`**${tGalo.nome}** cai no chão com tanta força que Sismólogos acharam que era um terremoto!`,
+											`**${uGalo.nome}** derruba seu oponente no chão e sai cantando vitória. **${tGalo.nome}** aproveita a distração para atacar pelas costas!`,
+											`Diversos xingamentos são proferidos por **${uData.username}** enquanto **${uGalo.nome}** se recusa a obedecer seus comandos!`,
+											`Lembrando dos ensinamentos de seu mestre, **${tGalo.nome}** usa sua concentração para acertar um soco potente!`,
+											`**${uGalo.nome}** consegue acertar uma boa sequência de chutes, bicadas, socos e penadas!`,
+											`**${tGalo.nome}** pega várias pedras do chão e as atira em direção à **${uGalo.nome}**`,
+											`**${uGalo.nome}** xinga a mãe de **${tGalo.nome}**! Ele não deixou barato e partiu pra cima!`,
+											`**${tGalo.nome}** inicia uma dança espetacular de acasalamento, pensando que, talvez, seu oponente seja fêmea.`,
+											`**${uGalo.nome}** apanha sua bíblia e começa a ler Êxodo 23:7 "Não se envolva em acusações falsas, e não mate o inocente e o justo, pois não vou declarar justo quem fizer o mal."`,
+											`**${tGalo.nome}** ficou com tanto medo que botou um ovo...`,
+											`**${uGalo.nome}** arremessa penas cortantes em **${tGalo.nome}**, mas acaba acertando **${tData.username}**.`,
+											`Por algum motivo, **${tGalo.nome}** esqueceu da luta e começou a ciscar o chão.`,
+											`**${uGalo.nome}** corre em direção de **${tGalo.nome}**, dá um duplo carpado fodinha e finaliza o combo com um MEGA ARRANHÃO FODÃO.`,
+											`**${tGalo.nome}** reveste seu corpo com penas de latão, recebendo +5 DEF.`,
+											`**${uGalo.nome}** levanta uma nuvem de poeira com suas asas, cegando temporariamente o **${tGalo.nome}**.`,
+											`**${tGalo.nome}** prepara um golpe poderoso...`,
+											`**${uGalo.nome}** prepara um golpe poderoso...`,
+											`Uma nave alienígena aparece para abduzir **${tData.username}**, mas **${tGalo.nome}** protege seu dono e volta à rinha.`,
+											`**${uGalo.nome}** começa a latir e **${tGalo.nome}** fica assustado.`,
+											`**${tGalo.nome}** hipnotiza seu adversário, fazendo **${uGalo.nome}** dar um soco em seu mestre **${uData.username}**!`,
+											`**${uGalo.nome}** utiliza um pedaço de vidro para refletir a luz na cara e cegar **${tGalo.nome}**!`,
+											`**${tGalo.nome}** interrompe a luta e começa a tragar um cigarro. É o maldito Cocky Blinder.`,
+											`**${uGalo.nome}** chamou **${tGalo.nome}** para um x1 de Pedra-Papel-Tesoura. Ambos perdem.`,
+											`Um grupo de galinhas invade a rinha, distraindo os lutadores. **${uData.username}** e **${tData.username}** afugentam as galinhas para a luta continuar.`,
+											`**${uGalo.nome}** ativa o instinto superior e desvia de todos os golpes de **${tGalo.nome}**.`,
+											`**${tGalo.nome}** botou um ${bot.config.ovogranada2} Ovo-granada e o jogou em **${uGalo.nome}**, explodindo parte da arena com ele!`,
+										]
 
-								let textos_luta = [
-									`**${uGalo.nome}** voou por incríveis 2 segundos e deixou **${tGalo.nome}** perplecto!`,
-									`**${tGalo.nome}** ciscou palha no olho de **${uGalo.nome}** e aproveitou para um ataque surpresa!`,
-									`**${uGalo.nome}** arrancou o olho de **${tGalo.nome}**! Por sorte era o olho ruim.`,
-									`**${tGalo.nome}** deu um rasante em **${uGalo.nome}** arrancando várias de suas penas!`,
-									`**${uGalo.nome}** acertou um combo de 5 hits em **${tGalo.nome}**!`,
-									`**${tGalo.nome}** aproveitou que **${uGalo.nome}** olhou para uma galinha da plateia e deu um mortal triplo carpado!`,
-									`**${uGalo.nome}** usou um golpe especial e **${tGalo.nome}** ficou sem entender nada!`,
-									`**${tGalo.nome}** apanha bastante, mas mostra para **${uGalo.nome}** que pau que nasce torto tanto bate até que fura!`,
-									`**${uGalo.nome}** rasga o peito de **${tGalo.nome}** como se fosse manteiga!`,
-									`**${tGalo.nome}** tentou usar *Raio Destruidor da Morte* em **${uGalo.nome}**, mas acaba errando e acerta o juiz.`,
-									`**${uGalo.nome}** tenta acertar um *Fogo Sagrado da Conflagração* em **${tGalo.nome}**, erra por pouco e acerta a plateia!`,
-									`**${tGalo.nome}** está paralizado e não consegue se mover!`,
-									`**${uGalo.nome}** se sente lento e acaba errando diversos ataques.`,
-									`A Polícia Federal adentra no recinto e todos ficam em pânico. Um dos policiais fala: "APOSTO MIL NO **${tGalo.nome.toUpperCase()}**"!`,
-									`Pouco se importando com as regras, **${uGalo.nome}** pega uma ${bot.config.colt45} Colt 45 e atira em **${tGalo.nome}**.`,
-									`**${tGalo.nome}** utiliza um *Z-Move* com **${tData.username}**, causando dano crítico em **${uGalo.nome}**!`,
-									`**${uGalo.nome}** utiliza um *Z-Move* com **${uData.username}** em **${tGalo.nome}**. É super efetivo!`,
-									`**${tGalo.nome}** tenta usar uma técnica especial, mas **${uGalo.nome}** aproveita a abertura e desce a porrada.`,
-									`Após receber diversos golpes, **${uGalo.nome}** está atordoado, mas ainda continua de pé!`,
-									`Mesmo após atacar diversas vezes, **${tGalo.nome}** percebe que seu oponente ainda está de pé!`,
-									`**${uGalo.nome}** usa seu bico afiado para trucidar os membros de **${tGalo.nome}**.`,
-									`**${tGalo.nome}** aproveita a distância e joga diversas penas afiadas em **${uGalo.nome}**!`,
-									`**${uGalo.nome}** gira em círculos e levanta muita poeira. Nâo há como ver nada!`,
-									`**${tGalo.nome}** cai no chão com tanta força que Sismólogos acharam que era um terremoto!`,
-									`**${uGalo.nome}** derruba seu oponente no chão e sai cantando vitória. **${tGalo.nome}** aproveita a distração para atacar pelas costas!`,
-									`Diversos xingamentos são proferidos por **${uData.username}** enquanto **${uGalo.nome}** se recusa a obedecer seus comandos!`,
-									`Lembrando dos ensinamentos de seu mestre, **${tGalo.nome}** usa sua concentração para acertar um soco potente!`,
-									`**${uGalo.nome}** consegue acertar uma boa sequência de chutes, bicadas, socos e penadas!`,
-									`**${tGalo.nome}** pega várias pedras do chão e as atira em direção à **${uGalo.nome}**`,
-									`**${uGalo.nome}** xinga a mãe de **${tGalo.nome}**! Ele não deixou barato e partiu pra cima!`,
-									`**${tGalo.nome}** inicia uma dança espetacular de acasalamento, pensando que, talvez, seu oponente seja fêmea.`,
-									`**${uGalo.nome}** apanha sua bíblia e começa a ler Êxodo 23:7 "Não se envolva em acusações falsas, e não mate o inocente e o justo, pois não vou declarar justo quem fizer o mal."`,
-									`**${tGalo.nome}** ficou com tanto medo que botou um ovo...`,
-									`**${uGalo.nome}** arremessa penas cortantes em **${tGalo.nome}**, mas acaba acertando **${tData.username}**.`,
-									`Por algum motivo, **${tGalo.nome}** esqueceu da luta e começou a ciscar o chão.`,
-									`**${uGalo.nome}** corre em direção de **${tGalo.nome}**, dá um duplo carpado fodinha e finaliza o combo com um MEGA ARRANHÃO FODÃO.`,
-									`**${tGalo.nome}** reveste seu corpo com penas de latão, recebendo +5 DEF.`,
-									`**${uGalo.nome}** levanta uma nuvem de poeira com suas asas, cegando temporariamente o **${tGalo.nome}**.`,
-									`**${tGalo.nome}** prepara um golpe poderoso...`,
-									`**${uGalo.nome}** prepara um golpe poderoso...`,
-									`Uma nave alienígena aparece para abduzir **${tData.username}**, mas **${tGalo.nome}** protege seu dono e volta à rinha.`,
-									`**${uGalo.nome}** começa a latir e **${tGalo.nome}** fica assustado.`,
-									`**${tGalo.nome}** hipnotiza seu adversário, fazendo **${uGalo.nome}** dar um soco em seu mestre **${uData.username}**!`,
-									`**${uGalo.nome}** utiliza um pedaço de vidro para refletir a luz na cara e cegar **${tGalo.nome}**!`,
-									`**${tGalo.nome}** interrompe a luta e começa a tragar um cigarro. É o maldito Cocky Blinder.`,
-									`**${uGalo.nome}** chamou **${tGalo.nome}** para um x1 de Pedra-Papel-Tesoura. Ambos perdem.`,
-									`Um grupo de galinhas invade a rinha, distraindo os lutadores. **${uData.username}** e **${tData.username}** afugentam as galinhas para a luta continuar.`,
-									`**${uGalo.nome}** ativa o instinto superior e desvia de todos os golpes de **${tGalo.nome}**.`,
-									`**${tGalo.nome}** botou um ${bot.config.ovogranada2} Ovo-granada e o jogou em **${uGalo.nome}**, explodindo parte da arena com ele!`,
-								]
+										bot.shuffle(textos_luta)
 
-								bot.shuffle(textos_luta)
+										//gera textos de batalha
+										const msg1 = new Discord.MessageEmbed().setDescription(textos_inicio[Math.floor(Math.random() * textos_inicio.length)]).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({
+											embeds: [msg1]
+										}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 2000)
 
-								//gera textos de batalha
-								const msg1 = new Discord.MessageEmbed().setDescription(textos_inicio[Math.floor(Math.random() * textos_inicio.length)]).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({
-									embeds: [msg1]
-								}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 2000)
+										if (uGalo.power === tGalo.power) {
+											const msg2 = new Discord.MessageEmbed().setDescription(`**${uGalo.nome}** não sabe como atacar **${tGalo.nome}**! Eles já estão parados se encarando por 5 minutos!`).setColor(bot.colors.background)
+											const msg3 = new Discord.MessageEmbed().setDescription(`Não há como prever quem ganhará esta rinha! Ambos os galos são incrivelmente e igualmente habilidosos!`).setColor(bot.colors.background)
+											setTimeout(() => message.channel.send({embeds: [randomDesafiante >= randomDesafiado ? msg2 : msg3]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 7000)
 
-								if (uGalo.power === tGalo.power) {
-									const msg2 = new Discord.MessageEmbed().setDescription(`**${uGalo.nome}** não sabe como atacar **${tGalo.nome}**! Eles já estão parados se encarando por 5 minutos!`).setColor(bot.colors.background)
-									const msg3 = new Discord.MessageEmbed().setDescription(`Não há como prever quem ganhará esta rinha! Ambos os galos são incrivelmente e igualmente habilidosos!`).setColor(bot.colors.background)
-									setTimeout(() => message.channel.send({embeds: [randomDesafiante >= randomDesafiado ? msg2 : msg3]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 7000)
-
-								}
-								else {
-									const msg4 = new Discord.MessageEmbed().setDescription(textos_luta[0]).setColor(bot.colors.background)
-									setTimeout(() => message.channel.send({embeds: [msg4]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 7000)
-								}
-
-								const msg5 = new Discord.MessageEmbed().setDescription(textos_luta[1]).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({embeds: [msg5]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 12000)
-
-								const msg6 = new Discord.MessageEmbed().setDescription(textos_luta[2]).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({embeds: [msg6]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 17000)
-
-								const msg7 = new Discord.MessageEmbed().setDescription(textos_luta[3]).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({embeds: [msg7]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 22000)
-
-								const msg8 = new Discord.MessageEmbed().setDescription(textos_luta[4]).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({embeds: [msg8]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 27000)
-
-								const msg9 = new Discord.MessageEmbed().setDescription(textos_luta[5]).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({embeds: [msg9]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 32000)
-
-								// const msgNew1 = new Discord.MessageEmbed().setDescription(textos_luta[6]).setColor(bot.colors.background)
-								// setTimeout(() => message.channel.send(msgNew1), 37000)
-
-								// const msgNew2 = new Discord.MessageEmbed().setDescription(textos_luta[7]).setColor(bot.colors.background)
-								// setTimeout(() => message.channel.send(msgNew2), 42000)
-
-								const msg10 = new Discord.MessageEmbed().setDescription(randomDesafiante >= randomDesafiado ? (randomDesafiante % 2 == 0 ? `**${tGalo.nome}** é arremessado para longe da arena, e **${uGalo.nome}** sai vitorioso ` : `**${uGalo.nome}** está implacável e **${tGalo.nome}** já não resiste mais!`) : `**${tGalo.nome}** sabe que sua derrota foi digna e vai ao chão!`).setColor(bot.colors.background)
-								const msg11 = new Discord.MessageEmbed().setDescription(randomDesafiante >= randomDesafiado ? (randomDesafiante % 2 == 0 ? `**${uGalo.nome}** está tão machucado que é levado pra UTI às pressas` : `Os golpes de **${tGalo.nome}** são certeiros e **${uGalo.nome}** está ciente de sua derrota!`) : `**${uGalo.nome}** cai na lona com um sorriso no rosto, pois sabe que deu o seu melhor.`).setColor(bot.colors.background)
-								setTimeout(() => message.channel.send({embeds: [desafianteVencedor ? msg10 : msg11]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 37000)
-
-								setTimeout(() => {
-									currTime = new Date().getTime()
-									uData = bot.data.get(message.author.id)
-									tData = bot.data.get(alvo.id)
-									uGalo = bot.galos.get(message.author.id)
-									tGalo = bot.galos.get(alvo.id)
-
-									let vencedor
-									let perdedor
-									let vencedorU
-									let perdedorU
-									let mensagemLevelUp
-									let mensagemLevelDown
-
-									// let ovosGanhos = bot.getRandom(1, 10)
-
-									if (desafianteVencedor) {
-										uData.moni += parseInt(aposta)
-										tData.moni -= parseInt(aposta)
-										uGalo.wins++
-
-										// uData._ovo += ovosGanhos
-
-										tGalo.loses++
-										vencedor = uGalo
-										perdedor = tGalo
-										vencedorU = uData
-										perdedorU = tData
-
-										if (tGalo.power >= 60) {
-											tGalo.power -= 1
-											mensagemLevelDown = `**${perdedor.nome}** desceu para o nível ${perdedor.power - 30}`
-										}
-
-										if (uGalo.power >= 70) {
-											mensagemLevelUp = `**${vencedor.nome}** está no nível ${vencedor.power - 30} e não pode mais upar`
 										}
 										else {
-											uGalo.power++
-											mensagemLevelUp = `**${vencedor.nome}** subiu para o nível ${vencedor.power - 30}`
+											const msg4 = new Discord.MessageEmbed().setDescription(textos_luta[0]).setColor(bot.colors.background)
+											setTimeout(() => message.channel.send({embeds: [msg4]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 7000)
 										}
 
+										const msg5 = new Discord.MessageEmbed().setDescription(textos_luta[1]).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({embeds: [msg5]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 12000)
+
+										const msg6 = new Discord.MessageEmbed().setDescription(textos_luta[2]).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({embeds: [msg6]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 17000)
+
+										const msg7 = new Discord.MessageEmbed().setDescription(textos_luta[3]).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({embeds: [msg7]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 22000)
+
+										const msg8 = new Discord.MessageEmbed().setDescription(textos_luta[4]).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({embeds: [msg8]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 27000)
+
+										const msg9 = new Discord.MessageEmbed().setDescription(textos_luta[5]).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({embeds: [msg9]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 32000)
+
+										// const msgNew1 = new Discord.MessageEmbed().setDescription(textos_luta[6]).setColor(bot.colors.background)
+										// setTimeout(() => message.channel.send(msgNew1), 37000)
+
+										// const msgNew2 = new Discord.MessageEmbed().setDescription(textos_luta[7]).setColor(bot.colors.background)
+										// setTimeout(() => message.channel.send(msgNew2), 42000)
+
+										const msg10 = new Discord.MessageEmbed().setDescription(randomDesafiante >= randomDesafiado ? (randomDesafiante % 2 == 0 ? `**${tGalo.nome}** é arremessado para longe da arena, e **${uGalo.nome}** sai vitorioso ` : `**${uGalo.nome}** está implacável e **${tGalo.nome}** já não resiste mais!`) : `**${tGalo.nome}** sabe que sua derrota foi digna e vai ao chão!`).setColor(bot.colors.background)
+										const msg11 = new Discord.MessageEmbed().setDescription(randomDesafiante >= randomDesafiado ? (randomDesafiante % 2 == 0 ? `**${uGalo.nome}** está tão machucado que é levado pra UTI às pressas` : `Os golpes de **${tGalo.nome}** são certeiros e **${uGalo.nome}** está ciente de sua derrota!`) : `**${uGalo.nome}** cai na lona com um sorriso no rosto, pois sabe que deu o seu melhor.`).setColor(bot.colors.background)
+										setTimeout(() => message.channel.send({embeds: [desafianteVencedor ? msg10 : msg11]}).catch(() => console.log("Não consegui enviar mensagem `galo rinha msg`")), 37000)
+
+										setTimeout(() => {
+											currTime = new Date().getTime()
+											uData = bot.data.get(message.author.id)
+											tData = bot.data.get(alvo.id)
+											uGalo = bot.galos.get(message.author.id)
+											tGalo = bot.galos.get(alvo.id)
+
+											let vencedor
+											let perdedor
+											let vencedorU
+											let perdedorU
+											let mensagemLevelUp
+											let mensagemLevelDown
+
+											// let ovosGanhos = bot.getRandom(1, 10)
+
+											if (desafianteVencedor) {
+												uData.moni += parseInt(aposta)
+												tData.moni -= parseInt(aposta)
+												uGalo.wins++
+
+												// uData._ovo += ovosGanhos
+
+												tGalo.loses++
+												vencedor = uGalo
+												perdedor = tGalo
+												vencedorU = uData
+												perdedorU = tData
+
+												if (tGalo.power >= 60) {
+													tGalo.power -= 1
+													mensagemLevelDown = `**${perdedor.nome}** desceu para o nível ${perdedor.power - 30}`
+												}
+
+												if (uGalo.power >= 70) {
+													mensagemLevelUp = `**${vencedor.nome}** está no nível ${vencedor.power - 30} e não pode mais upar`
+												}
+												else {
+													uGalo.power++
+													mensagemLevelUp = `**${vencedor.nome}** subiu para o nível ${vencedor.power - 30}`
+												}
+
+											}
+											else {
+												tData.moni += parseInt(aposta)
+												uData.moni -= parseInt(aposta)
+												tGalo.wins++
+
+												// tData._ovo += ovosGanhos
+
+												uGalo.loses++
+												vencedor = tGalo
+												perdedor = uGalo
+												vencedorU = tData
+												perdedorU = uData
+
+												if (uGalo.power >= 60) {
+													uGalo.power -= 1
+													mensagemLevelDown = `**${perdedor.nome}** desceu para o nível ${perdedor.power - 30}`
+												}
+
+												if (tGalo.power >= 70) {
+													mensagemLevelUp = `**${vencedor.nome}** está no nível ${vencedor.power - 30} e não pode mais upar`
+												}
+												else {
+													tGalo.power++
+													mensagemLevelUp = `**${vencedor.nome}** subiu para o nível ${vencedor.power - 30}`
+												}
+											}
+
+											// mensagemLevelUp += `\n\n**${vencedor.galoNome}** ganhou ${bot.config.ovo} ${ovosGanhos} Ovos de páscoa do ${bot.config.caramuru} Caramuru`
+
+											const multiplicador_tempo_rinha = 0.5
+											uGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
+											uGalo.emRinha = false
+											tGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
+											tGalo.emRinha = false
+											bot.data.set(message.author.id, uData)
+											bot.data.set(targetMention.id, tData)
+											bot.galos.set(message.author.id, uGalo)
+											bot.galos.set(targetMention.id, tGalo)
+
+											setTimeout(() => {
+												bot.users.fetch(message.author.id).then(user => {
+													user.send(`Seu galo está pronto para outra batalha! ${bot.config.galo}`)
+														.catch(() => message.reply(`seu galo está pronto para outra batalha! ${bot.config.galo}`)
+															.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+												})
+											}, uGalo.descansar - currTime)
+
+											setTimeout(() => {
+												bot.users.fetch(targetMention.id).then(user => {
+													user.send(`Seu galo está pronto para outra batalha! ${bot.config.galo}`)
+														.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${targetMention.id})`))
+												})
+											}, tGalo.descansar - currTime)
+
+											//bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(parseInt(aposta) * bot.imposto))
+
+											const fimRinha = new Discord.MessageEmbed()
+												.setDescription(`${bot.config.galo} **${vencedor.nome}** ganhou a rinha contra **${perdedor.nome}**!\n**${vencedorU.username}** recebeu R$ ${parseInt(aposta).toLocaleString().replace(/,/g, ".")}`)
+												.setColor('WHITE')
+												.setThumbnail(vencedor.avatar)
+												.setFooter(bot.user.username, bot.user.avatarURL())
+												.setTimestamp()
+
+											const log = new Discord.MessageEmbed()
+												.setDescription(`${bot.config.galo} **${vencedorU.username} ganhou a rinha contra ${perdedorU.username}!**`)
+												.addField("Aposta", "R$" + parseInt(aposta).toLocaleString().replace(/,/g, "."), true)
+												.setColor(bot.colors.white)
+
+											if (mensagemLevelUp) {
+												fimRinha.addField(`<:small_green_triangle:801611850491363410> ${mensagemLevelUp}`, '\u200b', true)
+												log.addField(`<:small_green_triangle:801611850491363410> ${mensagemLevelUp}`, '\u200b', true)
+											}
+											if (mensagemLevelDown) {
+												fimRinha.addField(`🔻 ${mensagemLevelDown}`, '\u200b', true)
+												log.addField(`🔻 ${mensagemLevelDown}`, '\u200b', true)
+											}
+
+											bot.log(message, log)
+
+
+											// CONVITE EVENTO
+											// if (uGalo.power > 40 && tGalo.power > 40) {
+											// 	let texto_convite = `Parabéns pela vitória, ${vencedorU.username} e ${vencedor.nome}! Vocês foram convidados para participar dos torneios **Canja de Galinha das Américas** e **Canjica de Galinha Sul-América**. ${bot.config.galo}\n\nCada torneio terá 16 participantes e os vencedores levarão para casa R$ 100.000!\n\nOs vencedores se enfrentarão na **Supercopa das Canjas** que terá premiação de R$ 200.000 + badge ${bot.badges.campeao_canja} exclusiva para o galo!\n\nPara se inscreverem, encontrem a categoria \`🐓 TORNEIO\` no servidor oficial do Cross Roads (\`;convite\`) e no canal \`#arena\`, mencione o moderador **SFoster** e mande um _printscreen_ deste convite.`
+											// 	if (vencedorU == uData) {
+											// 		message.author.send(texto_convite)
+											// 			.catch();
+											// 	} else {
+											// 		bot.users.fetch(targetMention.id).then(user => {
+											// 			user.send(texto_convite)
+											// 				.catch();
+											// 		});
+											// 	}
+											// }
+
+											return message.channel.send({embeds: [fimRinha]})
+												.catch(() => console.log("Não consegui enviar mensagem `galo fim rinha`"))
+										}, 38000)
+
 									}
-									else {
-										tData.moni += parseInt(aposta)
-										uData.moni -= parseInt(aposta)
-										tGalo.wins++
+									else if (reaction.emoji.id === '572134589863034884') {
+										bot.galos.set(message.author.id, false, 'emRinha')
+										bot.galos.set(alvo.id, false, 'emRinha')
 
-										// tData._ovo += ovosGanhos
+										bot.log(message, new Discord.MessageEmbed()
+											.setDescription(`${bot.config.galo} **${tData.username} recusou a rinha de ${tData.username}**`)
+											.addField("Aposta", "R$" + parseInt(aposta).toLocaleString().replace(/,/g, "."), true)
+											.setColor(bot.colors.white))
 
-										uGalo.loses++
-										vencedor = tGalo
-										perdedor = uGalo
-										vencedorU = tData
-										perdedorU = uData
-
-										if (uGalo.power >= 60) {
-											uGalo.power -= 1
-											mensagemLevelDown = `**${perdedor.nome}** desceu para o nível ${perdedor.power - 30}`
-										}
-
-										if (tGalo.power >= 70) {
-											mensagemLevelUp = `**${vencedor.nome}** está no nível ${vencedor.power - 30} e não pode mais upar`
-										}
-										else {
-											tGalo.power++
-											mensagemLevelUp = `**${vencedor.nome}** subiu para o nível ${vencedor.power - 30}`
-										}
+										return bot.createEmbed(message, `**${tData.username}** recusou o desafio. Que galinha! ${bot.config.galo}`, null, bot.colors.white)
 									}
-
-									// mensagemLevelUp += `\n\n**${vencedor.galoNome}** ganhou ${bot.config.ovo} ${ovosGanhos} Ovos de páscoa do ${bot.config.caramuru} Caramuru`
-
-									const multiplicador_tempo_rinha = 0.5
-									uGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
-									uGalo.emRinha = false
-									tGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
-									tGalo.emRinha = false
-									bot.data.set(message.author.id, uData)
-									bot.data.set(targetMention.id, tData)
-									bot.galos.set(message.author.id, uGalo)
-									bot.galos.set(targetMention.id, tGalo)
-
-									setTimeout(() => {
-										bot.users.fetch(message.author.id).then(user => {
-											user.send(`Seu galo está pronto para outra batalha! ${bot.config.galo}`)
-												.catch(() => message.reply(`seu galo está pronto para outra batalha! ${bot.config.galo}`)
-													.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
-										})
-									}, uGalo.descansar - currTime)
-
-									setTimeout(() => {
-										bot.users.fetch(targetMention.id).then(user => {
-											user.send(`Seu galo está pronto para outra batalha! ${bot.config.galo}`)
-												.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${targetMention.id})`))
-										})
-									}, tGalo.descansar - currTime)
-
-									//bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(parseInt(aposta) * bot.imposto))
-
-									const fimRinha = new Discord.MessageEmbed()
-										.setDescription(`${bot.config.galo} **${vencedor.nome}** ganhou a rinha contra **${perdedor.nome}**!\n**${vencedorU.username}** recebeu R$ ${parseInt(aposta).toLocaleString().replace(/,/g, ".")}`)
-										.setColor('WHITE')
-										.setThumbnail(vencedor.avatar)
-										.setFooter(bot.user.username, bot.user.avatarURL())
-										.setTimestamp()
-
-									const log = new Discord.MessageEmbed()
-										.setDescription(`${bot.config.galo} **${vencedorU.username} ganhou a rinha contra ${perdedorU.username}!**`)
-										.addField("Aposta", "R$" + parseInt(aposta).toLocaleString().replace(/,/g, "."), true)
-										.setColor(bot.colors.white)
-
-									if (mensagemLevelUp) {
-										fimRinha.addField(`<:small_green_triangle:801611850491363410> ${mensagemLevelUp}`, '\u200b', true)
-										log.addField(`<:small_green_triangle:801611850491363410> ${mensagemLevelUp}`, '\u200b', true)
-									}
-									if (mensagemLevelDown) {
-										fimRinha.addField(`🔻 ${mensagemLevelDown}`, '\u200b', true)
-										log.addField(`🔻 ${mensagemLevelDown}`, '\u200b', true)
-									}
-
-									bot.log(message, log)
-
-
-									// CONVITE EVENTO
-									// if (uGalo.power > 40 && tGalo.power > 40) {
-									// 	let texto_convite = `Parabéns pela vitória, ${vencedorU.username} e ${vencedor.nome}! Vocês foram convidados para participar dos torneios **Canja de Galinha das Américas** e **Canjica de Galinha Sul-América**. ${bot.config.galo}\n\nCada torneio terá 16 participantes e os vencedores levarão para casa R$ 100.000!\n\nOs vencedores se enfrentarão na **Supercopa das Canjas** que terá premiação de R$ 200.000 + badge ${bot.badges.campeao_canja} exclusiva para o galo!\n\nPara se inscreverem, encontrem a categoria \`🐓 TORNEIO\` no servidor oficial do Cross Roads (\`;convite\`) e no canal \`#arena\`, mencione o moderador **SFoster** e mande um _printscreen_ deste convite.`
-									// 	if (vencedorU == uData) {
-									// 		message.author.send(texto_convite)
-									// 			.catch();
-									// 	} else {
-									// 		bot.users.fetch(targetMention.id).then(user => {
-									// 			user.send(texto_convite)
-									// 				.catch();
-									// 		});
-									// 	}
-									// }
-
-									return message.channel.send({embeds: [fimRinha]})
-										.catch(() => console.log("Não consegui enviar mensagem `galo fim rinha`"))
-								}, 38000)
-
-							}
-							else if (reaction.emoji.id === '572134589863034884') {
-								bot.galos.set(message.author.id, false, 'emRinha')
-								bot.galos.set(alvo.id, false, 'emRinha')
-
-								bot.log(message, new Discord.MessageEmbed()
-									.setDescription(`${bot.config.galo} **${tData.username} recusou a rinha de ${tData.username}**`)
-									.addField("Aposta", "R$" + parseInt(aposta).toLocaleString().replace(/,/g, "."), true)
-									.setColor(bot.colors.white))
-
-								return bot.createEmbed(message, `**${tData.username}** recusou o desafio. Que galinha! ${bot.config.galo}`, null, bot.colors.white)
-							}
-						}).catch(() => console.log("Não consegui remover as reações mensagem `galo`"))
+								}
+							).catch(() => console.log("Não consegui remover as reações mensagem `galo`"))
+						}
 					}
-				})
+				)
 
 				collector.on('end', async () => {
 					// if (msg) msg.reactions.removeAll()
@@ -1423,7 +1369,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 			})
 
 	}
-	else if (option == "avatar") { // trocar avatar do galo
+	else if (option === "avatar") { // trocar avatar do galo
 
 		let uGalo = bot.galos.get(message.author.id)
 
@@ -1580,7 +1526,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 
 	}
-	else if (option == "boss") {
+	else if (option === "boss") {
 		let premio = 1000000 //2000000
 		if (!aposta) {
 			const embed = new Discord.MessageEmbed()

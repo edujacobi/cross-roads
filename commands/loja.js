@@ -17,7 +17,7 @@ exports.run = async (bot, message, args) => {
 			.setTimestamp()
 
 		Object.entries(bot.guns).forEach(([key, value]) => {
-			if (!['minigun', 'jetpack', 'bazuca', 'exoesqueleto', 'ovogranada'].includes(key)) {
+			if (!['minigun', 'jetpack', 'bazuca', 'exoesqueleto', 'ovogranada', 'celular'].includes(key)) {
 				let ATK = value.atk
 				let DEF = value.def
 				let emote = bot.config[value.emote]
@@ -53,8 +53,8 @@ exports.run = async (bot, message, args) => {
 			.catch(() => console.log("Não consegui enviar mensagem `loja`"))
 	}
 
-	if (option < 1 || (option % 1 !== 0) || option > 15) // 16 = jetpack / 17 = minigun / 18 = bazuca ...
-		return bot.createEmbed(message, `O ID deve ser entre 1 e 15 ${bot.config.loja}`, null, 'GREEN')
+	if (option < 1 || (option % 1 !== 0) || option > 14) // 16 = jetpack / 17 = minigun / 18 = bazuca ...
+		return bot.createEmbed(message, `O ID deve ser entre 1 e 14 ${bot.config.loja}`, null, 'GREEN')
 
 	let currTime = new Date().getTime()
 

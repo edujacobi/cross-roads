@@ -187,9 +187,9 @@ async function roubarLugar(bot, message, lugar, uData) {
 		if (isConjugeParticipando)
 			recompensa = ~~(recompensa * 0.5)
 		if (uData.classe === 'ladrao')
-			recompensa = ~~(recompensa * 1.1)
+			recompensa = ~~(recompensa * 1.15)
 		uData.roubosW += 1
-		uData.roubo = currTime + 60 * (uData.classe === 'ladrao' ? 1.1 : (uData.classe === 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
+		uData.roubo = currTime + 60 * (uData.classe === 'ladrao' ? 1.15 : (uData.classe === 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
 		uData.moni += recompensa
 		uData.valorRoubado += recompensa
 		bot.data.set(message.author.id, uData)
@@ -207,7 +207,7 @@ async function roubarLugar(bot, message, lugar, uData) {
 
 		if (isConjugeParticipando && conjuge) {
 			conjuge.roubosW += 1
-			conjuge.roubo = currTime + 60 * (conjuge.classe === 'ladrao' ? 1.1 : (conjuge.classe === 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
+			conjuge.roubo = currTime + 60 * (conjuge.classe === 'ladrao' ? 1.15 : (conjuge.classe === 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
 			conjuge.moni += recompensa
 			conjuge.valorRoubado += recompensa
 			conjuge.emRoubo.tempo = 0
@@ -254,7 +254,7 @@ async function roubarLugar(bot, message, lugar, uData) {
 
 	} else {
 		uData.roubosL++
-		let multiplo = uData.classe === 'ladrao' ? 1.1 : (uData.classe === 'advogado' ? 0.85 : 1)
+		let multiplo = uData.classe === 'ladrao' ? 1.15 : (uData.classe === 'advogado' ? 0.85 : 1)
 		let tempo_preso = (lugar.id * 20) * (multiplo * multiplicador_evento_tempo_preso)
 		uData.preso = currTime + Math.floor(tempo_preso * 60 * 1000)
 
@@ -952,7 +952,7 @@ Há uma pequena chance do alvo ser também espancado!`)
 					if (defPower > 0)
 						moneyAtkPower -= getPercent(moneyDefPower, moneyAtkPower)
 
-					if (uData.classe == 'ladrao')
+					if (uData.classe === 'ladrao')
 						moneyAtkPower *= 1.1
 
 					let money = Math.floor(getPercent(moneyAtkPower, tData.moni))
@@ -993,7 +993,7 @@ Há uma pequena chance do alvo ser também espancado!`)
 					uData.valorRoubado += money + (chips * 80)
 					uData.ficha += chips
 					uData.roubosW++
-					uData.roubo = currTime + 60 * (uData.classe == 'ladrao' ? 1.1 : (uData.classe == 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
+					uData.roubo = currTime + 60 * (uData.classe === 'ladrao' ? 1.15 : (uData.classe === 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
 
 					bot.data.set(alvo, tData)
 					bot.data.set(message.author.id, uData)
@@ -1033,7 +1033,7 @@ Há uma pequena chance do alvo ser também espancado!`)
 				} else {
 					//console.log("Falha")
 					const embed_robb_final = new Discord.MessageEmbed()
-						.setDescription(`Você falhou na sua tentativa e ficará preso por ${bot.segToHour(uData.classe == 'ladrao' ? Math.floor(tempo_preso * 60 * 1.1) : tempo_preso * 60)} ${bot.config.police}`)
+						.setDescription(`Você falhou na sua tentativa e ficará preso por ${bot.segToHour(uData.classe === 'ladrao' ? Math.floor(tempo_preso * 60 * 1.15) : tempo_preso * 60)} ${bot.config.police}`)
 						.setColor(bot.colors.policia)
 						.setFooter(uData.username, membro.avatarURL())
 						.setTimestamp()
@@ -1042,7 +1042,7 @@ Há uma pequena chance do alvo ser também espancado!`)
 						embeds: [embed_robb_final]
 					}).catch(() => console.log("Não consegui editar mensagem `roubar`"))
 
-					uData.preso = currTime + (uData.classe == 'ladrao' ? Math.floor(tempo_preso * 60 * 1000 * 1.1) : tempo_preso * 60 * 1000)
+					uData.preso = currTime + (uData.classe === 'ladrao' ? Math.floor(tempo_preso * 60 * 1000 * 1.15) : tempo_preso * 60 * 1000)
 					uData.roubosL++
 					bot.data.set(alvo, tData)
 

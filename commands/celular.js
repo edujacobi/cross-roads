@@ -1,4 +1,7 @@
 exports.run = async (bot, message, args) => {
+
+	if (!bot.isAdmin(message.author.id)) return
+	
 	const Discord = require('discord.js')
 	const Piii = require("piii")
 	const piiiFilters = require("piii-filters")
@@ -10,7 +13,7 @@ exports.run = async (bot, message, args) => {
 	let credito = 1000
 	let uData = bot.data.get(message.author.id);
 	let currTime = new Date().getTime()
-	let vip = uData.vipTime > currTime ? true : false
+	let vip = uData.vipTime > currTime
 
 	const piii = new Piii({
 		filters: [

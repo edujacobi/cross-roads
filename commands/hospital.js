@@ -19,19 +19,19 @@ exports.run = async (bot, message, args) => {
 		})
 
 		//let tempo_restante_proporcao = (uData.hospitalizado / currTime) - 1
-		let preço = Math.floor((3000 + (defPower * (defPower / 6)) ** 2) + (uData.moni * 0.1) + (uData.ficha * 80 * 0.1))
+		let preço = Math.floor((3000 + (defPower * (defPower / 4)) ** 2) + (uData.moni * 0.05) + (uData.ficha * 80 * 0.05))
 
 		const confirmed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.hospital} Atendimento particular`)
 			.setColor('RED')
-			.setDescription(`**Você está curado!** ${bot.config.hospital}`)
+			.setDescription(`**Você está curado!**`)
 			.setFooter(uData.username, message.member.user.avatarURL())
 			.setTimestamp()
 
 		const tratamento = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.hospital} Atendimento particular`)
 			.setColor('RED')
-			.setDescription(`Seu tratamento custará **R$ ${preço.toLocaleString().replace(/,/g, ".")}**.\n\nConfirmar pagamento? ${bot.config.hospital}`)
+			.setDescription(`Seu tratamento custará **R$ ${preço.toLocaleString().replace(/,/g, ".")}**.\n\nConfirmar pagamento?`)
 			.setFooter(uData.username, message.member.user.avatarURL())
 			.setTimestamp()
 
@@ -83,7 +83,7 @@ exports.run = async (bot, message, args) => {
 
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.hospital} Hospital`)
-			.setDescription("*Público, Gratuito e de Qualidade!*\n")
+			.setDescription("*Público, Gratuito e de Qualidade!*\nUsuários hospitalizados possuem -5 de DEF e -5% de Valor defendido.")
 			.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/739635753063153714/radar_hostpital.png")
 			.setColor('RED')
 			.addField("Serviço público", `Infelizmente não temos mais leitos livres, então você precisará esperar no corredor até ser atendido.`)

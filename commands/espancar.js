@@ -21,9 +21,7 @@ exports.run = async (bot, message, args) => {
 			.setColor(bot.colors.espancar)
 			.setDescription(`Derrote seu nêmesis e mostre quem é que manda!
 Quem perder a luta, ficará hospitalizado por um tempo determinado pela arma com maior defesa do jogador defensor.
-Para conseguir espancar, o alvo deve estar ${bot.config.vadiando} **Vadiando**
-
-Usuários hospitalizados possuem -5 de DEF e -5% de Valor defendido.
+Para conseguir espancar, o alvo deve estar ${bot.config.vadiando} **Vadiando**.
 
 Quando alguém tentar te espancar, você pode 💪 **Brigar** ou 👟 **Correr**!
 

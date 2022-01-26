@@ -119,6 +119,7 @@ module.exports = bot => {
 		jobTime: 0,
 		roubo: 0,
 		preso: 0,
+		subornoPago: 0,
 		fuga: 0,
 		qtEsmolasDadas: 0,
 		qtEsmolasRecebidas: 0,
