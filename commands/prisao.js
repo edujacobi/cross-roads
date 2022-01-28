@@ -403,7 +403,7 @@ exports.run = async (bot, message, args) => {
 
 		let chance = bot.getRandom(0, 100)
 		let sucesso = uData.classe === 'advogado' ? true : chance < 75
-		if (uData.subornoPago > uData.preso)
+		if (uData.subornoPago === uData.preso)
 			return bot.createEmbed(message, `Não aceitaremos nada vindo de você, espertalhão! ${bot.config.prisao}`, "\"Quem sabe na próxima tu deixa de ser idiota\"", bot.colors.policia)
 		if (uData.preso < currTime)
 			return bot.createEmbed(message, `Você não está preso ${bot.config.prisao}`, "\"Mas podemos te prender. O que acha?\"", bot.colors.policia)
@@ -456,7 +456,7 @@ exports.run = async (bot, message, args) => {
 			await b.deferUpdate()
 			uData = bot.data.get(message.author.id)
 			currTime = new Date().getTime()
-			if (uData.subornoPago > uData.preso)
+			if (uData.subornoPago === uData.preso)
 				return bot.createEmbed(message, `Não aceitaremos nada vindo de você, espertalhão! ${bot.config.prisao}`, "\"Quem sabe na próxima tu deixa de ser idiota\"", bot.colors.policia)
 			if (uData.moni < preço)
 				return bot.msgSemDinheiro(message)
@@ -527,7 +527,7 @@ Estar preso limita muitas de suas ações no jogo, como trabalhar, investir, apo
 Você pode tentar espancar outros presos.
 Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 			.addField(`${bot.badges.fujao_s5} Fugir`, `Você tem ${chanceBase * multiplicador_evento_chance_fuga}% (${chanceJetpack * multiplicador_evento_chance_fuga}% se possuir uma ${bot.config.jetpack} **Jetpack**) de chance de fugir da prisão!`)
-			.addField(`${bot.badges.deputado_s5} Subornar`, `Os guardas são gananciosos, e quanto melhor sua arma, mais eles pedirão!`)
+			.addField(`${bot.badges.deputado_s5} Subornar`, `Os guardas são gananciosos, e quanto melhor sua arma, mais eles pedirão! Eles também podem recusar seu suborno, mas ficarão com seu dinheiro.`)
 			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/817102027183357992/prisao.png') //message.guild.iconURL()
 			.setColor(bot.colors.policia)
 			.setFooter(bot.user.username, bot.user.avatarURL())
