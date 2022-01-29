@@ -71,42 +71,40 @@ exports.run = async (bot, message, args) => {
 	if (bot.isAlvoEmRouboOuEspancamento(message, tData))
 		return
 
-	if (uData.esmolaEntregueHoje < currTime) {
-		if (tData.esmolaRecebidaHoje < currTime) {
-
-			uData.esmolaEntregueHoje = currTime + hora
-
-			tData.esmolaRecebidaHoje = tData.classe === 'mendigo' ? tData.esmolaRecebidaHoje = currTime + (hora / 2) : tData.esmolaRecebidaHoje = currTime + hora
-
-			uData.qtEsmolasDadas += esmola
-			tData.qtEsmolasRecebidas += esmola
-
-			uData.moni -= esmola
-			tData.moni += esmola
-
-			if (message.author.id === bot.config.adminID) //Jacobi
-				uData.esmolaEntregueHoje = currTime
-
-			if (alvo === '526203502318321665') //Bot
-				tData.esmolaRecebidaHoje = currTime
-
-			bot.data.set(message.author.id, uData)
-			bot.data.set(alvo, tData)
-
-			const msgEsmola = new Discord.MessageEmbed()
-				.setColor('GREEN')
-				.setDescription(`**${bot.data.get(message.author.id, "username")}** do servidor ${message.guild.name} te deu uma esmola de R$ ${esmola} ${bot.config.coin}`)
-
-			bot.users.fetch(alvo).then(user => user.send({embeds: [msgEsmola]})
-				.catch(() => console.log(`Não consegui mandar mensagem privada para ${tData.username} (${alvo})`)))
-
-			return bot.createEmbed(message, `Você doou **R$ ${esmola}** para ${tData.username} ${bot.config.coin}`, `${alvo === bot.user.id ? "Obrigado! • " : ""}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
-
-		} else
-			return bot.createEmbed(message, `${tData.username} deve esperar ${bot.segToHour((tData.esmolaRecebidaHoje - currTime) / 1000)} para receber uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
-
-	} else
+	if (uData.esmolaEntregueHoje > currTime)
 		return bot.createEmbed(message, `Você deve esperar ${bot.segToHour((uData.esmolaEntregueHoje - currTime) / 1000)} para entregar uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
+	
+	if (tData.esmolaRecebidaHoje > currTime)
+		return bot.createEmbed(message, `${tData.username} deve esperar ${bot.segToHour((tData.esmolaRecebidaHoje - currTime) / 1000)} para receber uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
+
+	uData.esmolaEntregueHoje = currTime + hora
+
+	tData.esmolaRecebidaHoje = tData.classe === 'mendigo' ? tData.esmolaRecebidaHoje = currTime + (hora / 2) : tData.esmolaRecebidaHoje = currTime + hora
+
+	uData.qtEsmolasDadas += esmola
+	tData.qtEsmolasRecebidas += esmola
+
+	uData.moni -= esmola
+	tData.moni += esmola
+
+	if (message.author.id === bot.config.adminID) //Jacobi
+		uData.esmolaEntregueHoje = currTime
+
+	if (alvo === '526203502318321665') //Bot
+		tData.esmolaRecebidaHoje = currTime
+
+	bot.data.set(message.author.id, uData)
+	bot.data.set(alvo, tData)
+
+	const msgEsmola = new Discord.MessageEmbed()
+		.setColor('GREEN')
+		.setDescription(`**${bot.data.get(message.author.id, "username")}** te deu uma esmola de R$ ${esmola} ${bot.config.coin}`) //do servidor ${message.guild.name}
+
+	bot.users.fetch(alvo).then(user => user.send({embeds: [msgEsmola]})
+		.catch(() => console.log(`Não consegui mandar mensagem privada para ${tData.username} (${alvo})`)))
+
+	return bot.createEmbed(message, `Você doou **R$ ${esmola}** para ${tData.username} ${bot.config.coin}`, `${alvo === bot.user.id ? "Obrigado! • " : ""}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
+	
 }
 exports.config = {
 	alias: ['doar', 'esm', 'alms']

@@ -1415,35 +1415,22 @@ exports.run = async (bot, message, args) => {
 										currTime = new Date().getTime()
 
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) { // !players_negados.includes(newplayer.id)
-											if (jogador.preso > currTime) {
+											if (jogador.preso > currTime) 
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-
-											}
-											else if (jogador.hospitalizado > currTime) {
+											else if (jogador.hospitalizado > currTime) 
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-
-											}
-											else if (jogador.gangID !== uData.gangID) {
+											else if (jogador.gangID !== uData.gangID) 
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, bot.colors.background)
-
-											}
-											else if (jogador.roubo > currTime) {
+											else if (jogador.roubo > currTime) 
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-
-											}
-											else if (jogador.job != null) {
+											else if (jogador.job != null) 
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
-
-											}
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
 												bot.isUserEmRouboOuEspancamento(message, jogador)
-
 											else if (bot.isPlayerViajando(jogador))
 												bot.msgPlayerViajando(message, jogador, jogador.username)
-
 											else if (bot.isGaloEmRinha(newplayer.id))
 												bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
-
 											else {
 												jogador.emRoubo = {
 													tempo: currTime + 91000,
@@ -1493,7 +1480,7 @@ exports.run = async (bot, message, args) => {
 													uGang.golpeMissao1.time = currTime + 21600000 // 6h
 													players.forEach(membro => {
 														let userD = bot.data.get(membro)
-														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.1 * 2700000) : (uData.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
+														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.15 * 2700000) : (userD.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 														userD.roubosW++
 														userD.emRoubo.tempo = 0
 														setTimeout(() => {
@@ -1522,7 +1509,7 @@ exports.run = async (bot, message, args) => {
 													uGang.golpeMissao1.time = currTime + 21600000 // 6h
 													players.forEach(membro => {
 														let userD = bot.data.get(membro)
-														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.1) : tempo_preso)
+														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.15) : tempo_preso)
 														userD.roubosL++
 														userD.emRoubo.tempo = 0
 														bot.data.set(membro, userD)
@@ -1561,10 +1548,8 @@ exports.run = async (bot, message, args) => {
 						else if (r.emoji.name === '🚗') {
 							if (uGang.golpeMissao2.concluido)
 								return bot.createEmbed(message, `Sua gangue já comprou 🚗 **Carros de Fuga** ${getIcone(uGang.boneco)}`, null, uGang.cor)
-
 							if (uGang.golpeMissao2.time > currTime)
 								return bot.createEmbed(message, `Sua gangue deve esperar mais ${bot.segToHour((uGang.golpeMissao2.time - currTime) / 1000)} para comprar novos 🚗 **Carros de Fuga** ${getIcone(uGang.boneco)}`, null, uGang.cor)
-
 							if (uGang.caixa < 8000000)
 								return bot.createEmbed(message, `Sua gangue não tem dinheiro suficiente em caixa ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -1579,7 +1564,6 @@ exports.run = async (bot, message, args) => {
 						else if (r.emoji.name === '💻') {
 							if (uGang.golpeMissao3.concluido)
 								return bot.createEmbed(message, `Sua gangue já hackeou o 💻 **Sistema de Câmeras** ${getIcone(uGang.boneco)}`, null, uGang.cor)
-
 							if (uGang.golpeMissao3.time > currTime)
 								return bot.createEmbed(message, `Sua gangue deve esperar mais ${bot.segToHour((uGang.golpeMissao3.time - currTime) / 1000)} para tentar hackear novamente o 💻 **Sistema de Câmeras** ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -1624,25 +1608,18 @@ exports.run = async (bot, message, args) => {
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) {
 											if (jogador.preso > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-
 											else if (jogador.hospitalizado > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-
 											else if (jogador.gangID !== uData.gangID)
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${bot.config.gang}`, null, bot.colors.background)
-
 											else if (jogador.roubo > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-
 											else if (jogador.job != null)
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
-
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
 												bot.isUserEmRouboOuEspancamento(message, jogador)
-
 											else if (bot.isPlayerViajando(jogador))
 												bot.msgPlayerViajando(message, jogador, jogador.username)
-
 											else if (bot.isGaloEmRinha(newplayer.id))
 												bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 											else {
@@ -1696,7 +1673,7 @@ exports.run = async (bot, message, args) => {
 													uGang.golpeMissao3.time = currTime + 21600000 // 6h
 													players.forEach(membro => {
 														let userD = bot.data.get(membro)
-														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.1 * 2700000) : (uData.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
+														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.15 * 2700000) : (userD.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 														userD.emRoubo.tempo = 0
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user =>
@@ -1731,7 +1708,7 @@ exports.run = async (bot, message, args) => {
 													uGang.golpeMissao3.time = currTime + 21600000 // 6h
 													players.forEach(membro => {
 														let userD = bot.data.get(membro)
-														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.1) : tempo_preso)
+														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.15) : tempo_preso)
 														userD.roubosW++
 														userD.emRoubo.tempo = 0
 														bot.data.set(membro, userD)
@@ -1824,25 +1801,18 @@ exports.run = async (bot, message, args) => {
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) {
 											if (jogador.preso > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-
 											else if (jogador.hospitalizado > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-
 											else if (jogador.gangID !== uData.gangID)
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, bot.colors.background)
-
 											else if (jogador.roubo > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-
 											else if (jogador.job != null)
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
-
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
 												bot.isUserEmRouboOuEspancamento(message, jogador)
-
 											else if (bot.isPlayerViajando(jogador))
 												bot.msgPlayerViajando(message, jogador, jogador.username)
-
 											else if (bot.isGaloEmRinha(newplayer.id))
 												bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 											else {
@@ -1913,7 +1883,7 @@ exports.run = async (bot, message, args) => {
 
 													players.forEach(membro => {
 														let userD = bot.data.get(membro)
-														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.1 * 2700000) : (uData.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
+														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.15 * 2700000) : (userD.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 														userD.moni += userD.classe === 'ladrao' ? Math.floor(parte * 1.1) : parte
 														userD.emRoubo.tempo = 0
 														setTimeout(() => {
@@ -1950,7 +1920,7 @@ exports.run = async (bot, message, args) => {
 													let tempo_preso = bot.getRandom(28800000, 36000000) //8h a 10h
 													players.forEach(membro => {
 														let userD = bot.data.get(membro)
-														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.1) : tempo_preso)
+														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.15) : tempo_preso)
 														userD.roubosL++
 														userD.emRoubo.tempo = 0
 														bot.data.set(membro, userD)

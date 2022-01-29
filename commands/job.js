@@ -1,6 +1,6 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
-	let currTime = new Date().getTime();
+	let currTime = new Date().getTime()
 
 	function trabalhar(bot, message, job, uData, key) {
 		if (job == undefined || key == undefined)
@@ -9,24 +9,27 @@ exports.run = async (bot, message, args) => {
 		if (uData.job != null)
 			return bot.createEmbed(message, `Você precisa receber seu pagamento antes de começar outro trabalho! ${bot.config.bulldozer}`, ";receber", 'GREEN')
 
-		else {
-			uData.job = key
-			uData.jobTime = uData.classe == 'empresario' ? currTime + Math.round((job.time * 1000 * 60) * 0.95) : currTime + (job.time * 1000 * 60)
-			bot.createEmbed(message, `Você começou a trabalhar de **${job.desc}** ${bot.config.bulldozer}`, null, 'GREEN')
+		uData.job = key
+		uData.jobTime = currTime + (job.time * 1000 * 60)
+		bot.createEmbed(message, `Você começou a trabalhar de **${job.desc}** ${bot.config.bulldozer}`, null, 'GREEN')
 
-			let aviso = (Math.random() < 0.50 ? "" : "\nHabilite mensagens privadas com o Cross Roads e seja avisado sobre notificações importantes!")
+		let aviso = (Math.random() < 0.50 ? "" : "\nHabilite mensagens privadas com o Cross Roads e seja avisado sobre notificações importantes!")
+		
+		const embedPV = new Discord.MessageEmbed()
+			.setTitle(`${bot.config.bulldozer} Você terminou o trabalho **${job.desc}**!`)
+			.setColor('YELLOW')
 
-			setTimeout(() => {
-				message.author.send(`Você terminou o trabalho **${job.desc}**! ${bot.config.bulldozer}`)
-					.catch(err => message.reply(`você terminou o trabalho **${job.desc}**! ${bot.config.bulldozer}${aviso}`)
-						.catch(er => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Job\``));
-			}, uData.jobTime - currTime)
+		setTimeout(() => {
+			message.author.send({embeds: [embedPV]})
+				.catch(() => message.reply(`você terminou o trabalho **${job.desc}**! ${bot.config.bulldozer}${aviso}`)
+					.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Job\``))
+		}, uData.jobTime - currTime)
 
-			bot.data.set(message.author.id, uData)
-			return bot.log(message, new Discord.MessageEmbed()
-				.setDescription(`**${uData.username} começou a trabalhar de ${job.desc}**`)
-				.setColor('YELLOW'))
-		}
+		bot.data.set(message.author.id, uData)
+		return bot.log(message, new Discord.MessageEmbed()
+			.setDescription(`**${uData.username} começou a trabalhar de ${job.desc}**`)
+			.setColor('YELLOW'))
+
 	}
 
 	let uData = bot.data.get(message.author.id)
@@ -59,8 +62,9 @@ exports.run = async (bot, message, args) => {
 		else
 			return bot.createEmbed(message, `${bot.segToHour(minutes)} restantes para encerrar seu trabalho de **${bot.jobs[uData.job].desc}** ${bot.config.bulldozer}`, null, 'GREEN')
 
-	} else {
-		if (option == 'parar' || option == 'p' || option == 'stop') {
+	}
+	else {
+		if (option === 'parar' || option === 'p' || option === 'stop') {
 			if (uData.job != null) {
 				let minutes = Math.floor((uData.jobTime - currTime) / 1000)
 
@@ -76,7 +80,8 @@ exports.run = async (bot, message, args) => {
 					.setDescription(`**${uData.username} parou o trabalho ${job.desc}**`)
 					.setColor('YELLOW'))
 
-			} else
+			}
+			else
 				bot.createEmbed(message, `Você não pode parar o que nem começou ${bot.config.bulldozer}`, null, 'GREEN')
 
 			return bot.data.set(message.author.id, uData)
@@ -86,10 +91,10 @@ exports.run = async (bot, message, args) => {
 	if (option < 1 || (option % 1 != 0) || option > Object.keys(bot.jobs).length)
 		return bot.createEmbed(message, `O ID deve ser entre 1 e ${Object.keys(bot.jobs).length} ${bot.config.bulldozer}`, null, 'GREEN')
 
-	if (option >= 16 && day != 0 && day != 6 && !(day == 5 && hora >= 20) && message.author.id != bot.config.adminID)
+	if (option >= 16 && day !== 0 && day !== 6 && !(day === 5 && hora >= 20) && message.author.id !== bot.config.adminID)
 		return bot.createEmbed(message, `"Parça, este trabalho só fica disponível no final de semana" ${bot.config.thetruth}`, null, 0)
 
-	// if (option == 13)
+		// if (option == 13)
 	// 	return bot.createEmbed(message, `Trabalho em manutenção ${bot.config.bulldozer}`)
 
 	else {
@@ -118,7 +123,8 @@ exports.run = async (bot, message, args) => {
 									}
 								})
 
-							} else {
+							}
+							else {
 								if (currTime > uData.jobTime || !uData.jobTime) {
 									jobLugar = job
 									jobKey = key
@@ -126,7 +132,8 @@ exports.run = async (bot, message, args) => {
 							}
 						}
 
-					} else {
+					}
+					else {
 						for (let i = 0; i < job.arma.length; i++) {
 							let arma = job.arma[i]
 							if (key_udata == "_" + arma) {
@@ -138,7 +145,8 @@ exports.run = async (bot, message, args) => {
 										}
 									})
 
-								} else {
+								}
+								else {
 									if (emotes == "" && (currTime > uData.jobTime || !uData.jobTime)) {
 										jobLugar = job
 										jobKey = key
@@ -161,4 +169,4 @@ exports.run = async (bot, message, args) => {
 }
 exports.config = {
 	alias: ['trab', 'trabalho', 'j', 't', 'trabalhar']
-};
+}
