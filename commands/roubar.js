@@ -379,7 +379,7 @@ function verifyRoubo(bot, message, emoji_id) {
 					for (let i = 0; i < lugar.necessario.length; i++) {
 						let arma = lugar.necessario[i]
 						if (key_udata == arma) {
-							if (currTime > value_udata) {
+							if (currTime > value_udata.tempo) {
 								Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
 									if (arma == key_gun && lugarRoubo == null) {
 										let temp_emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
