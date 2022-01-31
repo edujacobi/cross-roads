@@ -8,7 +8,7 @@ exports.run = async (bot, message, args) => {
 	const MAX = 5 * MULT_INVEST
 	//	if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return message.channel.send('Comando em manutenção')
 
-	// return bot.createEmbed(message, `🎰 As Máquinas Caça-níqueis estão desativadas durante a primeira semana de temporada`)
+	return bot.createEmbed(message, `🎰 As Máquinas Caça-níqueis estão desativadas durante a primeira semana de temporada`)
 
 	if (multiplicador <= 0 || (multiplicador % 1 != 0))
 		return bot.msgValorInvalido(message)
