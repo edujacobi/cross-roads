@@ -7,8 +7,8 @@ module.exports = (bot, message) => {
 	if ((!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id) || bot.isAjudante(message.author.id))) && process.env.NODE_ENV === "test")
 		return
 
-	if (message.author.id !== bot.config.adminID)
-		return
+	// if (message.author.id !== bot.config.adminID)
+	// 	return
 
 	if (message.author.bot) return
 
