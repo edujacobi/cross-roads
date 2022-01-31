@@ -17,10 +17,10 @@ exports.run = async (bot, message, args) => {
 			.setTimestamp()
 
 		Object.entries(bot.guns).forEach(([key, value]) => {
-			if (!['minigun', 'jetpack', 'bazuca', 'exoesqueleto', 'ovogranada', 'celular'].includes(key)) {
+			if (!['minigun', 'jetpack', 'bazuca', 'exoesqueleto', 'granada', 'celular'].includes(key)) {
 				let ATK = value.atk
 				let DEF = value.def
-				let emote = bot.config[value.emote]
+				let emote = value.skins[uData.arma[value.data].skinAtual].emote
 				if (ATK && ATK.toString().indexOf('noite') === -1) {
 					if (uData.classe === 'assassino') {
 						if (ATK * 1.1 === Math.floor(ATK * 1.1))
@@ -28,7 +28,8 @@ exports.run = async (bot, message, args) => {
 						else
 							ATK = (ATK * 1.1).toFixed(1)
 
-					} else if (uData.classe === 'mendigo') {
+					}
+					else if (uData.classe === 'mendigo') {
 						if (ATK * 0.9 === Math.floor(ATK * 0.9))
 							ATK = ATK * 0.9
 						else
@@ -79,30 +80,29 @@ exports.run = async (bot, message, args) => {
 			if (uData.moni < preço)
 				return bot.msgSemDinheiro(message)
 
-			if ((uData["_" + gun.data] + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData["_" + gun.data] < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
+			if ((uData.arma[gun.data].tempo + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData.arma[gun.data].tempo < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
 				return bot.createEmbed(message, `Você não pode possuir mais que 720 horas de uma mesma arma ${bot.config.loja}`, null, 'GREEN')
 
 			uData.moni -= preço
 			uData.lojaGastos += preço
 
-			let emote = bot.config[gun.emote]
+			let emote = gun.skins[uData.arma[gun.data].skinAtual].emote
 
 			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} **${gun.desc}**`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
 
 			bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
 
-			Object.entries(uData).forEach(([key_udata, value_udata]) => {
-				if (key_udata === "_" + gun.data && gun.data !== 'minigun') {
-					value_udata = value_udata > currTime ? value_udata + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
-					uData[key_udata] = value_udata
-				}
+			Object.entries(uData.arma).forEach(([key, value]) => {
+				if (key === gun.data && gun.data !== 'minigun')
+					uData.arma[key].tempo = value.tempo > currTime ? value.tempo + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
+				
 			})
 
 			bot.log(message, new Discord.MessageEmbed()
 				.setDescription(`**${bot.config.loja} ${uData.username} comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} ${gun.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
 				// .addField("Imposto", `R$ ${valor_imposto.toLocaleString().replace(/,/g, ".")}`, true)
-				.addField("Tempo restante", bot.segToHour((uData["_" + gun.data] - currTime) / 1000), true)
+				.addField("Tempo restante", bot.segToHour((uData.arma[gun.data].tempo - currTime) / 1000), true)
 				.setColor('GREEN'))
 		}
 	})

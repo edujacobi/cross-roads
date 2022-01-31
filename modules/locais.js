@@ -7,7 +7,7 @@ module.exports = (bot) => {
 			sucesso: 75,
 			min: 100,
 			max: 350,
-			necessario: "knife"
+			necessario: "faca"
 		},
 		mercearia: {
 			id: 2,

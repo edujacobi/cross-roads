@@ -26,7 +26,7 @@ exports.run = async (bot, message, args) => {
 	}
 
 	// the path is relative to the *current folder*, so just ./filename.js
-	delete require.cache[require.resolve(`./${slashName}.js`)]
+	delete require.cache[require.resolve(`../slashes/${slashName}.js`)]
 
 	// We also need to delete and reload the slash from the bot.slashes Enmap
 	bot.slashes.delete(slashName)

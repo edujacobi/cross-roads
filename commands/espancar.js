@@ -30,28 +30,26 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			.addField("Comando", `\`;espancar [user]\``)
 			.setFooter(uData.username, membro.avatarURL())
 			.setTimestamp()
-		return message.channel.send({
-			embeds: [embed]
-		}).catch(() => console.log("Não consegui enviar mensagem `espancar`"))
+
+		return message.channel.send({embeds: [embed]})
+			.catch(() => console.log("Não consegui enviar mensagem `espancar`"))
 	}
 
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
-
 	if (uData.espancar > currTime)
 		return bot.createEmbed(message, `Você só poderá espancar novamente em ${bot.segToHour(Math.floor((uData.espancar - currTime) / 1000))} ${bot.config.espancar}`, null, bot.colors.espancar)
-
 	if (uData.roubo > currTime)
 		return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((uData.roubo - currTime) / 1000))} ${bot.config.police}`, null, bot.colors.policia)
 
 	let granadaUsada = null
 
-	if (args[0].toLowerCase() === 'granada' && uData._ovogranada > 0) {
+	if (args[0].toLowerCase() === 'granada' && uData.arma.granada.quant > 0) {
 		args.shift()
 		granadaUsada = true
-
 	}
-	else if (args[0].toLowerCase() === 'semgranada' && uData._ovogranada > 0) {
+
+	else if (args[0].toLowerCase() === 'semgranada' && uData.arma.granada.quant > 0) {
 		args.shift()
 		granadaUsada = false
 	}
@@ -95,52 +93,36 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 
 	if (uData.job != null)
 		return bot.msgTrabalhando(message, uData)
-
 	if (uData.preso > currTime && targetD.preso < currTime)
 		return bot.msgPreso(message, uData)
-
 	// if (targetD.classe == undefined)
 	// 	return bot.createEmbed(message, `**${targetD.username}** não está ativo na temporada e não pode ser espancado ${bot.config.espancar}`, null, bot.colors.espancar)
-
 	if (bot.isUserEmRouboOuEspancamento(message, uData))
 		return
-
 	if (bot.isAlvoEmRouboOuEspancamento(message, targetD))
 		return
-
 	if (bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.espancar)
-
 	if (targetD.jobTime > currTime)
 		return bot.createEmbed(message, `**${targetD.username}** está trabalhando. Você não conseguirá espancá-lo ${bot.config.bulldozer}`, null, bot.colors.espancar)
-
 	if (targetD.preso > currTime && uData.preso < currTime)
 		return bot.createEmbed(message, `**${targetD.username}** está preso. Você só conseguirá espancá-lo se estiver preso também ${bot.config.police}`, null, bot.colors.espancar)
-
 	if (targetD.hospitalizado > currTime)
 		return bot.createEmbed(message, `**${targetD.username}** está hospitalizado. Você não conseguirá espancá-lo ${bot.config.hospital}`, null, bot.colors.hospital)
-
-	if (message.author.id == alvo)
-		return bot.createEmbed(message, `Você não pode espancar você mesmo, imbecil ${bot.config.espancar}`, null, bot.colors.espancar)
-
-	if (alvo == bot.config.adminID)
-		return bot.createEmbed(message, `Quem em sã consciência espancaria o Jacobi? ${bot.config.espancar}`, null, bot.colors.espancar)
-
+	// if (message.author.id == alvo)
+	// 	return bot.createEmbed(message, `Você não pode espancar você mesmo, imbecil ${bot.config.espancar}`, null, bot.colors.espancar)
+	// if (alvo == bot.config.adminID)
+	// 	return bot.createEmbed(message, `Quem em sã consciência espancaria o Jacobi? ${bot.config.espancar}`, null, bot.colors.espancar)
 	if (alvo == '526203502318321665') // bot
 		return bot.createEmbed(message, `01000100 01100101 01110011 01101001 01110011 01110100 01100001 <:CrossRoadsLogo:757021182020157571>`, null, bot.colors.espancar)
-
 	if (uData.gangID != null && uData.gangID == targetD.gangID)
 		return bot.createEmbed(message, `Você não pode espancar membros da sua gangue ${bot.config.espancar}`, null, bot.colors.espancar)
-
 	if (uData.fugindo > currTime)
 		return bot.createEmbed(message, `Você está tentando fugir da prisão e não pode tentar espancar ninguém ${bot.config.police}`, 'Foco!', bot.colors.espancar)
-
 	if (targetD.fugindo > currTime)
 		return bot.createEmbed(message, `**${targetD.username}** está tentando fugir da prisão. Aguarde um momento ${bot.config.police}`, 'Paciência!', bot.colors.espancar)
-
 	if (alvo == uData.conjuge)
 		return bot.createEmbed(message, `Você não pode espancar o seu cônjuge ${bot.config.espancar}`, null, bot.colors.espancar)
-
 	if (bot.isPlayerViajando(targetD))
 		return bot.msgPlayerViajando(message, targetD, targetD.username)
 
@@ -151,27 +133,27 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 	let hora = new Date().getHours()
 
 	// ATK e arma do espancador
-	Object.entries(uData).forEach(([key, value]) => {
+	Object.entries(uData.arma).forEach(([key, value]) => {
 		Object.values(bot.guns).forEach(arma => {
-			if (value > currTime && arma.atk > atkPower && (key == "_" + arma.data) && typeof (arma.atk) == "number") {
+			if (value.tempo > currTime && arma.atk > atkPower && (key == arma.data) && typeof (arma.atk) == "number") {
 				atkPower = arma.atk
-				armaATK = `${bot.config[arma.emote]} ${arma.desc}`
+				armaATK = `${arma.skins[uData.arma[arma.data].skinAtual].emote} ${arma.desc}`
 			}
 		})
 	})
 
 	// ATK do espancado
-	Object.entries(targetD).forEach(([key, value]) => {
+	Object.entries(targetD.arma).forEach(([key, value]) => {
 		Object.values(bot.guns).forEach(arma => {
-			if (value > currTime && arma.atk > atkPowerDefensor && (key == "_" + arma.data) && typeof (arma.atk) == "number")
+			if (value.tempo > currTime && arma.atk > atkPowerDefensor && (key == arma.data) && typeof (arma.atk) == "number")
 				atkPowerDefensor = arma.atk
 		})
 	})
 
 
-	if (uData._goggles > currTime && hora <= 4 && hora >= 20)
+	if (uData.arma.goggles.tempo > currTime && hora <= 4 && hora >= 20)
 		atkPower += 3
-	if (targetD._goggles > currTime && hora <= 4 && hora >= 20)
+	if (targetD.arma.goggles.tempo > currTime && hora <= 4 && hora >= 20)
 		atkPowerDefensor += 3
 
 	if (atkPowerDefensor - atkPower > 15)
@@ -179,13 +161,13 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 
 	let escolhido = false
 
-	if (uData._ovogranada <= 0 || granadaUsada != null)
+	if (uData.arma.granada.quant <= 0 || granadaUsada != null)
 		return espancamento()
 
 	let aceitar = '572134588340633611'
 	let negar = '572134589863034884'
 
-	bot.createEmbed(message, `Você possui **${bot.config.ovogranada} ${uData._ovogranada} Granada**.\nDeseja utilizar uma neste espancamento? Seu ATK aumentará em 5!`, `60 segundos para responder`, bot.colors.espancar)
+	bot.createEmbed(message, `Você possui **${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} ${uData.arma.granada.quant} Granada**.\nDeseja utilizar uma neste espancamento? Seu ATK aumentará em 5!`, `60 segundos para responder`, bot.colors.espancar)
 		.then(msg => {
 			msg.react(aceitar) // aceitar
 				.then(() => msg.react(negar)) // negar
@@ -262,7 +244,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			})
 		})
 
-	function espancamento() {
+	async function espancamento() {
 		uData = bot.data.get(message.author.id)
 		targetD = bot.data.get(alvo)
 		currTime = new Date().getTime()
@@ -291,14 +273,14 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 		let tempoHospitalizado = (45 + atkPowerDefensor) * multiplicador_evento_espancado_tempo
 		let tempoHospitalizadoAdicional = 5 + atkPowerDefensor * multiplicador_evento_espancado_tempo
 
-		if (uData.classe == 'mendigo')
+		if (uData.classe === 'mendigo')
 			atkPower *= 0.9
-		else if (uData.classe == 'assassino')
+		else if (uData.classe === 'assassino')
 			atkPower *= 1.1
 
-		if (targetD.classe == 'mendigo')
+		if (targetD.classe === 'mendigo')
 			atkPowerDefensor *= 0.9
-		else if (targetD.classe == 'assassino')
+		else if (targetD.classe === 'assassino')
 			atkPowerDefensor *= 1.1
 
 		let emote = uData.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[uData.classe].emote) : `<:Inventario:814663379536052244>`
@@ -323,11 +305,11 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			.setFooter(uData.username, membro.avatarURL())
 			.setTimestamp()
 		if (granadaUsada)
-			embed_robb_inicio.setDescription(`**Utilizando ${bot.config.ovogranada} Granada**!`)
+			embed_robb_inicio.setDescription(`**Utilizando ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} Granada**!`)
 
 		const embed_robb_private = new Discord.MessageEmbed()
 			.setAuthor(`Vou quebrar tua cara!`, membro.avatarURL())
-			.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}está tentando lhe espancar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.config.ovogranada} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
+			.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}está tentando lhe espancar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
 			.addField(`💪 Brigar`, `+5 ATK, mas quem apanhar ficará mais ${tempoHospitalizadoAdicional} minutos hospitalizado`, true)
 			.addField(`👟 Correr`, `-5 ATK, mas quem apanhar ficará menos ${tempoHospitalizadoAdicional} minutos hospitalizado, `, true)
 			.setColor(bot.colors.espancar)
@@ -361,15 +343,14 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 									if (r.emoji.name === '💪') {
 										const embed_robb_private_brigar = new Discord.MessageEmbed()
 											.setAuthor(`Vou quebrar tua cara!`, membro.avatarURL())
-											.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}está tentando lhe espancar utilizando ${armaATK}${granadaUsada ? ` e ${bot.config.ovogranada} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
+											.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}está tentando lhe espancar utilizando ${armaATK}${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
 											.addField(`💪 Brigar`, `Brigando...`)
 											.setColor(bot.colors.espancar)
 											.setFooter("Você tem 60 segundos para responder")
 											.setTimestamp()
 
-										msg.edit({
-											embeds: [embed_robb_private_brigar]
-										}).catch(() => console.log("Não consegui editar mensagem `espancar`"))
+										msg.edit({embeds: [embed_robb_private_brigar]})
+											.catch(() => console.log("Não consegui editar mensagem `espancar`"))
 
 										const embed_robb_inicio_brigar = new Discord.MessageEmbed()
 											.setAuthor('Vou quebrar tua cara!', bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.name == 'espancar').url)
@@ -377,9 +358,9 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 											.setColor(bot.colors.espancar)
 											.setFooter(bot.data.get(message.author.id, "username"), membro.avatarURL())
 											.setTimestamp()
-										message_robb.edit({
-											embeds: [embed_robb_inicio_brigar]
-										}).catch(() => console.log("Não consegui editar mensagem `espancar`"))
+
+										message_robb.edit({embeds: [embed_robb_inicio_brigar]})
+											.catch(() => console.log("Não consegui editar mensagem `espancar`"))
 
 										atkPowerDefensor += 5
 										tempoHospitalizado += tempoHospitalizadoAdicional
@@ -393,15 +374,14 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 
 										const embed_robb_private_correr = new Discord.MessageEmbed()
 											.setAuthor(`Vou quebrar tua cara!`, membro.avatarURL())
-											.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}está tentando lhe espancar utilizando ${armaATK}${granadaUsada ? ` e ${bot.config.ovogranada} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
+											.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}está tentando lhe espancar utilizando ${armaATK}${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
 											.addField(`👟 Correr`, `Correndo...`)
 											.setColor(bot.colors.espancar)
 											.setFooter("Você tem 60 segundos para responder")
 											.setTimestamp()
 
-										msg.edit({
-											embeds: [embed_robb_private_correr]
-										}).catch(() => console.log("Não consegui editar mensagem `espancar`"))
+										msg.edit({embeds: [embed_robb_private_correr]})
+											.catch(() => console.log("Não consegui editar mensagem `espancar`"))
 
 										const embed_robb_inicio_correr = new Discord.MessageEmbed()
 											.setAuthor('Vou quebrar tua cara!', bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.name == 'espancar').url)
@@ -410,9 +390,8 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 											.setFooter(bot.data.get(message.author.id, "username"), membro.avatarURL())
 											.setTimestamp()
 
-										message_robb.edit({
-											embeds: [embed_robb_inicio_correr]
-										}).catch(() => console.log("Não consegui editar mensagem `espancar`"))
+										message_robb.edit({embeds: [embed_robb_inicio_correr]})
+											.catch(() => console.log("Não consegui editar mensagem `espancar`"))
 
 										atkPowerDefensor -= 5
 										tempoHospitalizado -= tempoHospitalizadoAdicional
@@ -429,7 +408,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 				targetD = bot.data.get(alvo)
 				// console.log(granadaUsada)
 				if (granadaUsada)
-					uData._ovogranada -= 1
+					uData.arma.granada.quant -= 1
 
 				let randomDesafiante = bot.getRandom(1, 100)
 				let randomDesafiado = bot.getRandom(1, 100)
@@ -449,9 +428,8 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 						.setFooter(uData.username, membro.avatarURL())
 						.setTimestamp()
 
-					message_robb.edit({
-						embeds: [embed_espancar_final]
-					}).catch(() => console.log("Não consegui editar mensagem `espancar`"))
+					message_robb.edit({embeds: [embed_espancar_final]})
+						.catch(() => console.log("Não consegui editar mensagem `espancar`"))
 
 					let surrado = ['espancado', 'surrado', 'socado com muita força', 'chutado nas bolas', 'trucidado', 'acabado', 'escadeirado', 'arrochado', 'marretado', 'moído a pau']
 					bot.shuffle(surrado)
@@ -510,9 +488,8 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 						.setFooter(uData.username, membro.avatarURL())
 						.setTimestamp()
 
-					message_robb.edit({
-						embeds: [embed_espancar_final]
-					}).catch(() => console.log("Não consegui editar mensagem `espancar`"))
+					message_robb.edit({embeds: [embed_espancar_final]})
+						.catch(() => console.log("Não consegui editar mensagem `espancar`"))
 
 					uData.espancar = currTime + 3000000 * multiplicador_evento_tempo
 					uData.roubo = currTime + 1800000 * multiplicador_evento_tempo
@@ -529,7 +506,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 						user.send(`**${uData.username}** ${uData.gangID != null ? `da gangue **${bot.gangs.get(uData.gangID, 'nome')}** ` : ""}tentou lhe espancar, mas ${textoSurra} e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`)
 							.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
 					})
-					
+
 					const embedPVHeal = new Discord.MessageEmbed()
 						.setTitle(`${bot.config.hospital} Você está curado!`)
 						.setColor('RED')
@@ -549,7 +526,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			}, 62000)
 		}).catch(() => console.log("Não consegui enviar mensagem `espancar`"))
 	}
-
+			
 }
 exports.config = {
 	alias: ['socar', 'bater', 'esp', 'chutar', 'surrar', 'arrochar', 'moerapau']

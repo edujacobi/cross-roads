@@ -13,6 +13,12 @@ exports.run = async (bot, message, args) => {
 // 	// // bot.createEmbed(message, `R$ 200.000.000 foram transferidos do ${bot.config.cash} Banco para o caixa do ${bot.config.mafiaCasino} Cassino`)
 
 	bot.gangs.clear()
+	
+	bot.casais.forEach((casal, id) => {
+		casal.anel = null
+		casal.flores = 0
+		bot.casais.set(id, casal)
+	})
 
 // 	// bot.bilhete.clear()
 // 	// bot.bilhete.set('diaUltimoSorteio', 6)
@@ -56,127 +62,216 @@ exports.run = async (bot, message, args) => {
 // 	const tresDias = 259200000
 // 	const doisDias = 172800000
 
-// 	// bot.galos.forEach((galo, id) => {
-// 	// 	if (id != '526203502318321665') {
-// 	// 		galo.power = 30
-// 	// 		galo.wins = 0
-// 	// 		galo.loses = 0
-// 	// 		// bot.galos.delete(id, 'raça')
-// 	// 		// bot.galos.delete(id, 'nacionalidade')
-// 	// 		// bot.galos.delete(id, 'raridade')
-// 	// 		bot.galos.set(id, galo)
-// 	// 	}
-// 	// })
-
-	bot.data.forEach((user, id) => {
-		if (user.username != undefined) {
-			// bot.data.delete(id, '_9mm')
-			// bot.data.delete(id, 'galoPower')
-			// bot.data.delete(id, 'galoAvatar')
-			// bot.data.delete(id, 'galoNome')
-			// bot.data.delete(id, 'galoTit')
-			// bot.data.delete(id, 'galoTrain')
-			// bot.data.delete(id, 'galoTrainTime')
-			// bot.data.delete(id, 'galoEmRinha')
-			// bot.data.delete(id, 'galoW')
-			// bot.data.delete(id, 'galoL')
-			// bot.data.delete(id, 'tempoRinha')
-			// bot.data.delete(id, 'presente')
-			user.moni = 0
-			user.ficha = 0
-			user.weekly = 0
-			user.day = 0
-			user._knife = 0
-			user._colt45 = 0
-			user._tec9 = 0
-			user._rifle = 0
-			user._shotgun = 0
-			user._mp5 = 0
-			user._ak47 = 0
-			user._m4 = 0
-			user._sniper = 0
-			user._rpg = 0
-			user._goggles = 0
-			user._exoesqueleto = 0
-			user._katana = 0
-			user._colete = 0
-			user._colete_p = 0
-			user._jetpack = 0
-			user._minigun = 0
-			user._bazuca = 0
-			user._ovo = 0
-			user._ovogranada = 0
-			user._flor = 0
-			user.job = null
-			user.jobTime = 0
-			user.roubo = 0
-			user.preso = 0
-			user.fuga = 0
-			user.qtEsmolasDadas = 0
-			user.qtEsmolasRecebidas = 0
-			user.esmolaEntregueHoje = 0
-			user.esmolaRecebidaHoje = 0
-			user.betJ = 0
-			user.betW = 0
-			user.betL = 0
-			user.roubosW = 0
-			user.roubosL = 0
-			user.valorRoubado = 0
-			user.qtFugas = 0
-			user.qtRoubado = 0
-			user.jobGanhos = 0
-			user.lojaGastos = 0
-			user.invest = null
-			user.investTime = 0
-			user.investNotification = null
-			user.investGanhos = 0
-			user.espancarW = 0
-			user.espancarL = 0
-			user.hospitalizado = 0
-			user.espancar = 0
-			user.vasculhar = 0
-			user.vasculharAchou = 0
-			user.qtHospitalizado = 0
-			user.hospitalGastos = 0
-			user.cassinoGanhos = 0
-			user.cassinoPerdidos = 0
-			user.prisaoGastos = 0
-			user.depositoGang = 0
-			user.fugindo = 0
-			user.emRoubo = {
-				tempo: 0,
-				user: null,
-				isAlvo: false
-			}
-			user.emEspancamento = {
-				tempo: 0,
-				user: null,
-				isAlvo: false
-			}
-			// user.morto = 0
-			user._celular = 0
-			user.celularSmsBlock = false
-			user.celularPego = 0
-			user.celularCredito = 0
-			user.nickAlterado = false
-			user.gangID = null
-			user.classeAlterada = 0
-			// if (user.vipTime > Date.now())
-			// 	user.vipTime += tres_dias * 3
-
-			if (user.classe != undefined)
-				bot.data.delete(id, 'classe')
-			
-			// bot.data.set(id, user)
-
-			// if (user.username != undefined && user.username.length > 18)
-			// // 		bot.data.delete(id, 'username')
-
-			bot.data.set(id, user)
+	bot.galos.forEach((galo, id) => {
+		if (id != '526203502318321665') {
+			galo.power = 30
+			galo.wins = 0
+			galo.loses = 0
+			// bot.galos.delete(id, 'raça')
+			// bot.galos.delete(id, 'nacionalidade')
+			// bot.galos.delete(id, 'raridade')
+			bot.galos.set(id, galo)
 		}
 	})
+
+	bot.data.forEach((user, id) => {
+		// if (user.username != undefined) {
+
+		user.moni = 0
+		user.ficha = 0
+		user.weekly = 0
+		user.day = 0
+		
+		user.arma = {
+			faca: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			colt45: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			tec9: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			rifle: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			shotgun: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			mp5: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			ak47: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			m4: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			rpg: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			goggles: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			sniper: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			katana: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			colete: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			colete_p: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			jetpack: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			minigun: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			bazuca: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			exoesqueleto: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			granada: {
+				quant: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+		}
+		user._ovo = 0
+		user._flor = 0
+		user.job = null
+		user.jobTime = 0
+		user.roubo = 0
+		user.preso = 0
+		user.fuga = 0
+		user.qtEsmolasDadas = 0
+		user.qtEsmolasRecebidas = 0
+		user.esmolaEntregueHoje = 0
+		user.esmolaRecebidaHoje = 0
+		user.betJ = 0
+		user.betW = 0
+		user.betL = 0
+		user.roubosW = 0
+		user.roubosL = 0
+		user.valorRoubado = 0
+		user.qtFugas = 0
+		user.qtRoubado = 0
+		user.jobGanhos = 0
+		user.lojaGastos = 0
+		user.invest = null
+		user.investTime = 0
+		user.investNotification = null
+		user.investGanhos = 0
+		user.espancarW = 0
+		user.espancarL = 0
+		user.hospitalizado = 0
+		user.espancar = 0
+		user.vasculhar = 0
+		user.vasculharAchou = 0
+		user.qtHospitalizado = 0
+		user.hospitalGastos = 0
+		user.cassinoGanhos = 0
+		user.cassinoPerdidos = 0
+		user.prisaoGastos = 0
+		user.depositoGang = 0
+		user.fugindo = 0
+		user.emRoubo = {
+			tempo: 0,
+			user: null,
+			isAlvo: false
+		}
+		user.emEspancamento = {
+			tempo: 0,
+			user: null,
+			isAlvo: false
+		}
+		// user.morto = 0
+		user._celular = 0
+		user.celularSmsBlock = false
+		user.celularPego = 0
+		user.celularCredito = 0
+		user.nickAlterado = false
+		user.gangID = null
+		user.classeAlterada = 0
+		// if (user.vipTime > Date.now())
+		// 	user.vipTime += tres_dias * 3
+
+		if (user.classe != undefined)
+			bot.data.delete(id, 'classe')
+
+		// bot.data.set(id, user)
+
+		// if (user.username != undefined && user.username.length > 18)
+		// // 		bot.data.delete(id, 'username')
+
+		bot.data.set(id, user)
+
+
+		bot.data.delete(id, '_knife')
+		bot.data.delete(id, '_colt45')
+		bot.data.delete(id, '_tec9')
+		bot.data.delete(id, '_rifle')
+		bot.data.delete(id, '_shotgun')
+		bot.data.delete(id, '_mp5')
+		bot.data.delete(id, '_ak47')
+		bot.data.delete(id, '_m4')
+		bot.data.delete(id, '_sniper')
+		bot.data.delete(id, '_rpg')
+		bot.data.delete(id, '_goggles')
+		bot.data.delete(id, '_exoesqueleto')
+		bot.data.delete(id, '_katana')
+		bot.data.delete(id, '_colete')
+		bot.data.delete(id, '_colete_p')
+		bot.data.delete(id, '_jetpack')
+		bot.data.delete(id, '_minigun')
+		bot.data.delete(id, '_bazuca')
+		bot.data.delete(id, '_ovogranada')
+		// }
+	})
 	// console.log("===")
-	message.reply('Concluído! Bem vindo à pré-temporada 7!')
+	message.reply('Concluído! Bem vindo à Temporada 7!')
 
 	// }, 1200000)
 

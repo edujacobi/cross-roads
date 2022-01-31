@@ -1,5 +1,5 @@
 exports.run = async (bot, message, args) => {
-	const Discord = require('discord.js');
+	const Discord = require('discord.js')
 	const embed1 = new Discord.MessageEmbed()
 		.setAuthor(`Badges`)
 		.setTitle(`Badges de final de temporada`)
@@ -46,13 +46,12 @@ exports.run = async (bot, message, args) => {
 		.addField(`${bot.badges.bilionario} Bilionário`, "Tenha R$ 1.000.000.000 em mãos", true)
 		.addField(`${bot.badges.cataBug} Cata Bug`, "Reporte um bug gravíssimo que poderia quebrar o jogo", true)
 		.addField(`${bot.badges.vip} VIP`, "Adquira VIP", true)
-		.setFooter(`${bot.user.username} • Badges criadas por: Cesar`, bot.user.avatarURL())
-		.setTimestamp();
-	return message.channel.send({
-			embeds: [embed1, embed2, embed3]
-		})
-		.catch(err => console.log("Não consegui enviar mensagem `badges`"));
-};
+		.setFooter(`${bot.user.username} • Badges criadas por Cesar e Jacobi`, bot.user.avatarURL())
+		.setTimestamp()
+	
+	return message.channel.send({embeds: [embed1, embed2, embed3]})
+		.catch(() => console.log("Não consegui enviar mensagem `badges`"))
+}
 exports.config = {
 	alias: ['insignias', 'medalhas', 'emblemas']
-};
+}

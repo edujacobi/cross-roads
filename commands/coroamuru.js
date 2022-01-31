@@ -55,7 +55,7 @@ exports.run = async (bot, message, args) => {
 	}
 
 	let coroamuru = '<:Coroamuru2:881007505717751858>'
-	let premio = 1000000
+	let premio = 50000
 
 	const HORA = 2700000 //45 min
 	const TRINTA_SEG = 30000
@@ -101,7 +101,7 @@ exports.run = async (bot, message, args) => {
 				.setCustomId(message.id + message.author.id + 'top'))
 	}
 
-	// return bot.createEmbed(message, `${coroamuru} Coroamuru está viajando de férias durante a primeira semana de temporada`)
+	return bot.createEmbed(message, `${coroamuru} Coroamuru está viajando de férias durante a primeira semana de temporada`)
 
 	if (args[0] === 'reset' && message.author.id === bot.config.adminID) {
 		bot.coroamuru.clear()

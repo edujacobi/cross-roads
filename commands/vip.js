@@ -23,6 +23,7 @@ const beneficios = () => {
 		"25% de desconto na troca de Classe",
 		// "Pode solicitar alteração do `Jogando desde`",
 		"Sorteios do Bilhete premiado exclusivos",
+		"Pode selecionar Skins para armas",
 		"Muito mais a vir!"
 	]
 
@@ -39,7 +40,7 @@ exports.run = async (bot, message, args) => {
 		.setThumbnail("https://media.discordapp.net/attachments/531174573463306240/799060089503875072/VIP.png")
 		.setColor(0xffd700)
 		.addField("Vantagens", beneficios())
-		.addField("Como adquirir", "Mande uma DM pro Jacobi#5109. Caso não consiga, entre no servidor do Cross Roads. Valores: R$ 8,00 = 1 mês. R$ 20,00 = 3 meses.")
+		.addField("Como adquirir", "Mande uma DM pro Jacobi#5109. Caso não consiga, entre no servidor do Cross Roads. Valores: R$ 10,00 = 1 mês. R$ 25,00 = 3 meses.")
 		.setFooter(bot.data.get(message.author.id, "username"), message.member.user.avatarURL())
 		.setTimestamp()
 

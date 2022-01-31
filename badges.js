@@ -115,6 +115,7 @@ const badges = {
 
 	"dev": "<:Desenvolvedor:925465898414899241> ",//"<:dev:801248050071994418> ",
 	"mod": "<:mod:823251404742721578> ",
+	"ajd": "<:Ajudante:801248050071994418> "
 }
 
 module.exports = badges;

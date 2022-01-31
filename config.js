@@ -5,29 +5,7 @@ const config = {
 
 	"ficha": "<:ficha:757021259451203665>",
 	"coin": "<:coin:539572031436619777>",
-
-	// armas
-	"faca": "<:faca:754480878478164030>",
-	"colt45": "<:colt45:754480878868103229>",
-	"tec9": "<:tec9:754480879350317200>",
-	"mp5": "<:mp5:754480879354773575>",
-	"ak47": "<:ak47:754480873751183453>",
-	"m4": "<:m4:754480879258173520>",
-	"rpg": "<:rpg:757033334374400010>",
-	"goggles": "<:goggles:754480878721171539>",
-	"sniper": "<:sniper:787684004199137281>",
-	"colete": "<:Colete_Leve:818891695357165629>",
-	"colete_p": "<:Colete_Pesado:818891697819090974>",
-	"jetpack": "<:jetpack:754480879090532373>",
-	"bazuca": "<:bazuca:757033333342339072>",
-	"exoesqueleto": "<:exoesqueleto:816407267834200084>",
-	"rifle": "<:rifle:754480878742405131>",
-	"escopeta": "<:escopeta:754480874472472606>",
-	"katana": "<:katana:754480878104870944>",
-	"minigun": "<:minigun:757033333619163208>",
-	"ovogranada": "<:Granada:829906313239855105>", //<:GranadaNatal:921846896056737852>
-	"ovogranada2": "<:OvoGranada:829906313710272517>",
-
+	
 	// ações
 	"vasculhar": "<:vasculhar:816407267581886575>",
 	"roubar": '<:roubar:791447877997297665>',
@@ -76,7 +54,6 @@ const config = {
 	"caramuru": "<:caramuru:798219263432196096>",
 	"carregamento": "<:carregamento:539497345197277214>",
 	"prisao": "<:prisao:817097391840296980>",
-	"cellphone": "<:celular:734247685422579714>",
 	"ovo": "<:Presente:921753148610211901>", //"<:ovo:827309700285595699>",
 	"aviao": "<:aviao:916097534936637450>"
 

@@ -98,13 +98,15 @@ exports.run = async (bot, message, args) => {
 				embed.addField(`${bot.aneis[uData.anel].emote} ${bot.aneis[uData.anel].desc}`, `Você já possui um anel!`)
 
 			const rowAneis = new Discord.MessageActionRow()
+			
+			let uCasamento = bot.casais.get(uData.casamentoID)
 
 			Object.values(bot.aneis).forEach(anel => {
 				rowAneis.addComponents(new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel(anel.desc)
 					.setEmoji(anel.emote)
-					.setDisabled(uData.casamentoID != null ? anel.id <= bot.aneis[bot.casais.get(uData.casamentoID, 'anel')].id : false)
+					.setDisabled(uData.casamentoID != null && uCasamento?.anel != null ? anel.id <= bot.aneis[bot.casais.get(uData.casamentoID, 'anel')].id : false)
 					.setCustomId(message.id + message.author.id + anel.desc.toLowerCase())
 				)
 			})

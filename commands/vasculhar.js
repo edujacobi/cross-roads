@@ -14,13 +14,12 @@ exports.run = async (bot, message, args) => {
 		Object.entries(lugar).forEach(([key, value]) => {
 			if (item == key) {
 				if (value.item !== 'moni' && value.item !== 'ficha' && value.item !== 'granada' && value.item !== 'flor' && value.item !=='badge' && value.item !== 'ovo') {
-					Object.entries(uData).forEach(([key_udata, value_udata]) => {
-						if (key_udata == '_' + value.item) {
-							value_udata = value_udata > currTime ? value_udata + value.tempo * hora : currTime + value.tempo * hora
-							uData[key_udata] = value_udata
+					Object.entries(uData.arma).forEach(([key_udata, arma]) => {
+						if (key_udata == value.item) {
+							arma.tempo = arma.tempo > currTime ? arma.tempo + value.tempo * hora : currTime + value.tempo * hora
 							Object.values(bot.guns).forEach(gun => {
 								if (gun.data == value.item) {
-									let emote = bot.config[gun.emote]
+									let emote = gun.skins[arma.skinAtual].emote
 									achou = true
 									uData.vasculharAchou += 1
 									if (message.author.id !== bot.config.adminID)
@@ -50,12 +49,12 @@ exports.run = async (bot, message, args) => {
 
 				} else if (value.item === 'granada') {
 					let quant = bot.getRandom(value.min, value.max)
-					uData._ovogranada += quant
+					uData.arma.granada.quant += quant
 					achou = true
 					uData.vasculharAchou += 1
 					if (message.author.id !== bot.config.adminID)
 						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.ovogranada} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Granada` : `Granadas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Shaka laka boom!`, 'LIGHT_GREY')
+					return bot.createEmbed(message, `Você encontrou ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Granada` : `Granadas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Shaka laka boom!`, 'LIGHT_GREY')
 
 				} else if (value.item === 'flor') {
 					let quant = 1
@@ -96,7 +95,7 @@ exports.run = async (bot, message, args) => {
 
 	let lixao = {
 		1: {
-			item: 'knife',
+			item: 'faca',
 			tempo: 6,
 		},
 		2: {
@@ -123,11 +122,11 @@ exports.run = async (bot, message, args) => {
 			max: 5,
 		},
 		7: {
-			item: 'knife',
+			item: 'faca',
 			tempo: 4,
 		},
 		8: {
-			item: 'knife',
+			item: 'faca',
 			tempo: 3,
 		},
 		9: {
@@ -138,7 +137,7 @@ exports.run = async (bot, message, args) => {
 	}
 	let matagal = {
 		1: {
-			item: 'knife',
+			item: 'faca',
 			tempo: 2,
 		},
 		2: {
@@ -183,7 +182,7 @@ exports.run = async (bot, message, args) => {
 	}
 	let esgoto = {
 		1: {
-			item: 'knife',
+			item: 'faca',
 			tempo: 2,
 		},
 		2: {
@@ -447,13 +446,28 @@ exports.run = async (bot, message, args) => {
 			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/814659864286461982/vasculhar_20210223172037.png')
 			.setDescription('Procuro pessoas corajosas e sem nojo de entrar em locais sujos e perigosos. Muitas coisas boas podem ser encontradas!\nVocê pode vasculhar uma vez a cada hora.')
 			.setColor('LIGHT_GREY')
-			.addField('Lixão', `O lixão tem chances maiores de encontrar **Armas**.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar lixão\``, true)
-			.addField('Matagal', `No matagal você encontrará **Dinheiro** mais facilmente.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar matagal\``, true)
-			.addField('Esgoto', `**Fichas** são encontradas com maior facilidade no esgoto.\n${bot.config.faca}${bot.config.colt45}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar esgoto\``, true)
-			.addField('Fábrica de armas', `**Armas** melhores e mais **Dinheiro**.\n${bot.config.rifle}${bot.config.colete}${bot.config.escopeta}${bot.config.mp5}${bot.config.coin}\nNecessário: ${bot.config.escopeta}\n\`;vasculhar fábrica\``, true)
-			.addField('Usina nuclear', `**Armas** ainda mais fortes e muito **Dinheiro**.\n${bot.config.goggles}${bot.config.colete}${bot.config.ak47}${bot.config.m4}${bot.config.coin}\nNecessário: ${bot.config.ak47}\n\`;vasculhar usina\``, true)
-			.addField('Nave extraterrestre', `**Armas** estupidamente fortes e milhares de **Fichas**.\n${bot.config.rpg}${bot.config.colete}${bot.config.ficha}\nNecessário: ${bot.config.rpg}\n\`;vasculhar nave\``, true)
-			.addField('Base Militar', `Itens militares proibidões\n${bot.config.bazuca}${bot.config.exoesqueleto}${bot.config.ovogranada}\nNecessário: ${bot.config.minigun}\n\`;vasculhar base\``, true)
+			.addField('Lixão', `O lixão tem chances maiores de encontrar **Armas**.
+${bot.guns.faca.skins[uData.arma.faca.skinAtual].emote}${bot.guns.colt45.skins[uData.arma.colt45.skinAtual].emote}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar lixão\``, true)
+			.addField('Matagal', `No matagal você encontrará **Dinheiro** mais facilmente.
+${bot.guns.faca.skins[uData.arma.faca.skinAtual].emote}${bot.guns.colt45.skins[uData.arma.colt45.skinAtual].emote}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar matagal\``, true)
+			.addField('Esgoto', `**Fichas** são encontradas com maior facilidade no esgoto.
+${bot.guns.faca.skins[uData.arma.faca.skinAtual].emote}${bot.guns.colt45.skins[uData.arma.colt45.skinAtual].emote}${bot.config.ficha}${bot.config.coin}\n\`;vasculhar esgoto\``, true)
+			.addField('Fábrica de armas', `**Armas** melhores e mais **Dinheiro**.
+${bot.guns.rifle.skins[uData.arma.rifle.skinAtual].emote}${bot.guns.colete.skins[uData.arma.colete.skinAtual].emote}${bot.guns.shotgun.skins[uData.arma.shotgun.skinAtual].emote}${bot.guns.mp5.skins[uData.arma.mp5.skinAtual].emote}${bot.config.coin}
+Necessário: ${bot.guns.shotgun.skins[uData.arma.shotgun.skinAtual].emote}
+\`;vasculhar fábrica\``, true)
+			.addField('Usina nuclear', `**Armas** ainda mais fortes e muito **Dinheiro**.
+${bot.guns.goggles.skins[uData.arma.goggles.skinAtual].emote}${bot.guns.colete.skins[uData.arma.colete.skinAtual].emote}${bot.guns.ak47.skins[uData.arma.ak47.skinAtual].emote}${bot.guns.m4.skins[uData.arma.m4.skinAtual].emote}${bot.config.coin}
+Necessário: ${bot.guns.ak47.skins[uData.arma.ak47.skinAtual].emote}
+\`;vasculhar usina\``, true)
+			.addField('Nave extraterrestre', `**Armas** estupidamente fortes e milhares de **Fichas**.
+${bot.guns.rpg.skins[uData.arma.rpg.skinAtual].emote}${bot.guns.colete.skins[uData.arma.colete.skinAtual].emote}${bot.config.ficha}
+Necessário: ${bot.guns.rpg.skins[uData.arma.rpg.skinAtual].emote}
+\`;vasculhar nave\``, true)
+			.addField('Base Militar', `Itens militares proibidões
+${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.guns.exoesqueleto.skins[uData.arma.exoesqueleto.skinAtual].emote}${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote}
+Necessário: ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote}
+\`;vasculhar base\``, true)
 			// .addField(`${bot.config.ovo} Ninho de páscoa`, `O que o coelhinho esconde?\n\`;vasculhar ninho\``)
 			// .addField(`🎄 Árvore de Natal`, `O que tem no saco do velhinho?\n\`;vasculhar árvore\``, true)
 			.setFooter(`${bot.user.username} • "ETs gostam de apostar em cassinos?"`, bot.user.avatarURL())
@@ -505,23 +519,23 @@ exports.run = async (bot, message, args) => {
 			vasculharLugar(esgoto, uData)
 			
 		} else if (['fabrica', 'fábrica', 'f', '4'].includes(option)) {
-			if (uData._shotgun < currTime && uData._mp5 < currTime && uData._ak47 < currTime && uData._m4 < currTime && uData._sniper < currTime && uData._katana < currTime && uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.escopeta} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData.arma.shotgun.tempo < currTime && uData.arma.mp5.tempo < currTime && uData.arma.ak47.tempo < currTime && uData.arma.m4.tempo < currTime && uData.arma.sniper.tempo < currTime && uData.arma.katana.tempo < currTime && uData.arma.rpg.tempo < currTime && uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
+				return bot.createEmbed(message, `É necessário possuir ${bot.guns.shotgun.skins[uData.arma['shotgun'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(fabrica, uData)
 			
 		} else if (['usina', 'u', '5'].includes(option)) {
-			if (uData._ak47 < currTime && uData._m4 < currTime && uData._sniper < currTime && uData._katana < currTime && uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.ak47} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData.arma.ak47.tempo < currTime && uData.arma.m4.tempo < currTime && uData.arma.sniper.tempo < currTime && uData.arma.katana.tempo < currTime && uData.arma.rpg.tempo < currTime && uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
+				return bot.createEmbed(message, `É necessário possuir ${bot.guns.ak47.skins[uData.arma['ak47'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(usina, uData)
 			
 		} else if (['nave', 'n', '6'].includes(option)) {
-			if (uData._rpg < currTime && uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.rpg} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData.arma.rpg.tempo < currTime && uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
+				return bot.createEmbed(message, `É necessário possuir ${bot.guns.rpg.skins[uData.arma['rpg'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(nave, uData)
 			
 		} else if (['base', 'b', '7'].includes(option)) {
-			if (uData._minigun < currTime && uData._bazuca < currTime)
-				return bot.createEmbed(message, `É necessário possuir ${bot.config.minigun} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
+			if (uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
+				return bot.createEmbed(message, `É necessário possuir ${bot.guns.minigun.skins[uData.arma['minigun'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, 'LIGHT_GREY')
 			vasculharLugar(base, uData)
 			
 		} 

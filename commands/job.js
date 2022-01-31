@@ -14,7 +14,7 @@ exports.run = async (bot, message, args) => {
 		bot.createEmbed(message, `Você começou a trabalhar de **${job.desc}** ${bot.config.bulldozer}`, null, 'GREEN')
 
 		let aviso = (Math.random() < 0.50 ? "" : "\nHabilite mensagens privadas com o Cross Roads e seja avisado sobre notificações importantes!")
-		
+
 		const embedPV = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.bulldozer} Você terminou o trabalho **${job.desc}**!`)
 			.setColor('YELLOW')
@@ -112,20 +112,19 @@ exports.run = async (bot, message, args) => {
 
 		Object.entries(bot.jobs).forEach(([key, job]) => {
 			if (option == job.id) {
-				Object.entries(uData).forEach(([key_udata, value_udata]) => {
+				Object.entries(uData.arma).forEach(([keyArma, arma]) => {
 					if (!Array.isArray(job.arma)) {
-						if (key_udata == "_" + job.arma || job.arma == null) {
-							if (currTime > value_udata) {
+						if (keyArma == job.arma || job.arma == null) {
+							if (arma.tempo < currTime) {
 								Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
 									if (job.arma == key_gun) {
-										let emote = bot.config[value_gun.emote]
+										let emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
 										return bot.createEmbed(message, `É necessário possuir ${emote} para este trabalho ${bot.config.bulldozer}`, null, 'GREEN')
 									}
 								})
-
 							}
 							else {
-								if (currTime > uData.jobTime || !uData.jobTime) {
+								if (uData.jobTime < currTime || !uData.jobTime) {
 									jobLugar = job
 									jobKey = key
 								}
@@ -136,18 +135,18 @@ exports.run = async (bot, message, args) => {
 					else {
 						for (let i = 0; i < job.arma.length; i++) {
 							let arma = job.arma[i]
-							if (key_udata == "_" + arma) {
-								if (currTime > value_udata) {
+							if (arma.data == arma) {
+								if (arma.tempo < currTime) {
 									Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
 										if (arma == key_gun) {
-											let temp_emote = bot.config[value_gun.emote]
+											let temp_emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
 											emotes += `${temp_emote}`
 										}
 									})
 
 								}
 								else {
-									if (emotes == "" && (currTime > uData.jobTime || !uData.jobTime)) {
+									if (emotes == "" && (uData.jobTime < currTime || !uData.jobTime)) {
 										jobLugar = job
 										jobKey = key
 									}

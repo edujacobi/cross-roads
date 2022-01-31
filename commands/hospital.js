@@ -11,9 +11,9 @@ exports.run = async (bot, message, args) => {
 
 		let defPower = 0
 
-		Object.entries(uData).forEach(([key, value]) => {
+		Object.entries(uData.arma).forEach(([key, value]) => {
 			Object.values(bot.guns).forEach(arma => {
-				if (value > currTime && arma.def > defPower && key == "_" + arma.data)
+				if (value.tempo > currTime && arma.def > defPower && key == arma.data)
 					defPower = arma.def
 			})
 		})

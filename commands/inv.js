@@ -77,32 +77,32 @@ exports.run = async (bot, message, args) => {
 	let atkPower = 0
 	let defPower = 0
 
-	Object.entries(uData).forEach(([key, value]) => {
+	Object.entries(uData.arma).forEach(([key, value]) => {
 		Object.values(bot.guns).forEach(arma => {
-			if (value > currTime && arma.atk > atkPower && key == "_" + arma.data && typeof (arma.atk) == "number")
+			if (typeof (arma.atk) == "number" && value.tempo > currTime && arma.atk > atkPower && key == arma.data)
 				atkPower = arma.atk
 		})
 	})
-	Object.entries(uData).forEach(([key, value]) => {
+	Object.entries(uData.arma).forEach(([key, value]) => {
 		Object.values(bot.guns).forEach(arma => {
-			if (value > currTime && arma.def > defPower && key == "_" + arma.data && typeof (arma.def) == "number")
+			if ( typeof (arma.def) == "number" && value.tempo > currTime && arma.def > defPower && key == arma.data)
 				defPower = arma.def
 		})
 	})
 	let hora = new Date().getHours()
 
-	if (uData._goggles > currTime && !(hora > 4 && hora < 20))
+	if (uData.arma.goggles.tempo > currTime && !(hora > 4 && hora < 20))
 		atkPower += 3
 
 	if (defPower !== 0 && uData.hospitalizado > currTime)
 		defPower -= 5
-	if (uData._colete > currTime)
+	if (uData.arma.colete.tempo > currTime)
 		defPower += 2
-	if (uData._colete_p > currTime)
+	if (uData.arma.colete_p.tempo > currTime)
 		defPower += 5
-	if (uData._goggles > currTime && !(hora > 4 && hora < 20))
+	if (uData.arma.goggles.tempo > currTime && !(hora > 4 && hora < 20))
 		defPower += 3
-	if (uData._exoesqueleto > currTime)
+	if (uData.arma.exoesqueleto.tempo > currTime)
 		defPower += 5
 
 	if (uGang && uGang.base === 'bunker')
@@ -113,8 +113,9 @@ exports.run = async (bot, message, args) => {
 			atkPower = (atkPower * 0.9)
 		else
 			atkPower = (atkPower * 0.9).toFixed(1)
-
-	} else if (uData.classe === 'assassino') {
+	}
+	
+	else if (uData.classe === 'assassino') {
 		if (atkPower * 1.1 === Math.floor(atkPower * 1.1))
 			atkPower = (atkPower * 1.1)
 		else
@@ -150,38 +151,36 @@ exports.run = async (bot, message, args) => {
 
 	// let total = 0
 	Object.entries(bot.guns).forEach(([id_arma, arma]) => {
-		Object.entries(uData).forEach(([key, value]) => {
+		Object.entries(uData.arma).forEach(([key, value]) => {
 			let emoji
-			if (arma.data === 'ovogranada') {
-				if (key.includes("_") && value > 0) {
-					if (key.substring(1) === arma.data) {
-						emoji = bot.config[arma.emote]
-						if ((textGuns + emoji).length < 225)
-							textGuns += `${emoji} `
-						else if ((textGuns2 + emoji).length < 225)
-							textGuns2 += `${emoji} `
-						else
-							textGuns3 += `${emoji} `
+			if (arma.data === 'granada') {
+				if (value.quant > 0 && key === arma.data) {
+					emoji = arma.skins[uData.arma[arma.data].skinAtual].emote
+					if ((textGuns + emoji).length < 225)
+						textGuns += `${emoji} `
+					else if ((textGuns2 + emoji).length < 225)
+						textGuns2 += `${emoji} `
+					else
+						textGuns3 += `${emoji} `
 
-						invOpen.addField(`${emoji} ${arma.desc}`, value.toString(), true)
-						// total += 1
-					}
+					invOpen.addField(`${emoji} ${arma.desc}`, value.quant.toString(), true)
+					// total += 1
+					
 				}
 
-			} else {
-				if (key.includes("_") && value > currTime) {
-					if (key.substring(1) === arma.data) {
-						emoji = bot.config[arma.emote]
-						if ((textGuns + emoji).length < 225)
-							textGuns += `${emoji} `
-						else if ((textGuns2 + emoji).length < 225)
-							textGuns2 += `${emoji} `
-						else
-							textGuns3 += `${emoji} `
+			}
+			else {
+				if (value.tempo > currTime && key === arma.data) {
+					emoji = arma.skins[uData.arma[arma.data].skinAtual].emote
+					if ((textGuns + emoji).length < 225)
+						textGuns += `${emoji} `
+					else if ((textGuns2 + emoji).length < 225)
+						textGuns2 += `${emoji} `
+					else
+						textGuns3 += `${emoji} `
 
-						invOpen.addField(`${emoji} ${arma.desc}`, bot.segToHour((value - currTime) / 1000), true)
-						// total += 1
-					}
+					invOpen.addField(`${emoji} ${arma.desc}`, bot.segToHour((value.tempo - currTime) / 1000), true)
+					// total += 1
 				}
 			}
 		})
@@ -256,8 +255,8 @@ exports.run = async (bot, message, args) => {
 		.setCustomId(message.id + message.author.id + 'userinfo')
 
 	const buttonTemp = new Discord.MessageButton()
-		.setStyle('PRIMARY')
-		.setLabel('Final da temporada 6')
+		.setStyle('SUCCESS')
+		.setLabel('Temporada 7')
 		.setCustomId(message.id + message.author.id + 'temp')
 
 	rowAbrir.addComponents(buttonUI)
@@ -293,7 +292,8 @@ exports.run = async (bot, message, args) => {
 		rowAbrir.addComponents(buttonTemp)
 		rowFechar.addComponents(buttonTemp)
 
-	} else {
+	}
+	else {
 		const buttonRoubar = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('Roubar')
@@ -349,13 +349,15 @@ exports.run = async (bot, message, args) => {
 				components: rowActions.components.length === 0 ? [rowFechar] : [rowFechar, rowActions]
 			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
 
-		} else if (b.customId === message.id + message.author.id + 'fechar') {
+		}
+		else if (b.customId === message.id + message.author.id + 'fechar') {
 			msg.edit({
 				embeds: [invClosed],
 				components: rowActions.components.length === 0 ? [rowAbrir] : [rowAbrir, rowActions]
 			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
 
-		} else if (b.customId === message.id + message.author.id + 'invest')
+		}
+		else if (b.customId === message.id + message.author.id + 'invest')
 			bot.commands.get('investir').run(bot, message, args)
 		else if (b.customId === message.id + message.author.id + 'userinfo')
 			bot.commands.get('userinfo').run(bot, message, [alvo])
@@ -370,9 +372,9 @@ exports.run = async (bot, message, args) => {
 		else if (b.customId === message.id + message.author.id + 'temp') {
 			const embedTemp = new Discord.MessageEmbed()
 				.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
-				.setDescription("Final da Temporada 6")
-				.addField("A Temporada 6 encerrou dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
-				.addField("A Temporada 7 iniciará dia 31/01!", `Um reset total acontecerá, fique ligado!`)
+				.setDescription("Início da Temporada 7")
+				// .addField("A Temporada 6 encerrou dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
+				.addField("A Temporada 7 iniciou dia 31/01!", `Um reset total aconteceu!`)
 				.setColor(bot.colors.admin)
 				.setFooter(`Atenciosamente, Jacobi`)
 			message.channel.send({embeds: [embedTemp]})

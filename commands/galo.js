@@ -892,7 +892,8 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 			.catch(() => console.log("Não consegui enviar mensagem `galo info`"))
 
 	}
-	else if (option === "rinha") { // desafiar outros players
+	else if (option === "rinha") {
+		// desafiar outros players
 		// if (!bot.isAdmin(message.author.id))
 		// 	return message.reply("Comando em manutenção")
 		//return bot.createEmbed(message, "As Rinhas foram desativadas devido a um bug. ${bot.config.galo}")
@@ -1112,7 +1113,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 											`**${tGalo.nome}** está paralizado e não consegue se mover!`,
 											`**${uGalo.nome}** se sente lento e acaba errando diversos ataques.`,
 											`A Polícia Federal adentra no recinto e todos ficam em pânico. Um dos policiais fala: "APOSTO MIL NO **${tGalo.nome.toUpperCase()}**"!`,
-											`Pouco se importando com as regras, **${uGalo.nome}** pega uma ${bot.config.colt45} Colt 45 e atira em **${tGalo.nome}**.`,
+											`Pouco se importando com as regras, **${uGalo.nome}** pega uma ${bot.guns.colt45.skins.default.emote} Colt 45 e atira em **${tGalo.nome}**.`,
 											`**${tGalo.nome}** utiliza um *Z-Move* com **${tData.username}**, causando dano crítico em **${uGalo.nome}**!`,
 											`**${uGalo.nome}** utiliza um *Z-Move* com **${uData.username}** em **${tGalo.nome}**. É super efetivo!`,
 											`**${tGalo.nome}** tenta usar uma técnica especial, mas **${uGalo.nome}** aproveita a abertura e desce a porrada.`,
@@ -1146,7 +1147,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 											`**${uGalo.nome}** chamou **${tGalo.nome}** para um x1 de Pedra-Papel-Tesoura. Ambos perdem.`,
 											`Um grupo de galinhas invade a rinha, distraindo os lutadores. **${uData.username}** e **${tData.username}** afugentam as galinhas para a luta continuar.`,
 											`**${uGalo.nome}** ativa o instinto superior e desvia de todos os golpes de **${tGalo.nome}**.`,
-											`**${tGalo.nome}** botou um ${bot.config.ovogranada2} Ovo-granada e o jogou em **${uGalo.nome}**, explodindo parte da arena com ele!`,
+											`**${tGalo.nome}** botou um ${bot.guns.granada.skins.pascoa.emote} Ovo-granada e o jogou em **${uGalo.nome}**, explodindo parte da arena com ele!`,
 										]
 
 										bot.shuffle(textos_luta)
@@ -1527,7 +1528,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 	}
 	else if (option === "boss") {
-		let premio = 1000000 //2000000
+		let premio = 50000 //2000000
 		if (!aposta) {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.caramuru} O mestre dos galos`)
@@ -1558,7 +1559,7 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				return bot.createEmbed(message, `**Caramuru** só pode ser desafiado aos finais de semana ${bot.config.caramuru}`, null, bot.colors.white)
 			}
 
-			// return bot.createEmbed(message, `**Caramuru** está de folga durante a primeira semana da temporada ${bot.config.caramuru}`, null, bot.colors.white)
+			return bot.createEmbed(message, `**Caramuru** está de folga durante a primeira semana da temporada ${bot.config.caramuru}`, null, bot.colors.white)
 			if (bot.isUserEmRouboOuEspancamento(message, uData)) {
 				return
 			}
@@ -1569,42 +1570,25 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				return bot.msgGaloDescansando(message, uGalo)
 			}
 
-			if (uGalo.train == 1) {
-				if (uGalo.trainTime > currTime) {
-					return bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.caramuru}`, null, bot.colors.white)
-				}
-				else {
-					return bot.createEmbed(message, `Seu galo terminou o treinamento. Conclua-o antes de começar uma rinha ${bot.config.caramuru}`, null, bot.colors.white)
-				}
-			}
-
-			if (uGalo.emRinha == true) {
+			if (uGalo.train)
+				return uGalo.trainTime > currTime ?
+					bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.caramuru}`, null, bot.colors.white)
+					: bot.createEmbed(message, `Seu galo terminou o treinamento. Conclua-o antes de começar uma rinha ${bot.config.caramuru}`, null, bot.colors.white)
+			if (uGalo.emRinha)
 				return bot.createEmbed(message, `Seu galo já está em uma rinha ${bot.config.caramuru}`, null, bot.colors.white)
-			}
-
-			if (caramuru.emRinha == true) {
+			if (caramuru.emRinha)
 				return bot.createEmbed(message, `Caramuru já está em uma rinha ${bot.config.caramuru}`, null, bot.colors.white)
-			}
-
-			if (uData.preso > currTime) {
+			if (uData.preso > currTime)
 				return bot.msgPreso(message, uData)
-			}
-
-			if (uData.hospitalizado > currTime) {
+			if (uData.hospitalizado > currTime)
 				return bot.msgHospitalizado(message, uData)
-			}
-
-			if (uData.job != null) {
+			if (uData.job != null)
 				return bot.msgTrabalhando(message, uData)
-			}
-
-			if ((uGalo.wins + uGalo.loses) < 10) {
+			if ((uGalo.wins + uGalo.loses) < 10)
 				return bot.createEmbed(message, `Seu galo precisa participar de mais rinhas para desafiar o Caramuru ${bot.config.caramuru}`, null, bot.colors.white)
-			}
 
-			if (uGalo.nome == '' || uGalo.nome == 'Galo') {
+			if (uGalo.nome == '' || uGalo.nome == 'Galo')
 				uGalo.nome = `Galo de ${uData.username}`
-			}
 
 			bot.galos.set(message.author.id, true, 'emRinha')
 			bot.createEmbed(message, `**${uData.username}** desafiou **Caramuru** para uma rinha 1x1 ${bot.config.caramuru}`, null, bot.colors.white)
@@ -1673,37 +1657,31 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 
 			//gera textos de batalha
 			const msg0 = new Discord.MessageEmbed().setDescription(textos_inicio[Math.floor(Math.random() * textos_inicio.length)]).setColor(bot.colors.background)
-			setTimeout(() => message.channel.send({
-				embeds: [msg0]
-			}).catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 4000)
+			setTimeout(() => message.channel.send({embeds: [msg0]})
+				.catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 4000)
 
 			const msg1 = new Discord.MessageEmbed().setDescription(textos_luta[0]).setColor(bot.colors.background)
-			setTimeout(() => message.channel.send({
-				embeds: [msg1]
-			}).catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 7000)
+			setTimeout(() => message.channel.send({embeds: [msg1]})
+				.catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 7000)
 
 			const msg2 = new Discord.MessageEmbed().setDescription(textos_luta[1]).setColor(bot.colors.background)
-			setTimeout(() => message.channel.send({
-				embeds: [msg2]
-			}).catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 10000)
+			setTimeout(() => message.channel.send({embeds: [msg2]})
+				.catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 10000)
 
 			const msg3 = new Discord.MessageEmbed().setDescription(textos_luta[2]).setColor(bot.colors.background)
-			setTimeout(() => message.channel.send({
-				embeds: [msg3]
-			}).catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 13000)
+			setTimeout(() => message.channel.send({embeds: [msg3]})
+				.catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 13000)
 
 			const msg4 = new Discord.MessageEmbed().setDescription(textos_luta[3]).setColor(bot.colors.background)
-			setTimeout(() => message.channel.send({
-				embeds: [msg4]
-			}).catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 16000)
+			setTimeout(() => message.channel.send({embeds: [msg4]})
+				.catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 16000)
 
 			const msg5 = new Discord.MessageEmbed().setDescription(randomDesafiante >= randomCaramuru ? `**${uGalo.nome}** fez o impensável e **${caramuru.nome}** é derrotado!` : `**${caramuru.nome}** percebe que seu oponente é digno, e desaba satisfeito!`).setColor(bot.colors.background)
 
 			const msg6 = new Discord.MessageEmbed().setDescription(randomDesafiante >= randomCaramuru ? `Obviamente, **${caramuru.nome}** mostrou para **${uGalo.nome}** o porquê de ainda ser o Top 1!` : `**${caramuru.nome}** vence com facilidade, mas deseja mais sorte ao novato, na próxima vez.`).setColor(bot.colors.background)
 
-			setTimeout(() => message.channel.send({
-				embeds: [desafianteVencedor ? msg5 : msg6]
-			}).catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 19000)
+			setTimeout(() => message.channel.send({embeds: [desafianteVencedor ? msg5 : msg6]})
+				.catch(() => console.log("Não consegui enviar mensagem `galo boss msg`")), 19000)
 
 			setTimeout(() => {
 				currTime = new Date().getTime()
@@ -1726,19 +1704,19 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 					perdedor = caramuru
 					vencedorU = uData
 
-					if (uGalo.power >= 70) {
+					if (uGalo.power >= 70) 
 						mensagemLevelUp = `**${vencedor.nome}** está no nível ${vencedor.power - 30} e não pode mais upar`
-					}
+					
 					else {
-						if (uGalo.power == 69) {
+						if (uGalo.power == 69) 
 							uGalo.power += 1
-						}
-						else if (uGalo.power == 68) {
+						
+						else if (uGalo.power == 68) 
 							uGalo.power += 2
-						}
-						else {
+						
+						else 
 							uGalo.power += 3
-						}
+						
 						mensagemLevelUp = `**${vencedor.nome}** subiu para o nível ${vencedor.power - 30}`
 					}
 
@@ -1793,9 +1771,8 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 
 				bot.log(message, log)
 
-				return message.channel.send({
-					embeds: [fimRinha]
-				}).catch(() => console.log("Não consegui enviar mensagem `galo boss fim`"))
+				return message.channel.send({embeds: [fimRinha]})
+					.catch(() => console.log("Não consegui enviar mensagem `galo boss fim`"))
 			}, 20000)
 		}
 

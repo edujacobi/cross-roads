@@ -23,17 +23,17 @@ exports.run = async (bot, message, args) => {
 			.setDescription("Olhe para essas belezinhas!")
 			.setColor(0)
 			.setThumbnail("https://media.discordapp.net/attachments/531174573463306240/854876912857120789/MercadoNegro.png")
-			.addField(`${bot.config.minigun} ${bot.guns.minigun.desc}`,
+			.addField(`${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote} ${bot.guns.minigun.desc}`,
 				`R$ ${uData.classe === 'mafioso' ? bot.guns.minigun.preço.toLocaleString().replace(/,/g, ".") : (bot.guns.minigun.preço * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}
 ATK ${bot.guns.minigun.atk}
 DEF ${bot.guns.minigun.def}
 \`;mercadonegro 1\``, true)
-			.addField(`${bot.config.jetpack} ${bot.guns.jetpack.desc}`,
+			.addField(`${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} ${bot.guns.jetpack.desc}`,
 				`R$ ${uData.classe === 'mafioso' ? bot.guns.jetpack.preço.toLocaleString().replace(/,/g, ".") : (bot.guns.jetpack.preço * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}
 Fuga +30%
 168h
 \`;mercadonegro 2\``, true)
-			.addField(`${bot.config.exoesqueleto} ${bot.guns.exoesqueleto.desc}`,
+			.addField(`${bot.guns.exoesqueleto.skins[uData.arma.exoesqueleto.skinAtual].emote} ${bot.guns.exoesqueleto.desc}`,
 				`R$ ${uData.classe === 'mafioso' ? bot.guns.exoesqueleto.preço.toLocaleString().replace(/,/g, ".") : (bot.guns.exoesqueleto.preço * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}
 DEF ${bot.guns.exoesqueleto.def}
 Valor defendido ${bot.guns.exoesqueleto.moneyDef}%
@@ -42,7 +42,7 @@ Valor defendido ${bot.guns.exoesqueleto.moneyDef}%
 				`R$ ${prices[3].toLocaleString().replace(/,/g, ".")}
 5% de desconto
 \`;mercadonegro 4\``, true)
-			.addField(`${bot.config.ovogranada} 2 Granadas`,
+			.addField(`${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} 2 Granadas`,
 				`R$ ${uData.classe === 'mafioso' ? prices[4].toLocaleString().replace(/,/g, ".") : (prices[4] * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}
 +5 ATK em roubos e espancamentos
 \`;mercadonegro 5\``, true)
@@ -63,17 +63,17 @@ Aumenta o nível do galo para 45
 			.addField(`${bot.jobs.et.desc}`,
 				`Duração: ${bot.jobs.et.time / 60}h
 Salário: R$ ${bot.jobs.et.pagamento.toLocaleString().replace(/,/g, ".")}
-Necessário: ${bot.config.rpg}${bot.config.katana}${bot.config.goggles}${bot.config.colete}${bot.config.colete_p}
+Necessário: ${bot.guns.rpg.skins[uData.arma.rpg.skinAtual].emote}${bot.guns.katana.skins[uData.arma.katana.skinAtual].emote}${bot.guns.goggles.skins[uData.arma.goggles.skinAtual].emote}${bot.guns.colete.skins[uData.arma.colete.skinAtual].emote}${bot.guns.colete_p.skins[uData.arma.colete_p.skinAtual].emote}
 \`;job 16\``, true)
 			.addField(`${bot.jobs.mafia.desc}`,
 				`Duração: ${bot.jobs.mafia.time / 60}h
 Salário: R$ ${bot.jobs.mafia.pagamento.toLocaleString().replace(/,/g, ".")}
-Necessário: ${bot.config.minigun}
+Necessário: ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote}
 \`;job 17\``, true)
 			.addField(`${bot.jobs.conquistador.desc}`,
 				`Duração: ${bot.jobs.conquistador.time / 60}h
 Salário: R$ ${bot.jobs.conquistador.pagamento.toLocaleString().replace(/,/g, ".")}
-Necessário: ${bot.config.bazuca}${bot.config.minigun}${bot.config.exoesqueleto}${bot.config.jetpack}
+Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote}${bot.guns.exoesqueleto.skins[uData.arma.exoesqueleto.skinAtual].emote}${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote}
 \`;job 18\``, true)
 			.setFooter(`${uData.username} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 			.setTimestamp()
@@ -116,46 +116,46 @@ Necessário: ${bot.config.bazuca}${bot.config.minigun}${bot.config.exoesqueleto}
 
 	switch (parseInt(option)) {
 		case 1:
-			if ((uData._minigun + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData._minigun < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
+			if ((uData.arma.minigun.tempo + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData.arma.minigun.tempo < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
 				return bot.createEmbed(message, `Você não pode possuir mais que 720 horas de uma mesma arma ${bot.config.mercadonegro}`, null, 0)
 
-			uData._minigun = uData._minigun > currTime ? uData._minigun + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
-			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${bot.config.minigun} **${bot.guns.minigun.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
+			uData.arma.minigun.tempo = uData.arma.minigun.tempo > currTime ? uData.arma.minigun.tempo + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
+			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote} **${bot.guns.minigun.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
 				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(72 * multiplicador * 60 * 60)} de ${bot.config.minigun} ${bot.guns.minigun.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
-				.addField("Tempo restante", bot.segToHour((uData._minigun - currTime) / 1000), true)
+				.addField("Tempo restante", bot.segToHour((uData.arma.minigun.tempo - currTime) / 1000), true)
 				.setColor(0))
 
 			break
 
 		case 2:
-			if ((uData._jetpack + (semana * multiplicador) > currTime + 2880 * 60 * 60 * 1000) || (uData._jetpack < currTime && currTime + (semana * multiplicador) > currTime + 2880 * 60 * 60 * 1000))
+			if ((uData.arma.jetpack.tempo + (semana * multiplicador) > currTime + 2880 * 60 * 60 * 1000) || (uData.arma.jetpack.tempo < currTime && currTime + (semana * multiplicador) > currTime + 2880 * 60 * 60 * 1000))
 				return bot.createEmbed(message, `Você não pode possuir mais que 2880 horas da Jetpack ${bot.config.mercadonegro}`, null, 0)
 
-			uData._jetpack = uData._jetpack > currTime ? uData._jetpack + (semana * multiplicador) : currTime + (semana * multiplicador)
-			bot.createEmbed(message, `Você comprou ${bot.segToHour(168 * 60 * 60 * multiplicador)} de ${bot.config.jetpack} **${bot.guns.jetpack.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
+			uData.arma.jetpack.tempo = uData.arma.jetpack.tempo > currTime ? uData.arma.jetpack.tempo + (semana * multiplicador) : currTime + (semana * multiplicador)
+			bot.createEmbed(message, `Você comprou ${bot.segToHour(168 * 60 * 60 * multiplicador)} de ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} **${bot.guns.jetpack.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
 				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(168 * 60 * 60)} de ${bot.config.jetpack} ${bot.guns.jetpack.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
-				.addField("Tempo restante", bot.segToHour((uData._jetpack - currTime) / 1000), true)
+				.addField("Tempo restante", bot.segToHour((uData.arma.jetpack.tempo - currTime) / 1000), true)
 				.setColor(0))
 
 			break
 
 		case 3:
-			if ((uData._exoesqueleto + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData._exoesqueleto < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
+			if ((uData.arma.exoesqueleto.tempo + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000) || (uData.arma.exoesqueleto.tempo < currTime && currTime + (tres_dias * multiplicador) > currTime + 720 * 60 * 60 * 1000))
 				return bot.createEmbed(message, `Você não pode possuir mais que 720 horas de uma mesma arma ${bot.config.mercadonegro}`, null, 0)
 
-			uData._exoesqueleto = uData._exoesqueleto > currTime ? uData._exoesqueleto + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
-			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${bot.config.exoesqueleto} **${bot.guns.exoesqueleto.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
+			uData.arma.exoesqueleto.tempo = uData.arma.exoesqueleto.tempo > currTime ? uData.arma.exoesqueleto.tempo + (tres_dias * multiplicador) : currTime + (tres_dias * multiplicador)
+			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${bot.guns.exoesqueleto.skins[uData.arma.exoesqueleto.skinAtual].emote} **${bot.guns.exoesqueleto.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
 				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(72 * 60 * 60)} de ${bot.config.exoesqueleto} ${bot.guns.exoesqueleto.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
-				.addField("Tempo restante", bot.segToHour((uData._exoesqueleto - currTime) / 1000), true)
+				.addField("Tempo restante", bot.segToHour((uData.arma.exoesqueleto.tempo - currTime) / 1000), true)
 				.setColor(0))
 
 			break
@@ -175,16 +175,16 @@ Necessário: ${bot.config.bazuca}${bot.config.minigun}${bot.config.exoesqueleto}
 
 		case 5:
 			let quantidadeGranada = 2 * multiplicador
-			if (uData._ovogranada + quantidadeGranada > 50)
-				return bot.createEmbed(message, `Você não pode possuir mais que 50 unidades de Granada ${bot.config.mercadonegro}`, null, 0)
+			if (uData.arma.granada.quant + quantidadeGranada > 50)
+				return bot.createEmbed(message, `Você não pode possuir mais que 50 unidades de ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada** ${bot.config.mercadonegro}`, null, 0)
 
-			uData._ovogranada += quantidadeGranada
-			bot.createEmbed(message, `Você comprou ${quantidadeGranada} unidades de ${bot.config.ovogranada} **Granada**!`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
+			uData.arma.granada.quant += quantidadeGranada
+			bot.createEmbed(message, `Você comprou ${quantidadeGranada} unidades de ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**!`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
-				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${quantidadeGranada} ${bot.config.ovogranada} Granadas**`)
+				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${quantidadeGranada} ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} Granadas**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
-				.addField("Granadas totais", uData._ovogranada.toString(), true)
+				.addField("Granadas totais", uData.arma.granada.quant.toString(), true)
 				.setColor(0))
 
 			break

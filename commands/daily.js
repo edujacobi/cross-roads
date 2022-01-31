@@ -38,21 +38,18 @@ exports.run = async (bot, message, args) => {
 		let textEvent = evento ? ` e ${bot.config.ovo} ${ovo} ${isVip ? 'Presentes' : 'Presente'}` : ''
 		let textFlores = casado ? ` e ${bot.config.flor} ${flores} ${isVip ? 'Flores' : 'Flor'}` : ''
 
-		bot.createEmbed(
-			message,
-			`Você recebeu seus R$ ${daily.toLocaleString().replace(/,/g, '.')}${textFlores}${textEvent} diários ${bot.config.coin}`,
+		bot.createEmbed(message, `Você recebeu seus R$ ${daily.toLocaleString().replace(/,/g, '.')}${textFlores}${textEvent} diários ${bot.config.coin}`,
 			`R$ ${uData.moni.toLocaleString().replace(/,/g, '.')}`,
 			'GREEN'
 		)
 
-		return bot.log(
-			message,
-			new Discord.MessageEmbed()
-				.setDescription(`${uData.username} recebeu seus R$ ${daily} diários`)
-				.addField('Ficou com', `R$ ${uData.moni.toLocaleString().replace(/,/g, '.')}`)
-				.setColor('GREEN')
+		return bot.log(message, new Discord.MessageEmbed()
+			.setDescription(`${uData.username} recebeu seus R$ ${daily} diários`)
+			.addField('Ficou com', `R$ ${uData.moni.toLocaleString().replace(/,/g, '.')}`)
+			.setColor('GREEN')
 		)
-	} else bot.createEmbed(message, `Você já recebeu hoje. O daily ficará disponível novamente em ${bot.segToHour((uData.day + dia - currTime) / 1000)} ${bot.config.coin}`, null, 'GREEN')
+	}
+	else bot.createEmbed(message, `Você já recebeu hoje. O daily ficará disponível novamente em ${bot.segToHour((uData.day + dia - currTime) / 1000)} ${bot.config.coin}`, null, 'GREEN')
 }
 exports.config = {
 	alias: ['d', 'diario'],

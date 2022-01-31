@@ -1,5 +1,5 @@
 exports.run = async (bot, message, args) => {
-	const Discord = require('discord.js');
+	const Discord = require('discord.js')
 	const embed = new Discord.MessageEmbed()
 
 		.setTitle(`${bot.config.cash} Banco Central`)
@@ -9,12 +9,11 @@ exports.run = async (bot, message, args) => {
 		// .addField("Segurança aumentada", "Altamente protegido!")
 		.addField("Cofre", `R$ ${bot.banco.get('caixa').toLocaleString().replace(/,/g, ".")}`)
 		.setFooter(bot.user.username, bot.user.avatarURL())
-		.setTimestamp();
-	message.channel.send({
-			embeds: [embed]
-		})
-		.catch(err => console.log("Não consegui enviar mensagem `banco`"));
-};
+		.setTimestamp()
+	
+	message.channel.send({embeds: [embed]})
+		.catch(err => console.log("Não consegui enviar mensagem `banco`"))
+}
 exports.config = {
 	alias: ['bank']
-};
+}

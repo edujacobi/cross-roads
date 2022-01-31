@@ -3,6 +3,7 @@ module.exports = bot => {
 	bot.imposto = 0.05 // 5% do bet
 	bot.carregamentoCassino = 0
 	bot.moderators = ['145466251496390656', '843955033543540756', '606290632725626940', '555414232989040661', '731765213237346357', '274726815476744192']
+	bot.ajudantes = ['593444673297580042', '761236646116982844']
 
 	bot.palavrasBanidas = [
 		'arrombado', 'viado', 'fdp', 'buceta', 'puta', 'caralh', 'filhadaputagem', 'filhodaputa', 'nazista',
@@ -15,6 +16,8 @@ module.exports = bot => {
 	bot.isAdmin = id => id === bot.config.adminID
 
 	bot.isMod = id => bot.moderators.includes(id)
+
+	bot.isAjudante = id => bot.ajudantes.includes(id)
 
 	bot.getRandom = (min, max) => {
 		min = Math.ceil(min)
@@ -91,26 +94,104 @@ module.exports = bot => {
 		ficha: 0,
 		weekly: 0,
 		day: 0,
-		_knife: 0,
-		_colt45: 0,
-		_tec9: 0,
-		_rifle: 0,
-		_shotgun: 0,
-		_mp5: 0,
-		_ak47: 0,
-		_m4: 0,
-		_rpg: 0,
-		_goggles: 0,
-		_sniper: 0,
-		_katana: 0,
-		_colete: 0,
-		_colete_p: 0,
-		_jetpack: 0,
-		_minigun: 0,
-		_bazuca: 0,
-		_exoesqueleto: 0,
+		arma: {
+			faca: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			colt45: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			tec9: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			rifle: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			shotgun: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			mp5: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			ak47: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			m4: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			sniper: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			katana: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			rpg: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			goggles: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			colete: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			colete_p: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			jetpack: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			minigun: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			bazuca: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			exoesqueleto: {
+				tempo: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+			granada: {
+				quant: 0,
+				skinAtual: 'default',
+				skinsCompradas: [],
+			},
+		},
 		_ovo: 0,
-		_ovogranada: 0,
 		_flor: 0,
 		conjuge: null,
 		anel: null,
@@ -319,6 +400,18 @@ module.exports = bot => {
 		}
 	}
 
+	bot.removeSkinsNoVIP = () => {
+		bot.data.forEach((user, id) => {
+			if (user.username != undefined && user.vipTime < Date.now()) {
+				user.arma.forEach(arma => {
+					if (arma.skinAtual !== 'default')
+						arma.skinAtual = 'default'
+				})
+				bot.data.set(id, user)
+			}
+		})
+	}
+
 	bot.getUserBadges = (userId, isInv) => {
 		let textoBadge = ''
 
@@ -327,6 +420,8 @@ module.exports = bot => {
 			textoBadge += bot.badges.dev
 		if (bot.moderators.includes(userId)) //MOD
 			textoBadge += bot.badges.mod
+		if (bot.ajudantes.includes(userId)) //MOD
+			textoBadge += bot.badges.ajd
 		if (bot.data.get(userId, 'vipTime') > new Date().getTime()) // VIP
 			textoBadge += bot.badges.vip
 

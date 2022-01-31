@@ -112,14 +112,17 @@ exports.run = async (bot, message, args) => {
 		const fugaInicio = new Discord.MessageEmbed()
 			.setAuthor('Fuga em andamento...', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url)
 			.setColor(bot.colors.policia)
-			.setFooter(`${uData.username} • ${uData._jetpack > currTime ? `Com Jetpack` : `Sem Jetpack`}`, message.member.user.avatarURL())
+			.setFooter(`${uData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`}`, message.member.user.avatarURL())
 			.setTimestamp()
+		
+		let uCasamento = bot.casais.get(uData.casamentoID)
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Participar')
 				.setEmoji(bot.config.prisao)
+				.setDisabled(uCasamento?.anel === null)
 				.setCustomId(message.id + 'participar'))
 
 		let msgFuga = await message.channel.send({
@@ -137,7 +140,7 @@ exports.run = async (bot, message, args) => {
 		let isConjugeParticipando = false
 		let conjuge = false
 
-		let sucessoNecessario = uData._jetpack > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
+		let sucessoNecessario = uData.arma.jetpack.tempo  > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
 
 		collector.on('collect', async b => {
 			await b.deferUpdate()
@@ -160,7 +163,7 @@ exports.run = async (bot, message, args) => {
 
 			if (bot.isUserEmRouboOuEspancamento(message, cData)) return
 
-			let uCasamento = bot.casais.get(uData.casamentoID)
+			uCasamento = bot.casais.get(uData.casamentoID)
 
 			if (uCasamento.nivel === 0)
 				return bot.createEmbed(message, `Vocês estão com o nível do casamento muito baixo para realizar ações em dupla!`, null, bot.colors.casamento)
@@ -170,8 +173,8 @@ exports.run = async (bot, message, args) => {
 			chanceBase *= 1 + bot.aneis[uCasamento.anel].bonus * bonus / 100
 			chanceJetpack = chanceBase + 30
 
-			sucessoNecessario = uData._jetpack > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
-			let sucessoConjuge = cData._jetpack > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
+			sucessoNecessario = uData.arma.jetpack.tempo > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
+			let sucessoConjuge = cData.arma.jetpack.tempo > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
 
 			sucessoNecessario = (sucessoNecessario + sucessoConjuge) / 2
 
@@ -186,7 +189,7 @@ exports.run = async (bot, message, args) => {
 				embeds: [fugaInicio
 					.setAuthor('Fuga em andamento... O amor pode tudo!', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url)
 					// .addField("Debug", `Chance base: ${chanceBase}\nSucesso necessarario: ${sucessoNecessario}\nSucesso conjuge: ${sucessoConjuge}\nChance calculada: ${chance}`)
-					.setFooter(`${uData.username} e ${cData.username} • ${uData._jetpack > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData._jetpack > currTime ? `com Jetpack` : `sem Jetpack`}`, message.member.user.avatarURL())
+					.setFooter(`${uData.username} e ${cData.username} • ${uData.arma.jetpack.tempo  > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData.arma.jetpack.tempo  > currTime ? `com Jetpack` : `sem Jetpack`}`, message.member.user.avatarURL())
 				]
 			})
 
@@ -215,14 +218,14 @@ exports.run = async (bot, message, args) => {
 			const embedFinal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData._jetpack > currTime ? bot.shuffle(frasesSucessoJetpack)[0] : bot.shuffle(frasesSucesso)[0]}, mas a polícia ${bot.shuffle(frasesProcurado)[0]} ${bot.config.police}`)
+				.setDescription(`${uData.arma.jetpack.tempo  > currTime ? bot.shuffle(frasesSucessoJetpack)[0] : bot.shuffle(frasesSucesso)[0]}, mas a polícia ${bot.shuffle(frasesProcurado)[0]} ${bot.config.police}`)
 				.setFooter(`${uData.username} • Espere 30 minutos para roubar novamente`, message.member.user.avatarURL())
 				.setTimestamp()
 
 			const embedFinalCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData._jetpack > currTime && conjuge._jetpack > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
+				.setDescription(`${uData.arma.jetpack.tempo  > currTime && conjuge.arma.jetpack.tempo  > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
 				.setFooter(`${uData.username} e ${conjuge.username} • Esperem 30 minutos para roubar novamente`, message.member.user.avatarURL())
 				.setTimestamp()
 
@@ -260,12 +263,12 @@ exports.run = async (bot, message, args) => {
 
 			const logF = new Discord.MessageEmbed()
 				.setDescription(`**${uData.username} conseguiu fugir da prisão**`)
-				.addField(`${bot.config.jetpack} Jetpack`, uData._jetpack > currTime ? `Sim` : `Não`, true)
+				.addField(`${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack`, uData.arma.jetpack.tempo > currTime ? `Sim` : `Não`, true)
 				.setColor(bot.colors.policia)
 
 			if (isConjugeParticipando && conjuge)
 				logF.addField("Junto de seu conjuge", conjuge.username)
-					.addField(`${bot.config.jetpack} Jetpack`, conjuge._jetpack > currTime ? `Sim` : `Não`, true)
+					.addField(`${bot.guns.jetpack.skins[conjuge.arma.jetpack.skinAtual].emote} Jetpack`, conjuge.arma.jetpack.tempo > currTime ? `Sim` : `Não`, true)
 
 			return bot.log(message, logF)
 
@@ -275,16 +278,16 @@ exports.run = async (bot, message, args) => {
 
 			let atkPower = 0
 			let atkPowerConjuge = 0
-			Object.entries(uData).forEach(([key, value]) => {
+			Object.entries(uData.arma).forEach(([key, value]) => {
 				Object.values(bot.guns).forEach(arma => {
-					if (value > currTime && arma.atk > atkPower && (key == "_" + arma.data))
+					if (value.tempo > currTime && arma.atk > atkPower && (key == arma.data))
 						atkPower = arma.atk
 				})
 			})
 			if (isConjugeParticipando && conjuge) {
-				Object.entries(conjuge).forEach(([key, value]) => {
+				Object.entries(conjuge.arma).forEach(([key, value]) => {
 					Object.values(bot.guns).forEach(arma => {
-						if (value > currTime && arma.atk > atkPower && (key == "_" + arma.data))
+						if (value.tempo > currTime && arma.atk > atkPower && (key == arma.data))
 							atkPowerConjuge = arma.atk
 					})
 				})
@@ -325,9 +328,7 @@ exports.run = async (bot, message, args) => {
 
 					if (isConjugeParticipando && conjuge) {
 						bot.users.fetch(uData.conjuge).then(user => {
-							user.send({
-								embeds: [embedPV]
-							})
+							user.send({embeds: [embedPV]})
 								.catch(() => message.channel.send(`<@${uData.conjuge}> você está curado! ${bot.config.hospital}`)
 									.catch(() => `Não consegui responder ${bot.data.get(uData.conjuge, "username")} nem no PV nem no canal. \`Prisao fugir\``))
 						})
@@ -343,14 +344,14 @@ exports.run = async (bot, message, args) => {
 			const embed = new Discord.MessageEmbed()
 				.setTitle('Fuga fracassada')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData._jetpack > currTime ? bot.shuffle(frasesFracassoJetpack)[0] : bot.shuffle(frasesFracasso)[0]}. Você ficará preso por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
+				.setDescription(`${uData.arma.jetpack.tempo > currTime ? bot.shuffle(frasesFracassoJetpack)[0] : bot.shuffle(frasesFracasso)[0]}. Você ficará preso por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
 				.setFooter(`${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}`, message.member.user.avatarURL())
 				.setTimestamp()
 
 			const embedCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga fracassada')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData._jetpack > currTime && conjuge._jetpack > currTime ? bot.shuffle(frasesFracassoJetpackCasal)[0] : bot.shuffle(frasesFracassoCasal)[0]}. Vocês ficarão presos por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
+				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge.arma.jetpack.tempo > currTime ? bot.shuffle(frasesFracassoJetpackCasal)[0] : bot.shuffle(frasesFracassoCasal)[0]}. Vocês ficarão presos por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
 				.setFooter(`${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}\n${conjuge.username} • Tempo preso: ${bot.segToHour((conjuge.preso - currTime) / 1000)}`, message.member.user.avatarURL())
 				.setTimestamp()
 
@@ -378,13 +379,13 @@ exports.run = async (bot, message, args) => {
 
 			const logF = new Discord.MessageEmbed()
 				.setDescription(`**${uData.username} não conseguiu fugir da prisão e ficará preso por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}**`)
-				.addField(`${bot.config.jetpack} Jetpack`, uData._jetpack > currTime ? `Sim` : `Não`, true)
+				.addField(`${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack`, uData.arma.jetpack.tempo > currTime ? `Sim` : `Não`, true)
 				.addField(`Baleado`, chanceBaleado <= 10 ? `Sim` : `Não`, true)
 				.setColor(bot.colors.policia)
 
 			if (isConjugeParticipando && conjuge)
 				logF.addField("Junto de seu conjuge", conjuge.username)
-					.addField(`${bot.config.jetpack} Jetpack`, conjuge._jetpack > currTime ? `Sim` : `Não`, true)
+					.addField(`${bot.guns.jetpack.skins[conjuge.arma.jetpack.skinAtual].emote} Jetpack`, conjuge.arma.jetpack.tempo  > currTime ? `Sim` : `Não`, true)
 
 			return bot.log(message, logF)
 		}
@@ -392,9 +393,9 @@ exports.run = async (bot, message, args) => {
 	}
 	else if (option === 'subornar' || option === 's' || option === 'suborno') {
 		let atkPower = 0
-		Object.entries(uData).forEach(([key, value]) => {
+		Object.entries(uData.arma).forEach(([key, value]) => {
 			Object.values(bot.guns).forEach(arma => {
-				if (value > currTime && arma.atk > atkPower && key == "_" + arma.data)
+				if (value.tempo > currTime && arma.atk > atkPower && key == arma.data)
 					atkPower = arma.atk
 			})
 		})
@@ -470,7 +471,7 @@ exports.run = async (bot, message, args) => {
 				return
 			if (bot.isGaloEmRinha(message.author.id))
 				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.policia)
-			
+
 			if (sucesso) {
 				uData.moni -= preço
 				uData.prisaoGastos += preço
@@ -526,7 +527,7 @@ exports.run = async (bot, message, args) => {
 Estar preso limita muitas de suas ações no jogo, como trabalhar, investir, apostar, vasculhar, e claro, roubar.
 Você pode tentar espancar outros presos.
 Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
-			.addField(`${bot.badges.fujao_s5} Fugir`, `Você tem ${chanceBase * multiplicador_evento_chance_fuga}% (${chanceJetpack * multiplicador_evento_chance_fuga}% se possuir uma ${bot.config.jetpack} **Jetpack**) de chance de fugir da prisão!`)
+			.addField(`${bot.badges.fujao_s5} Fugir`, `Você tem ${chanceBase * multiplicador_evento_chance_fuga}% (${chanceJetpack * multiplicador_evento_chance_fuga}% se possuir uma ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} **Jetpack**) de chance de fugir da prisão!`)
 			.addField(`${bot.badges.deputado_s5} Subornar`, `Os guardas são gananciosos, e quanto melhor sua arma, mais eles pedirão! Eles também podem recusar seu suborno, mas ficarão com seu dinheiro.`)
 			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/817102027183357992/prisao.png') //message.guild.iconURL()
 			.setColor(bot.colors.policia)

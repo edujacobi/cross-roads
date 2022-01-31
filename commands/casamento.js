@@ -11,6 +11,8 @@ exports.run = async (bot, message, args) => {
 	} = bot.findUser(message, args)
 
 	if (!uData) return
+	
+	
 
 	// if (!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id) || uData.vipTime > currTime))
 	// 	return
@@ -19,7 +21,7 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `${emote} ${alvo === message.author.id ? "Você" : "Este jogador"} não é casado`, "Use ;casar para saber mais!", bot.colors.casamento)
 	
 	let uCasamento = bot.casais.get(uData.casamentoID)
-
+	
 	const getStringNivelCasamento = (nivel) => {
 		const hp = {
 			lFull_g: '<:lFull_g:902350148036866099>',
@@ -70,7 +72,7 @@ exports.run = async (bot, message, args) => {
 	}
 	const getRow = (uData) => {
 		uCasamento = bot.casais.get(uData.casamentoID)
-
+		
 		let row = new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SECONDARY')
@@ -82,7 +84,7 @@ exports.run = async (bot, message, args) => {
 				.setStyle('SECONDARY')
 				.setLabel('Entregar')
 				.setEmoji(bot.config.flor)
-				.setDisabled((uData._flor <= 0 || (currTime - uCasamento.ultimaFlor) < 7200000) || uCasamento.nivel >= 100 || bot.isPlayerViajando(uData))
+				.setDisabled((uData._flor <= 0 || (currTime - uCasamento.ultimaFlor) < 7200000) || uCasamento.nivel >= 100 || bot.isPlayerViajando(uData) || uCasamento.anel === null)
 				.setCustomId(message.id + message.author.id + 'flor'))
 
 		if (uCasamento.nivel >= 90)
@@ -90,7 +92,7 @@ exports.run = async (bot, message, args) => {
 				.setStyle('SUCCESS')
 				.setLabel('Viajar')
 				.setEmoji(bot.config.aviao)
-				.setDisabled(uCasamento.nivel < 100 || bot.isPlayerViajando(uData))
+				.setDisabled(uCasamento.nivel < 100 || bot.isPlayerViajando(uData) || uCasamento.anel === null)
 				.setCustomId(message.id + message.author.id + 'viajar'))
 
 		if (uCasamento.nivel <= 20)
@@ -105,7 +107,7 @@ exports.run = async (bot, message, args) => {
 			row.addComponents(new Discord.MessageButton()
 				.setStyle('PRIMARY')
 				.setLabel('Melhorar anel')
-				.setDisabled(uCasamento.nivel <= 10)
+				.setDisabled(uCasamento.nivel <= 10 && uCasamento.anel != null)
 				.setEmoji(bot.aneis[uData.anel].emote)
 				.setCustomId(message.id + message.author.id + 'anel'))
 
@@ -119,7 +121,7 @@ exports.run = async (bot, message, args) => {
 		.addField("Mural", uCasamento.mural.length > 0 ? `"${uCasamento.mural}"` : `...`)
 		.addField(`${bot.config.flor} Flores`, `${uCasamento.flores.toString()} entregues\n${uCasamento.ultimaFlor !== 0 ? `${bot.segToHour((currTime - uCasamento.ultimaFlor) / 1000)} desde a última` : "Não entregaram ainda"}`, true)
 		.addField(`${bot.config.aviao} Viagens`, `${uCasamento.viagem > currTime ? `Viajando por mais ${bot.segToHour((uCasamento.viagem - currTime) / 1000)}` : 'Não estão viajando'}\n${uCasamento.ultimaViagem !== 0 ? `${bot.segToHour((currTime - uCasamento.ultimaViagem) / 1000)} desde a última` : "Não viajaram ainda"}`, true)
-		.addField(`${bot.aneis[uCasamento.anel].emote} Anel`, `${bot.aneis[uCasamento.anel].desc}`, true)
+		.addField(`${uCasamento.anel == null ? '' : bot.aneis[uCasamento.anel].emote} Anel`, `${uCasamento.anel == null ? 'Sem anel' : bot.aneis[uCasamento.anel].desc}`, true)
 		.addField("Nível", `${getStringNivelCasamento(uCasamento.nivel)} **${uCasamento.nivel}**`)
 		.setFooter(`${uData.username} e ${bot.data.get(uData.conjuge, 'username')} • Casados desde ${new Date(uCasamento.desde).toLocaleString("pt-BR").replace(/-/g, "/")}${bot.isAdmin(message.author.id) ? ` • ID: ${uData.casamentoID}`: ''}`, bot.user.avatarURL())
 		.setTimestamp()
@@ -646,6 +648,9 @@ exports.run = async (bot, message, args) => {
 					uCasamento = bot.casais.get(uData.casamentoID)
 					uData = bot.data.get(message.author.id)
 					cData = bot.data.get(uData.conjuge)
+					
+					if (uCasamento.anel === null)
+						uCasamento.nivel = 75
 					
 					uCasamento.anel = uData.anel
 					

@@ -27,6 +27,7 @@ module.exports = async bot => {
 
 	setInterval(() => {
 		bot.decrescimoNivelCasal()
+		bot.removeSkinsNoVIP()
 	}, hora * 6)
 	
 

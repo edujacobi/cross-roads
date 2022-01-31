@@ -15,7 +15,7 @@ module.exports = (bot) => {
 			desc: "Açougueiro",
 			time: 1 * 60 * multiplicador_tempo_evento,
 			pagamento: 1 * 500,
-			arma: "knife"
+			arma: "faca"
 		},
 		vigilante: {
 			id: 3,
@@ -92,7 +92,7 @@ module.exports = (bot) => {
 			desc: "Segurança do Jacobi",
 			time: 10 * 60 * multiplicador_tempo_evento,
 			pagamento: 1000000,
-			arma: ["rpg", "katana", "goggles", "colete", "sniper", "m4", "ak47", "mp5", "shotgun", "rifle", "tec9", "colt45", "knife"]
+			arma: ["rpg", "katana", "goggles", "colete", "sniper", "m4", "ak47", "mp5", "shotgun", "rifle", "tec9", "colt45", "faca"]
 		},
 		informante: {
 			id: 14,

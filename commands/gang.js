@@ -251,7 +251,7 @@ exports.run = async (bot, message, args) => {
 		if (uGang.membros.length >= uGang.espacoMembro)
 			return bot.createEmbed(message, `**${uGang.nome}** já bateu o limite de jogadores ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		if (!target) return bot.createEmbed(message, `Insera um usuário a ser convidado ${getIcone(uGang.boneco)}`, null, uGang.cor)
+		if (!target) return bot.createEmbed(message, `Insira um usuário a ser convidado ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		if (target.id === message.author.id) return bot.createEmbed(message, `Você já faz parte desta gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -481,7 +481,7 @@ exports.run = async (bot, message, args) => {
 			return
 
 		if (!target)
-			return bot.createEmbed(message, `Insera um usuário para transferir a posse ${getIcone(uGang.boneco)}`, null, uGang.cor)
+			return bot.createEmbed(message, `Insira um usuário para transferir a posse ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		let tData = bot.data.get(target.id)
 
@@ -1743,9 +1743,9 @@ exports.run = async (bot, message, args) => {
 								return bot.createEmbed(message, `Sua gangue deve esperar mais ${bot.segToHour((uGang.golpeTime - currTime) / 1000)} para tentar roubar novamente o ${bot.config.cash} **Banco** ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 							let atkPower = 0
-							Object.entries(uData).forEach(([key, value]) => {
+							Object.entries(uData.arma).forEach(([key, value]) => {
 								Object.values(bot.guns).forEach(arma => {
-									if (value > currTime && arma.atk > atkPower && key === "_" + arma.data)
+									if (value.tempo > currTime && arma.atk > atkPower && key === arma.data)
 										atkPower = arma.atk
 								})
 							})
@@ -1832,9 +1832,9 @@ exports.run = async (bot, message, args) => {
 												embedField.name = `Membros [${players.length}/${uGang.espacoMembro}]`
 												embedField.value = texto
 												let atkPower = 0
-												Object.entries(jogador).forEach(([key, value]) => {
+												Object.entries(jogador.arma).forEach(([key, value]) => {
 													Object.values(bot.guns).forEach(arma => {
-														if (value > currTime && arma.atk > atkPower && key === "_" + arma.data) {
+														if (value.tempo > currTime && arma.atk > atkPower && key === arma.data) {
 															atkPower = arma.atk
 														}
 													})
