@@ -163,7 +163,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/856211643742945290/CrossRoadsLogo.png')
 			.setColor('GREEN')
 			.setTimestamp()
-			.setDescription(`Olá **${uData.username}**, bem vindo à Temporada 6 do **Cross Roads**!\n\nAntes de continuar jogando você deve escolher uma **Classe**`)
+			.setDescription(`Olá **${uData.username}**, bem vindo à Temporada 7 do **Cross Roads**!\n\nAntes de continuar jogando você deve escolher uma **Classe**`)
 
 		message.author.send({embeds: [embed],})
 			.catch(() => message.reply('Ops... não consigo te mandar mensagens no PV. Verifique suas configurações e use algum comando novamente')

@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 
 	if (!args[0]) {
@@ -7,7 +7,7 @@ exports.run = async (bot, message, args) => {
 			.setDescription("As seguintes armas e equipamentos estão disponíveis.\nVocê pode ver mais detalhes usando `;arma MP5`, por exemplo.")
 			.setColor('GREEN')
 			.setFooter(bot.user.username, bot.user.avatarURL())
-			.setTimestamp();
+			.setTimestamp()
 
 		Object.values(bot.guns).forEach(arma => {
 			// let emote = bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name == value.emote)
@@ -21,10 +21,8 @@ exports.run = async (bot, message, args) => {
 			}
 		})
 
-		return message.channel.send({
-				embeds: [embed]
-			})
-			.catch(err => console.log("Não consegui enviar mensagem `arma`"));
+		return message.channel.send({embeds: [embed]})
+			.catch(() => console.log("Não consegui enviar mensagem `arma`"))
 
 	}
 
@@ -39,9 +37,10 @@ exports.run = async (bot, message, args) => {
 	if (achou == false)
 		return bot.createEmbed(message, "Arma não encontrada")
 
+	let uData = bot.data.get(message.author.id)
 
 	let value = bot.guns[achou]
-	let emoji = bot.config[value.emote]
+	let emoji = value.skins[uData.arma[achou].skinAtual].emote
 	let emoji_id = emoji.substring(emoji.indexOf(':', 3) + 1, emoji.indexOf('>'))
 
 	const embed = new Discord.MessageEmbed()
@@ -50,13 +49,12 @@ exports.run = async (bot, message, args) => {
 		.setDescription(`${value.atk != null ? `**Poder de ataque:** ${value.atk}\n` : ""}${value.def != null ? `**Poder de defesa:** ${value.def}\n` : ""}${value.moneyAtk != null ? `**Valor roubado:** ${value.moneyAtk}%\n` : ""}${value.moneyDef != null ? `**Valor defendido:** ${value.moneyDef}%\n` : ""}${value.preço != null ? `**Preço:** R$ ${value.preço.toLocaleString().replace(/,/g, ".")}\n` : ""}${value.utilidade != null ? `${value.utilidade}` : ""}`)
 		.setColor('GREEN')
 		.setFooter(bot.user.username, bot.user.avatarURL())
-		.setTimestamp();
+		.setTimestamp()
 
-	return message.channel.send({
-		embeds: [embed]
-	}).catch(err => console.log("Não consegui enviar mensagem `arma`"))
+	return message.channel.send({embeds: [embed]})
+		.catch(() => console.log("Não consegui enviar mensagem `arma`"))
 
-};
+}
 exports.config = {
 	alias: ['gun', 'armas', 'guns', 'equipamentos', 'itens', 'item', 'equipamento', 'equip']
-};
+}
