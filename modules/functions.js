@@ -403,7 +403,7 @@ module.exports = bot => {
 	bot.removeSkinsNoVIP = () => {
 		bot.data.forEach((user, id) => {
 			if (user.username != undefined && user.vipTime < Date.now()) {
-				user.arma.forEach(arma => {
+				Object.values(user.arma).forEach(arma => {
 					if (arma.skinAtual !== 'default')
 						arma.skinAtual = 'default'
 				})
