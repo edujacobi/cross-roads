@@ -19,7 +19,7 @@ const bot = new Client(
     }, {
         // shardCount: "auto",
         allowedMentions: {parse: ['users'], repliedUser: false},
-        makeCache: 120,
+        makeCache: 60,
         disabledEvents: [
             'GUILD_DELETE', 'GUILD_UPDATE', 'GUILD_MEMBER_ADD',
             'GUILD_MEMBER_REMOVE', 'GUILD_MEMBER_UPDATE', 'GUILD_MEMBERS_CHUNK', 'GUILD_ROLE_CREATE',

@@ -11,7 +11,7 @@
 // manager.spawn();
 
 const { spawn } = require('child_process');
-const start = spawn('node', ['--unhandled-rejections=warn', '--trace-warnings', 'index.js']); // '--expose-gc'
+const start = spawn('node', ['--unhandled-rejections=warn', 'index.js']); // '--expose-gc''--trace-warnings', 
 
 start.stdout.on('data', (data) => {
 	console.log(`stdout: ${data}`);
