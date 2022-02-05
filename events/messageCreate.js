@@ -46,7 +46,6 @@ module.exports = (bot, message) => {
 	}
 	
 	let uData = bot.data.get(message.author.id)
-	
 
 	if (uData.username === undefined) {
 		const newUser = new Discord.MessageEmbed()
