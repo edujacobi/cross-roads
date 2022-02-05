@@ -34,8 +34,8 @@ module.exports = async bot => {
 	setInterval(() => {
 		// bot.putMoneyCassino()
 		bot.sortearBilhete()
-		if (global.gc)
-			global.gc()
+		// if (global.gc)
+		// 	global.gc()
 	}, (hora / 2))
 
 	bot.informRinhaRouboCancelado()
