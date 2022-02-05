@@ -37,8 +37,16 @@ module.exports = (bot, message) => {
 
 	if (!message.guild.me.permissions.has([Permissions.FLAGS.MANAGE_MESSAGES, Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.USE_EXTERNAL_EMOJIS, Permissions.FLAGS.ADD_REACTIONS]))
 		return bot.createEmbed(message, '<:badge_cata_bug:799043225557008474> **PERA!** Eu não possuo as permissões necessárias para o jogo rolar belezinha. Contate o Administrador deste Servidor.\n\nAs seguintes permissões são necessárias:\n`Gerenciar mensagens`, `Enviar mensagens`, `Inserir links`, `Usar emojis externos` e `Adicionar reações`')
-
+	
+	// Se tá no cooldown
+	if (bot.talkedRecently.has(message.author.id)) {
+		return message.reply('Você deve esperar 4 segundos entre cada comando.')
+			.then(m => setTimeout(() => m.delete(), 4000))
+			.catch(() => `Não consegui responder ${uData.username}. \`Mensagem Cooldown\``)
+	}
+	
 	let uData = bot.data.get(message.author.id)
+	
 
 	if (uData.username === undefined) {
 		const newUser = new Discord.MessageEmbed()
@@ -307,18 +315,12 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 		message.guild?.members?.cache?.get(message.author.id).roles?.remove(vip)
 			.catch(() => console.log('Não consegui remover o cargo VIP de ' + message.author.id))
 	}
-	// Se tá no cooldown
-	if (bot.talkedRecently.has(message.author.id)) {
-		return message.reply('Você deve esperar 3 segundos entre cada comando.')
-			.then(m => setTimeout(() => m.delete(), 3000))
-			.catch(() => `Não consegui responder ${uData.username}. \`Mensagem Cooldown\``)
-	}
 
 	bot.onlineNow.set(message.author.id, new Date().getTime())
 
 	if (!(isVip || isBooster || bot.isAdmin(message.author.id) || bot.isMod(message.author.id))) {
 		bot.talkedRecently.add(message.author.id)
-		setTimeout(() => bot.talkedRecently.delete(message.author.id), 3250)
+		setTimeout(() => bot.talkedRecently.delete(message.author.id), 3750)
 	}
 	// console.log(message.author.username, command, args)
 
@@ -331,6 +333,6 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 		.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
 		.setTimestamp()
 
-	bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
-		.catch(() => console.log('Não consegui fazer log de ', command, args))
+	// bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
+	// 	.catch(() => console.log('Não consegui fazer log de ', command, args))
 }
