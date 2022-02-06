@@ -5,7 +5,7 @@ exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let dia = new Date().getDay()
 	let hora = new Date().getHours()
-	let option = args[0]
+	let option = parseInt(args[0])
 	let multiplicador = args[1] ? args[1] : 1
 	const tres_dias = 259200000
 	const um_dia = 86400000
@@ -49,7 +49,7 @@ Valor defendido ${bot.guns.exoesqueleto.moneyDef}%
 			.addField(`${bot.config.superWhey} Super Whey`,
 				`R$ ${uData.classe === 'mafioso' ? prices[5].toLocaleString().replace(/,/g, ".") : (prices[5] * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}
 Aumenta o nível do galo para 45
-(Ele precisa estar nível 40 ou maior)
+Necessário nível 40+
 \`;mercadonegro 6\``, true)
 			// 			.addField(`${bot.config.ovo} 10 Presentes`, `R$ ${uData.classe === 'mafioso' ? prices[6].toLocaleString().replace(/,/g, ".") : (prices[6] * (1 + bot.imposto)).toLocaleString().replace(/,/g, ".")}
 			// *Porque você é uma criança mimada*
@@ -91,9 +91,9 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 	if (multiplicador < 1 || (multiplicador % 1 !== 0))
 		return bot.createEmbed(message, `O multiplicador informado é inválido ${bot.config.mercadonegro}`, null, 0)
 
-	let preço = uData.classe === 'mafioso' ? prices[option - 1] * multiplicador : prices[option - 1] * multiplicador * (1 + bot.imposto)
-	if (option === 4)
-		preço = prices[3] * multiplicador // ignora imposto para todos na compra de fichas
+	let preço = uData.classe === 'mafioso' || option === 4 ? prices[option - 1] * multiplicador : prices[option - 1] * multiplicador * (1 + bot.imposto)
+	// if (option === 4)
+	// 	preço = prices[3] * multiplicador // ignora imposto para todos na compra de fichas
 
 	if (uData.moni < preço)
 		return bot.msgSemDinheiro(message)
@@ -111,7 +111,7 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 	uData.moni -= preço
-	if (option != 4)
+	if (option !== 4)
 		uData.lojaGastos += preço
 
 	switch (parseInt(option)) {
