@@ -42,8 +42,8 @@ module.exports = (bot, message) => {
 
 	// Se tá no cooldown
 	if (bot.talkedRecently.has(message.author.id)) {
-		return message.reply('Você deve esperar 4 segundos entre cada comando.')
-			.then(m => setTimeout(() => m.delete(), 4000))
+		return message.reply('Você deve esperar 3 segundos entre cada comando.')
+			.then(m => setTimeout(() => m.delete(), 3200))
 			.catch(() => `Não consegui responder ${uData?.username}. \`Mensagem Cooldown\``)
 	}
 
@@ -319,18 +319,18 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 
 	if (!(isVip || isBooster || bot.isAdmin(message.author.id) || bot.isMod(message.author.id))) {
 		bot.talkedRecently.add(message.author.id)
-		setTimeout(() => bot.talkedRecently.delete(message.author.id), 3750)
+		setTimeout(() => bot.talkedRecently.delete(message.author.id), 3350)
 	}
 	// console.log(message.author.username, command, args)
 
 	cmd.run(bot, message, args)
 
-	const embed = new Discord.MessageEmbed()
-		.setAuthor(bot.data.has(message.author.id, 'username') ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())
-		.setDescription(`${bot.data.has(message.author.id, 'username') ? uData.username : message.author.username} **${message.content}**`)
-		.setColor(bot.colors.background)
-		.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
-		.setTimestamp()
+	// const embed = new Discord.MessageEmbed()
+	// 	.setAuthor(bot.data.has(message.author.id, 'username') ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())
+	// 	.setDescription(`${bot.data.has(message.author.id, 'username') ? uData.username : message.author.username} **${message.content}**`)
+	// 	.setColor(bot.colors.background)
+	// 	.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
+	// 	.setTimestamp()
 
 	// bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
 	// 	.catch(() => console.log('Não consegui fazer log de ', command, args))

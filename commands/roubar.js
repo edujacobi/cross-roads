@@ -557,20 +557,20 @@ Há uma pequena chance do alvo ser também espancado!`)
 
 	if (uData.job != null) return bot.msgTrabalhando(message, uData)
 
-	if (message.author.id == alvo)
+	if (message.author.id === alvo)
 		return bot.createEmbed(message, `Você não pode roubar você mesmo, idiota ${bot.config.roubar}`, null, bot.colors.roubar)
 
-	if (alvo == bot.config.adminID)
+	if (alvo === bot.config.adminID)
 		return bot.createEmbed(message, `Quem em sã consciência roubaria o Jacobi? ${bot.config.roubar}`, null, bot.colors.roubar)
 
-	if (alvo == '526203502318321665') // bot
+	if (alvo === '526203502318321665') // bot
 		return bot.createEmbed(message, `01000100 01100101 01110011 01101001 01110011 01110100 01100001 <:CrossRoadsLogo:757021182020157571>`, null, bot.colors.roubar)
 
-	if (uData.gangID != null && uData.gangID == tData.gangID)
+	if (uData.gangID != null && uData.gangID === tData.gangID)
 		return bot.createEmbed(message, `Você não pode roubar membros da sua gangue ${bot.config.roubar}`, null, bot.colors.roubar)
 
-	// if (tData.classe == undefined)
-	// 	return bot.createEmbed(message, `**${tData.username}** não está ativo na temporada e não pode ser roubado ${bot.config.roubar}`, null, bot.colors.roubar)
+	if (tData.classe == undefined)
+		return bot.createEmbed(message, `**${tData.username}** não está ativo na temporada e não pode ser roubado ${bot.config.roubar}`, null, bot.colors.roubar)
 
 	if (bot.isUserEmRouboOuEspancamento(message, uData))
 		return
@@ -587,8 +587,8 @@ Há uma pequena chance do alvo ser também espancado!`)
 	if (bot.isPlayerViajando(tData))
 		return bot.msgPlayerViajando(message, tData, tData.username)
 
-	// if (alvo == uData.conjuge)
-	// 	return bot.createEmbed(message, `Você não pode roubar o seu cônjuge ${bot.config.roubar}`, null, bot.colors.roubar)
+	if (alvo === uData.conjuge)
+		return bot.createEmbed(message, `Você não pode roubar o seu cônjuge ${bot.config.roubar}`, null, bot.colors.roubar)
 
 	let atkPower = 0
 	let defPower = 0

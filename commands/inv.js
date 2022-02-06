@@ -233,6 +233,9 @@ exports.run = async (bot, message, args) => {
 	> O bot irá adicionar botões à mensagem do inventário. Se o usuário que chamou o comando clicar no botão, a mensagem
 	 será editada para mostrar o segundo embed, o botão será trocado para fechar o inv.
 	*/
+
+	let isAberto = false
+	
 	const rowActions = new Discord.MessageActionRow()
 	const rowAbrir = new Discord.MessageActionRow()
 		.addComponents(new Discord.MessageButton()
@@ -258,38 +261,109 @@ exports.run = async (bot, message, args) => {
 		.setStyle('SUCCESS')
 		.setLabel('Anúncio')
 		.setCustomId(message.id + message.author.id + 'anuncio')
+	
+	let boneco = uGang?.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang?.boneco]
+	const buttonGang = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		// .setLabel(`Gangue ${uGang.tag !== '' ? `[${uGang.tag}]` : ''} ${uGang.nome}`)
+		.setLabel(`Gangue`)
+		.setEmoji(boneco)
+		.setDisabled(!bot.isComandoUsavelViagem(message, 'gang'))
+		.setCustomId(message.id + message.author.id + 'gang')
 
 	rowAbrir.addComponents(buttonUI)
 	rowFechar.addComponents(buttonUI)
 
 	if (uGang) {
-		let boneco = uGang.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang.boneco]
-		const buttonGang = new Discord.MessageButton()
-			.setStyle('SECONDARY')
-			// .setLabel(`Gangue ${uGang.tag !== '' ? `[${uGang.tag}]` : ''} ${uGang.nome}`)
-			.setLabel(`Gangue`)
-			.setEmoji(boneco)
-			.setDisabled(!bot.isComandoUsavelViagem(message, 'gang'))
-			.setCustomId(message.id + message.author.id + 'gang')
-
 		rowAbrir.addComponents(buttonGang)
 		rowFechar.addComponents(buttonGang)
 	}
 
+	let userD = bot.data.get(message.author.id)
+	
+	const buttonInvest = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		// .setLabel(bot.investimentos[uData.invest].desc)
+		.setLabel('Investimento')
+		.setEmoji(bot.config.propertyG)
+		.setDisabled(!bot.isComandoUsavelViagem(message, 'investir'))
+		.setCustomId(message.id + message.author.id + 'invest')
+	
+	const buttonRoubar = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		.setLabel('Roubar')
+		.setEmoji(bot.config.roubar)
+		.setDisabled(
+			userD.job != null ||
+			userD.roubo > currTime ||
+			userD.preso > currTime ||
+			userD.hospitalizado > currTime ||
+			userD.classe == undefined ||
+			uData.username == undefined ||
+			userD.emRoubo.tempo > currTime ||
+			userD.emEspancamento.tempo > currTime ||
+			uData.emRoubo.tempo > currTime ||
+			uData.emEspancamento.tempo > currTime ||
+			userD.gangID != null && userD.gangID === uData.gangID ||
+			alvo === uData.conjuge ||
+			bot.isGaloEmRinha(message.author.id) ||
+			bot.isGaloEmRinha(alvo) ||
+			bot.isPlayerViajando(uData) ||
+			!bot.isComandoUsavelViagem(message, 'roubar')
+		)
+		.setCustomId(message.id + message.author.id + 'roubar')
+
+	const buttonEspancar = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		.setLabel('Espancar')
+		.setEmoji(bot.config.espancar)
+		.setDisabled(
+			userD.job != null ||
+			uData.jobTime > currTime ||
+			userD.roubo > currTime ||
+			userD.preso > currTime && uData.preso < currTime ||
+			uData.preso > currTime && userD.preso < currTime ||
+			userD.hospitalizado > currTime ||
+			userD.fugindo > currTime ||
+			uData.fugindo > currTime ||
+			userD.classe == undefined ||
+			uData.username == undefined ||
+			userD.emRoubo.tempo > currTime ||
+			userD.emEspancamento.tempo > currTime ||
+			uData.emRoubo.tempo > currTime ||
+			uData.emEspancamento.tempo > currTime ||
+			userD.gangID != null && userD.gangID === uData.gangID ||
+			alvo === uData.conjuge ||
+			bot.isGaloEmRinha(message.author.id) ||
+			bot.isGaloEmRinha(alvo) ||
+			bot.isPlayerViajando(uData) ||
+			!bot.isComandoUsavelViagem(message, 'espancar')
+		)
+		.setCustomId(message.id + message.author.id + 'espancar')
+
+	const buttonEsmola = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		.setLabel('Dar esmola')
+		.setEmoji(bot.config.coin)
+		.setDisabled(
+			userD.emRoubo.tempo > currTime ||
+			userD.emEspancamento.tempo > currTime ||
+			uData.emRoubo.tempo > currTime ||
+			uData.emEspancamento.tempo > currTime ||
+			bot.isGaloEmRinha(message.author.id) ||
+			bot.isGaloEmRinha(alvo) ||
+			userD.esmolaEntregueHoje > currTime ||
+			uData.esmolaRecebidaHoje > currTime ||
+			!bot.isComandoUsavelViagem(message, 'esmola')
+		)
+		.setCustomId(message.id + message.author.id + 'esmola')
+
 	if (alvo === message.author.id) {
 		if (uData.invest != null) {
-			const buttonInvest = new Discord.MessageButton()
-				.setStyle('SECONDARY')
-				// .setLabel(bot.investimentos[uData.invest].desc)
-				.setLabel('Investimento')
-				.setEmoji(bot.config.propertyG)
-				.setDisabled(!bot.isComandoUsavelViagem(message, 'investir'))
-				.setCustomId(message.id + message.author.id + 'invest')
-
 			rowAbrir.addComponents(buttonInvest)
 			rowFechar.addComponents(buttonInvest)
 		}
-		
+
 		if (bot.getRandom(0, 100) < 20) {
 			rowAbrir.addComponents(buttonAnuncio)
 			rowFechar.addComponents(buttonAnuncio)
@@ -297,28 +371,9 @@ exports.run = async (bot, message, args) => {
 
 	}
 	else {
-		const buttonRoubar = new Discord.MessageButton()
-			.setStyle('SECONDARY')
-			.setLabel('Roubar')
-			.setEmoji(bot.config.roubar)
-			.setDisabled(!bot.isComandoUsavelViagem(message, 'roubar'))
-			.setCustomId(message.id + message.author.id + 'roubar')
-
-		const buttonEspancar = new Discord.MessageButton()
-			.setStyle('SECONDARY')
-			.setLabel('Espancar')
-			.setEmoji(bot.config.espancar)
-			.setDisabled(!bot.isComandoUsavelViagem(message, 'espancar'))
-			.setCustomId(message.id + message.author.id + 'espancar')
-
-		const buttonEsmola = new Discord.MessageButton()
-			.setStyle('SECONDARY')
-			.setLabel('Dar esmola')
-			.setEmoji(bot.config.coin)
-			.setDisabled(!bot.isComandoUsavelViagem(message, 'esmola'))
-			.setCustomId(message.id + message.author.id + 'esmola')
-
-		rowActions.addComponents(buttonRoubar).addComponents(buttonEspancar).addComponents(buttonEsmola)
+		rowActions.addComponents(buttonRoubar)
+			.addComponents(buttonEspancar)
+			.addComponents(buttonEsmola)
 	}
 
 	let msg = await message.channel.send({
@@ -347,33 +402,36 @@ exports.run = async (bot, message, args) => {
 	collector.on('collect', async b => {
 		await b.deferUpdate()
 		if (b.customId === message.id + message.author.id + 'abrir') {
-			msg.edit({
-				embeds: [invOpen],
-				components: rowActions.components.length === 0 ? [rowFechar] : [rowFechar, rowActions]
-			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
-
+			isAberto = true
 		}
 		else if (b.customId === message.id + message.author.id + 'fechar') {
-			msg.edit({
-				embeds: [invClosed],
-				components: rowActions.components.length === 0 ? [rowAbrir] : [rowAbrir, rowActions]
-			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
-
+			isAberto = false
 		}
-		else if (b.customId === message.id + message.author.id + 'invest')
+		else if (b.customId === message.id + message.author.id + 'invest') {
+			buttonInvest.setDisabled(true)
 			bot.commands.get('investir').run(bot, message, args)
-		else if (b.customId === message.id + message.author.id + 'userinfo')
+		}
+		else if (b.customId === message.id + message.author.id + 'userinfo') {
+			buttonUI.setDisabled(true)
 			bot.commands.get('userinfo').run(bot, message, [alvo])
-		else if (b.customId === message.id + message.author.id + 'roubar')
+		}
+		else if (b.customId === message.id + message.author.id + 'roubar') {
+			buttonRoubar.setDisabled(true)
 			bot.commands.get('roubar').run(bot, message, [alvo])
-		else if (b.customId === message.id + message.author.id + 'espancar')
+		}
+		else if (b.customId === message.id + message.author.id + 'espancar') {
+			buttonEspancar.setDisabled(true)
 			bot.commands.get('espancar').run(bot, message, [alvo])
-		else if (b.customId === message.id + message.author.id + 'esmola')
+		}
+		else if (b.customId === message.id + message.author.id + 'esmola') {
+			buttonEsmola.setDisabled(true)
 			bot.commands.get('esmola').run(bot, message, [alvo])
-		else if (b.customId === message.id + message.author.id + 'gang')
+		}
+		else if (b.customId === message.id + message.author.id + 'gang') {
+			buttonGang.setDisabled(true)
 			bot.commands.get('gang').run(bot, message, [uGang?.nome])
+		}
 		else if (b.customId === message.id + message.author.id + 'anuncio') {
-			
 			buttonAnuncio.setDisabled(true)
 
 			let avatar
@@ -384,7 +442,7 @@ exports.run = async (bot, message, args) => {
 					size: 128
 				})
 			})
-						
+
 			const embedAnuncio = new Discord.MessageEmbed()
 				.setTitle(`<:CrossRoadsLogo:757021182020157571> Entre no servidor oficial!`)
 				.setDescription("Quer acompanhar novos updates? Saber quando e como serão os próximos eventos?\nReceba benefícios por dar boost!\n\n[Entre no servidor oficial do Cross Roads clicando aqui!](https://discord.gg/sNf8avn)")
@@ -395,6 +453,13 @@ exports.run = async (bot, message, args) => {
 			message.channel.send({embeds: [embedAnuncio]})
 				.catch(() => console.log("Não consegui enviar mensagem `comunicado`"))
 		}
+
+		msg.edit({
+			embeds: isAberto ? [invOpen] : [invClosed],
+			components: rowActions.components.length === 0 ?
+				(isAberto ? [rowFechar] : [rowAbrir]) :
+				(isAberto ? [rowFechar, rowActions] : [rowAbrir, rowActions])
+		}).catch(() => console.log("Não consegui editar mensagem `inv`"))
 
 		// else if (reaction.emoji.name === '📢') {
 		// 	const embed = new Discord.MessageEmbed()
