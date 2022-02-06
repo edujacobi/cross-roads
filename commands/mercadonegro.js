@@ -92,8 +92,8 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 		return bot.createEmbed(message, `O multiplicador informado é inválido ${bot.config.mercadonegro}`, null, 0)
 
 	let preço = uData.classe === 'mafioso' ? prices[option - 1] * multiplicador : prices[option - 1] * multiplicador * (1 + bot.imposto)
-	if (option === 3)
-		preço = prices[option - 1] * multiplicador // ignora imposto para todos na compra de fichas
+	if (option === 4)
+		preço = prices[3] * multiplicador // ignora imposto para todos na compra de fichas
 
 	if (uData.moni < preço)
 		return bot.msgSemDinheiro(message)
