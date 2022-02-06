@@ -71,6 +71,9 @@ exports.run = async (bot, message, args) => {
 	if (bot.isAlvoEmRouboOuEspancamento(message, tData))
 		return
 
+	if (tData.classe == undefined)
+		return bot.createEmbed(message, `**${tData.username}** não está ativo na temporada e não receber esmola ${bot.config.coin}`, null, 'GREEN')
+
 	if (uData.esmolaEntregueHoje > currTime)
 		return bot.createEmbed(message, `Você deve esperar ${bot.segToHour((uData.esmolaEntregueHoje - currTime) / 1000)} para entregar uma esmola novamente ${bot.config.coin}`, null, 'GREEN')
 	
