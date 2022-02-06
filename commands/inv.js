@@ -85,7 +85,7 @@ exports.run = async (bot, message, args) => {
 	})
 	Object.entries(uData.arma).forEach(([key, value]) => {
 		Object.values(bot.guns).forEach(arma => {
-			if ( typeof (arma.def) == "number" && value.tempo > currTime && arma.def > defPower && key == arma.data)
+			if (typeof (arma.def) == "number" && value.tempo > currTime && arma.def > defPower && key == arma.data)
 				defPower = arma.def
 		})
 	})
@@ -114,7 +114,7 @@ exports.run = async (bot, message, args) => {
 		else
 			atkPower = (atkPower * 0.9).toFixed(1)
 	}
-	
+
 	else if (uData.classe === 'assassino') {
 		if (atkPower * 1.1 === Math.floor(atkPower * 1.1))
 			atkPower = (atkPower * 1.1)
@@ -165,7 +165,7 @@ exports.run = async (bot, message, args) => {
 
 					invOpen.addField(`${emoji} ${arma.desc}`, value.quant.toString(), true)
 					// total += 1
-					
+
 				}
 
 			}
@@ -254,10 +254,10 @@ exports.run = async (bot, message, args) => {
 		.setEmoji(uData.classe != null ? bot.classes[uData.classe].emote : '<:CrossRoadsLogo:757021182020157571>')
 		.setCustomId(message.id + message.author.id + 'userinfo')
 
-	const buttonTemp = new Discord.MessageButton()
+	const buttonAnuncio = new Discord.MessageButton()
 		.setStyle('SUCCESS')
-		.setLabel('Temporada 7')
-		.setCustomId(message.id + message.author.id + 'temp')
+		.setLabel('Anúncio')
+		.setCustomId(message.id + message.author.id + 'anuncio')
 
 	rowAbrir.addComponents(buttonUI)
 	rowFechar.addComponents(buttonUI)
@@ -289,8 +289,11 @@ exports.run = async (bot, message, args) => {
 			rowAbrir.addComponents(buttonInvest)
 			rowFechar.addComponents(buttonInvest)
 		}
-		rowAbrir.addComponents(buttonTemp)
-		rowFechar.addComponents(buttonTemp)
+		
+		if (bot.getRandom(0, 100) < 20) {
+			rowAbrir.addComponents(buttonAnuncio)
+			rowFechar.addComponents(buttonAnuncio)
+		}
 
 	}
 	else {
@@ -333,7 +336,7 @@ exports.run = async (bot, message, args) => {
 		message.id + message.author.id + 'espancar',
 		message.id + message.author.id + 'esmola',
 		message.id + message.author.id + 'gang',
-		message.id + message.author.id + 'temp',
+		message.id + message.author.id + 'anuncio',
 	].includes(button.customId) && button.user.id === message.author.id
 
 	const collector = message.channel.createMessageComponentCollector({
@@ -369,15 +372,27 @@ exports.run = async (bot, message, args) => {
 			bot.commands.get('esmola').run(bot, message, [alvo])
 		else if (b.customId === message.id + message.author.id + 'gang')
 			bot.commands.get('gang').run(bot, message, [uGang?.nome])
-		else if (b.customId === message.id + message.author.id + 'temp') {
-			const embedTemp = new Discord.MessageEmbed()
-				.setTitle(`<:CrossRoadsLogo:757021182020157571>	Comunicado`)
-				.setDescription("Início da Temporada 7")
+		else if (b.customId === message.id + message.author.id + 'anuncio') {
+			
+			buttonAnuncio.setDisabled(true)
+
+			let avatar
+
+			await bot.users.fetch('332228051871989761').then(user => {
+				avatar = user.avatarURL({
+					dynamic: true,
+					size: 128
+				})
+			})
+						
+			const embedAnuncio = new Discord.MessageEmbed()
+				.setTitle(`<:CrossRoadsLogo:757021182020157571> Entre no servidor oficial!`)
+				.setDescription("Quer acompanhar novos updates? Saber quando e como serão os próximos eventos?\nReceba benefícios por dar boost!\n\n[Entre no servidor oficial do Cross Roads clicando aqui!](https://discord.gg/sNf8avn)")
 				// .addField("A Temporada 6 encerrou dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
-				.addField("A Temporada 7 iniciou dia 31/01!", `Um reset total aconteceu!`)
+				// .addField("A Temporada 7 iniciou dia 31/01!", `Um reset total aconteceu!`)
 				.setColor(bot.colors.admin)
-				.setFooter(`Atenciosamente, Jacobi`)
-			message.channel.send({embeds: [embedTemp]})
+				.setFooter(`Atenciosamente, Jacobi`, avatar)
+			message.channel.send({embeds: [embedAnuncio]})
 				.catch(() => console.log("Não consegui enviar mensagem `comunicado`"))
 		}
 

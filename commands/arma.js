@@ -12,12 +12,12 @@ exports.run = async (bot, message, args) => {
 		Object.values(bot.guns).forEach(arma => {
 			// let emote = bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name == value.emote)
 			if (arma.atk || arma.def)
-				embed.addField(`${arma.skins.default.emote} ${arma.desc}`, `${arma.atk ? arma.atk : '0'} / ${arma.def ? arma.def : '0'}`, true)
+				embed.addField(`${arma.skins[uData.arma[achou].skinAtual].emote} ${arma.desc}`, `${arma.atk ? arma.atk : '0'} / ${arma.def ? arma.def : '0'}`, true)
 			else {
 				// if (arma.desc == 'Celular')
 				// 	embed.addField(`${bot.config[arma.emote]} ${arma.desc}`, `\`;celular\``, true)
 				if (arma.desc === 'Jetpack')
-					embed.addField(`${arma.skins.default.emote} ${arma.desc}`, `Para fugir`, true)
+					embed.addField(`${arma.skins[uData.arma[achou].skinAtual].emote} ${arma.desc}`, `Para fugir`, true)
 			}
 		})
 

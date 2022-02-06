@@ -31,7 +31,7 @@ exports.run = async (bot, interaction) => {
         .setThumbnail(bot.user.avatarURL())
         .setColor('GREEN')
         .addField("Tempo online", bot.segToHour(Math.floor(bot.uptime / 1000)), true)
-        .addField("Temporada 6", minToMonths((new Date() - new Date(2022, 0, 30)) / 1000 / 60), true)
+        .addField("Temporada 7", minToMonths((new Date() - new Date(2022, 0, 31)) / 1000 / 60), true)
         //.addField("Usuários", bot.users.cache.size, true)
         .addField("Jogadores", bot.data.indexes.length.toString(), true)
         //.addField("Servidores", bot.guilds.cache.size, true)
