@@ -1559,7 +1559,7 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				return bot.createEmbed(message, `**Caramuru** só pode ser desafiado aos finais de semana ${bot.config.caramuru}`, null, bot.colors.white)
 			}
 
-			return bot.createEmbed(message, `**Caramuru** está de folga durante a primeira semana da temporada ${bot.config.caramuru}`, null, bot.colors.white)
+			//return bot.createEmbed(message, `**Caramuru** está de folga durante a primeira semana da temporada ${bot.config.caramuru}`, null, bot.colors.white)
 			if (bot.isUserEmRouboOuEspancamento(message, uData)) {
 				return
 			}

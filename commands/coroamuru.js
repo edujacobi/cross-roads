@@ -101,7 +101,7 @@ exports.run = async (bot, message, args) => {
 				.setCustomId(message.id + message.author.id + 'top'))
 	}
 
-	return bot.createEmbed(message, `${coroamuru} Coroamuru está viajando de férias durante a primeira semana de temporada`)
+	//return bot.createEmbed(message, `${coroamuru} Coroamuru está viajando de férias durante a primeira semana de temporada`)
 
 	if (args[0] === 'reset' && message.author.id === bot.config.adminID) {
 		bot.coroamuru.clear()
