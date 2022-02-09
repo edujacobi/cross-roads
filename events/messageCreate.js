@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 const Piii = require('piii')
 const piiiFilters = require('piii-filters')
 
-module.exports = (bot, message) => {
+module.exports = async (bot, message) => {
 	if ((!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id) || bot.isAjudante(message.author.id))) && process.env.NODE_ENV === "test")
 		return
 
@@ -37,7 +37,7 @@ module.exports = (bot, message) => {
 
 	if (!message.guild.me.permissions.has([Permissions.FLAGS.MANAGE_MESSAGES, Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.USE_EXTERNAL_EMOJIS, Permissions.FLAGS.ADD_REACTIONS]))
 		return bot.createEmbed(message, '<:badge_cata_bug:799043225557008474> **PERA!** Eu não possuo as permissões necessárias para o jogo rolar belezinha. Contate o Administrador deste Servidor.\n\nAs seguintes permissões são necessárias:\n`Gerenciar mensagens`, `Enviar mensagens`, `Inserir links`, `Usar emojis externos` e `Adicionar reações`')
-	
+
 	let uData = bot.data.get(message.author.id)
 
 	// Se tá no cooldown
@@ -153,7 +153,8 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 							.setColor(bot.colors.admin)
 						)
 
-					} else if (b.customId === message.id + message.author.id + 'confirmar') {
+					}
+					else if (b.customId === message.id + message.author.id + 'confirmar') {
 						return msg.edit({
 							embeds: [embed.setDescription(`Cadastro cancelado. Para começar novamente, use qualquer comando (como \`;ajuda\`, por exemplo)!`).setColor('RED')],
 							components: []
@@ -282,6 +283,106 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 
 	let isServerCrossRoads = message.member?.guild?.id === '529674666692837378'
 
+	if (!uData.registrado && uData.arma.rpg.tempo > Date.now()) {
+		if (!isServerCrossRoads) {
+			const embed = new Discord.MessageEmbed()
+				.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)
+				.setDescription(`${uData.username}, parabéns por conseguir sua ${bot.guns.rpg.skins.default.emote} RPG! Prossiga para o servidor oficial para completar seu cadastro anti-fake.`)
+				.setColor(bot.colors.admin)
+				.setTimestamp()
+				.setFooter(bot.user.username, bot.user.avatarURL())
+
+			const row = new Discord.MessageActionRow()
+				.addComponents(new Discord.MessageButton()
+					.setStyle('LINK')
+					.setLabel('Entrar no servidor oficial')
+					.setURL('https://discord.gg/sNf8avn'))
+
+			return message.reply({embeds: [embed], components: [row]})
+				.catch(() => console.log("Não consegui enviar mensagem `cadastrar no servidor`"))
+		}
+
+		const embed = new Discord.MessageEmbed()
+			.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)
+			.setDescription(`${uData.username}, você batalhou bastante e finalmente pôde comprar sua primeira ${bot.guns.rpg.skins.default.emote} RPG.
+Você bateu em muitas velhinhas para chegar até aqui, mas ainda preciso que você me prove que você não é simplesmente um clone de algum experimento alienígena, entende?
+
+Confirmando, você concorda com todas as regras da <#529676890454360074> e que esta é sua única conta.`)
+			.setColor(bot.colors.admin)
+			.setTimestamp()
+			.setFooter(`${bot.user.username} • KKK eae fake!`, bot.user.avatarURL())
+		
+		let msg = await message.reply({embeds: [embed], ephemeral: true})
+			.catch(() => console.log("Não consegui enviar mensagem `cadastro`"))
+
+		const row = new Discord.MessageActionRow()
+			.addComponents(new Discord.MessageButton()
+				.setStyle('SUCCESS')
+				.setLabel('Confirmar, não sou um clone')
+				.setCustomId(message.id + message.author.id + 'confirm'))
+			.addComponents(new Discord.MessageButton()
+				.setStyle('DANGER')
+				.setLabel('Cancelar')
+				.setCustomId(message.id + message.author.id + 'cancel'))
+
+		await msg.edit({components: [row]})
+			.catch(() => console.log("Não consegui editar mensagem `cadastro`"))
+
+		const filter = (button) => button.customId.includes(message.id + message.author.id) && button.user.id === message.author.id
+
+		const collector = message.channel.createMessageComponentCollector({
+			filter: filter,
+			idle: 60000,
+		})
+
+		collector.on('collect', async c => {
+			await c.deferUpdate()
+			let uData = bot.data.get(message.author.id)
+			if (c.user.id !== message.author.id) return
+
+			if (c.customId.includes('confirm')) {
+				const embed = new Discord.MessageEmbed()
+					.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)
+					.setDescription(`${uData.username}, obrigado pela confirmação!`)
+					.setColor(bot.colors.admin)
+					.setTimestamp()
+					.setFooter(`${bot.user.username} • Circulando, circulando!`, bot.user.avatarURL())
+				
+				uData.registrado = true
+				
+				bot.data.set(message.author.id, uData)
+
+				return await msg.edit({embeds: [embed], components: []})
+					.catch(() => console.log("Não consegui editar mensagem `cadastro`"))
+			}
+
+			else if (c.customId.includes('cancel')) {
+				collector.stop()
+				const embed = new Discord.MessageEmbed()
+					.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)
+					.setDescription(`${uData.username}, não posso deixar você continuar se você é um clone!`)
+					.setColor('RED')
+					.setTimestamp()
+					.setFooter(`${bot.user.username} • Xispa!`, bot.user.avatarURL())
+
+				bot.users.fetch(bot.config.adminID).then(user => {
+					user.send(`Cancelou cadastro anti-fake: ${uData.username} (${c.user.id})`)
+				})
+				
+				return await msg.edit({embeds: [embed], components: []})
+					.catch(() => console.log("Não consegui editar mensagem `cadastro`"))				
+			}
+
+		})
+		collector.on('end', () => {
+			if (msg)
+				msg.edit({
+					components: []
+				}).catch(() => console.log("Não consegui editar mensagem `cadastro`"))
+		})
+		return
+	}
+
 	let jogador = message.member?.guild?.roles?.cache?.find(role => role.id === '824341916929622017')
 	if (isServerCrossRoads && jogador) {
 		message.guild?.members?.cache?.get(message.author.id).roles.add(jogador)
@@ -325,13 +426,13 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 
 	cmd.run(bot, message, args)
 
-	// const embed = new Discord.MessageEmbed()
-	// 	.setAuthor(bot.data.has(message.author.id, 'username') ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())
-	// 	.setDescription(`${bot.data.has(message.author.id, 'username') ? uData.username : message.author.username} **${message.content}**`)
-	// 	.setColor(bot.colors.background)
-	// 	.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
-	// 	.setTimestamp()
+	const embed = new Discord.MessageEmbed()
+		.setAuthor(bot.data.has(message.author.id, 'username') ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())
+		.setDescription(`${bot.data.has(message.author.id, 'username') ? uData.username : message.author.username} **${message.content}**`)
+		.setColor(bot.colors.background)
+		.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
+		.setTimestamp()
 
-	// bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
-	// 	.catch(() => console.log('Não consegui fazer log de ', command, args))
+	bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
+		.catch(() => console.log('Não consegui fazer log de ', command, args))
 }
