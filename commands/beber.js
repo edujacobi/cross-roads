@@ -195,6 +195,7 @@ exports.run = async (bot, message, args) => {
 			if (count > 60) textoCount += "\"Minha mulher falou que vai me abandonar...\"\n"
 			if (count > 70) textoCount += "\"Por favor, pare.\"\n"
 			if (count > 80) textoCount += "\"Meu estoque acabou, eu nem sei mais o que você está bebendo.\"\n"
+			if (count > 100) textoCount += "\"POR ACASO VOCÊ É O JACOBI???!.\"\n"
 
 			const embed = new Discord.MessageEmbed()
 				.setDescription(`${bot.config.dateDrink} Você bebeu **${bebida}** e se sente **${sensacao}**!${textoCount}${textoComa}`)
