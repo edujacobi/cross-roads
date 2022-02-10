@@ -165,14 +165,14 @@ exports.run = async (bot, message, args) => {
 			let bebida = bot.shuffle(bebidas)[0]
 			let sensacao = bot.shuffle(sensacoes)[0]
 
-			count++
-
 			bot.beberroes.set(message.author.id, Date.now(), 'ultimaBebida')
 
 			if (!fds && count > bot.beberroes.get(message.author.id, 'maximo.normal')) bot.beberroes.set(message.author.id, count, 'maximo.normal')
 
 			if (fds && count > bot.beberroes.get(message.author.id, 'maximo.happyHour')) bot.beberroes.set(message.author.id, count, 'maximo.happyHour')
-
+			
+			count++
+			
 			let chanceComa = fds ? 15 : 5
 
 			if (bot.getRandom(0, 100) < chanceComa) {
