@@ -283,7 +283,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 
 	let isServerCrossRoads = message.member?.guild?.id === '529674666692837378'
 
-	if (!uData.registrado && uData.arma.rpg.tempo > Date.now()) {
+	if (!uData.registrado && uData.arma.rpg.tempo > 0) {
 		if (!isServerCrossRoads) {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)

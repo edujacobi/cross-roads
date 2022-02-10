@@ -1,6 +1,6 @@
 const config = {
 	
-	"prefix": process.env.NODE_ENV === "test" ? ":" : ";",
+	"prefix": process.env.NODE_ENV === "test" ? "," : ";",
 	"adminID": "332228051871989761",
 
 	"ficha": "<:ficha:757021259451203665>",

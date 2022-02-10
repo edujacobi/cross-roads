@@ -3,7 +3,7 @@ exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let uData = bot.data.get(message.author.id)
 	let multiplicador_evento = 1
-	let preço = 5000 * ((bot.bilhete.get('diaUltimoSorteio') + 1) * 10 ) * multiplicador_evento
+	let preço = 500 * ((bot.bilhete.get('diaUltimoSorteio') + 1) * 10 ) * multiplicador_evento
 	let total = bot.bilhete.get('acumulado')
 	let lastWinner = bot.bilhete.get('lastWinner')
 	let userBilhete = bot.bilhete.get(message.author.id)

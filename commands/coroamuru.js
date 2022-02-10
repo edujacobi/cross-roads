@@ -36,7 +36,7 @@ exports.run = async (bot, message, args) => {
 		rigFull: '<:HP_R:852210883252977695>',
 		rigEmpty: '<:noHP_R:852210883429007370>',
 	}
-	
+
 	function getTop(bot, max) {
 		let top = []
 
@@ -84,10 +84,10 @@ exports.run = async (bot, message, args) => {
 			.setFooter(bot.user.username, bot.user.avatarURL())
 			.setTimestamp()
 	}
-	
+
 	function getRow() {
 		let vidaAtual = bot.coroamuru.get('vidaATUAL')
-		
+
 		return new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageButton()
 				.setStyle('DANGER')
@@ -110,7 +110,7 @@ exports.run = async (bot, message, args) => {
 
 		return bot.createEmbed(message, `${coroamuru} Coroamuru descansou e está curado!`, `Quem vai encarar?`, 0x0e64d1)
 	}
-		
+
 	let msg = await message.channel.send({
 		components: [getRow()],
 		embeds: [getEmbed()]
@@ -128,7 +128,7 @@ exports.run = async (bot, message, args) => {
 
 	collector.on('collect', async btn => {
 		await btn.deferUpdate()
-		
+
 		if (btn.customId === message.id + message.author.id + 'attack') {
 			let vidaAtual = bot.coroamuru.get('vidaATUAL')
 			if (vidaAtual <= 0)
@@ -255,8 +255,8 @@ exports.run = async (bot, message, args) => {
 					user.send(`Derrotou o Coroamuru: ${uData.username} (${btn.user.id})`)
 				})
 
-				let topDano = getTop(bot,1)
-				
+				let topDano = getTop(bot, 1)
+
 				const embedWin = new Discord.MessageEmbed()
 					.setTitle(`${coroamuru} Coroamuru`)
 					.setColor(0x0e64d1)
@@ -284,7 +284,8 @@ exports.run = async (bot, message, args) => {
 			message.channel.send({embeds: [embedATK]})
 				.catch(() => console.log("Não consegui enviar mensagem `coroamuru`"))
 
-		} else if (btn.customId === message.id + message.author.id + 'top') {
+		}
+		else if (btn.customId === message.id + message.author.id + 'top') {
 			let topGlobal = getTop(bot, 15)
 
 			const embed = new Discord.MessageEmbed()

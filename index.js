@@ -62,6 +62,7 @@ bot.banco = new Enmap({name: "banco"})
 bot.coroamuru = new Enmap({name: "coroamuru"})
 bot.bilhete = new Enmap({name: "bilhete"})
 bot.casais = new Enmap({name: "casais"})
+bot.beberroes = new Enmap({name: "beberroes"})
 
 const init = async () => {
     const commandFiles = await readdir("./commands/")

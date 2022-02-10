@@ -16,7 +16,7 @@ const beneficios = () => {
 		"Dobro de limite de caracteres no título do galo",
 		"Imune ao cooldown entre comandos",
 		"Entrega esmolas 50% maiores",
-		"Envio de SMS mais rápido",
+		// "Envio de SMS mais rápido",
 		"Acesso ao canal de desenvolvimento",
 		"Acesso à categoria VIP do servidor Cross Roads",
 		"Cargo VIP no servidor do Cross Roads",
