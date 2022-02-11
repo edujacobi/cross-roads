@@ -221,7 +221,7 @@ exports.run = async (bot, message, args) => {
 		textSituation = `${bot.config.hospital} Hospitalizado por mais ${bot.segToHour((uData.hospitalizado - currTime) / 1000)}`
 
 	if (uData.roubo > currTime && uData.preso < currTime)
-		textSituation += ` e ${bot.config.police} Procurado`
+		textSituation += ` e ${bot.config.police} Procurado por mais ${bot.segToHour((uData.roubo - currTime) / 1000)}`
 	if (uData.jobTime < currTime && uData.job)
 		textSituation += ` e ${bot.config.bulldozer} pode receber salário`
 	if (bot.isPlayerViajando(uData))

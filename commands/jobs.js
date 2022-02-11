@@ -19,7 +19,7 @@ exports.run = async (bot, message, args) => {
 		.setTitle(`${bot.config.bulldozer} Trabalhos`)
 		.setDescription(`Você não pode apostar, roubar nem vasculhar enquanto trabalha!`)
 		.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/738106899844562984/radar_bulldozer.png")
-		.setColor('GREEN')
+		.setColor('YELLOW')
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 
@@ -57,7 +57,7 @@ exports.run = async (bot, message, args) => {
 	})
 
 	return message.channel.send({embeds: [embed]})
-		.catch(err => console.log("Não consegui enviar mensagem `jobs`"))
+		.catch(() => console.log("Não consegui enviar mensagem `jobs`"))
 }
 exports.config = {
 	alias: ['trabalhos', 'trabs', 'ts', 'js']

@@ -17,7 +17,7 @@ exports.run = async (bot, message, args) => {
 		return
 
 	if (bot.isGaloEmRinha(message.author.id))
-		return bot.createEmbed(message, `Você não pode receber enquanto seu galo está em uma rinha ${bot.config.galo}`)
+		return bot.createEmbed(message, `Você não pode receber enquanto seu galo está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
 
 	let linhaTrabalho = ''
 	// let linhaInvest = ''
@@ -29,10 +29,10 @@ exports.run = async (bot, message, args) => {
 		let job = bot.jobs[uData.job]
 		let pagamento = job.pagamento
 
-		if (uData.classe == 'mafioso')
+		if (uData.classe === 'mafioso')
 			pagamento *= 0.9
 
-		if (uData.classe == 'empresario')
+		if (uData.classe === 'empresario')
 			pagamento *= 1.05
 
 		if (currTime > uData.jobTime) {
@@ -54,28 +54,9 @@ exports.run = async (bot, message, args) => {
 
 	}
 
-	// let horas = (uData.investTime + semana) > currTime ? currTime - uData.investLast : uData.investTime + semana - uData.investLast
-	// // se investimento ainda não passou de uma semana, então horas = tempo atual - ultimo saque, senão horas = investTime + semana - investLast
-
-	// let praSacar = uData.invest != null ? Math.floor(((horas / hora) * bot.investimentos[uData.invest].lucro)) : 0
-
-	// if (currTime < (uData.investTime + semana)) { //se o investimento ainda não completou uma semana
-	// 	linhaInvest = `Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} de seu investimento **${bot.investimentos[uData.invest].desc}** ${bot.config.propertyG}`
-	// 	uData.moni += parseInt(praSacar)
-	// 	uData.investGanhos += parseInt(praSacar)
-	// 	uData.investLast = currTime
-
-	// } else if (uData.invest != null) { // se já passou uma semana
-	// 	linhaInvest = `Seu investimento **${bot.investimentos[uData.invest].desc}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} dele ${bot.config.propertyR}`
-	// 	uData.moni += parseInt(praSacar)
-	// 	uData.investGanhos += parseInt(praSacar)
-	// 	uData.investLast = 0
-	// 	uData.invest = null
-	// 	uData.investTime = 0
-	// }
-
 	bot.data.set(message.author.id, uData)
-	return bot.createEmbed(message, `${linhaTrabalho}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`)
+	
+	return bot.createEmbed(message, `${linhaTrabalho}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'YELLOW')
 }
 exports.config = {
 	alias: ['receive', 'rcb']

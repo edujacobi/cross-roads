@@ -7,11 +7,11 @@ exports.run = async (bot, message, args) => {
 			return
 
 		if (uData.job != null)
-			return bot.createEmbed(message, `Você precisa receber seu pagamento antes de começar outro trabalho! ${bot.config.bulldozer}`, ";receber", 'GREEN')
+			return bot.createEmbed(message, `Você precisa receber seu pagamento antes de começar outro trabalho! ${bot.config.bulldozer}`, ";receber", 'YELLOW')
 
 		uData.job = key
 		uData.jobTime = currTime + (job.time * 1000 * 60)
-		bot.createEmbed(message, `Você começou a trabalhar de **${job.desc}** ${bot.config.bulldozer}`, null, 'GREEN')
+		bot.createEmbed(message, `Você começou a trabalhar de **${job.desc}** ${bot.config.bulldozer}`, null, 'YELLOW')
 
 		let aviso = (Math.random() < 0.50 ? "" : "\nHabilite mensagens privadas com o Cross Roads e seja avisado sobre notificações importantes!")
 
@@ -26,6 +26,7 @@ exports.run = async (bot, message, args) => {
 		}, uData.jobTime - currTime)
 
 		bot.data.set(message.author.id, uData)
+		
 		return bot.log(message, new Discord.MessageEmbed()
 			.setDescription(`**${uData.username} começou a trabalhar de ${job.desc}**`)
 			.setColor('YELLOW'))
@@ -46,124 +47,117 @@ exports.run = async (bot, message, args) => {
 
 	if (!option) {
 		if (uData.job == null)
-			return bot.createEmbed(message, `Você não está trabalhando ${bot.config.bulldozer}`, null, 'GREEN')
-
+			return bot.createEmbed(message, `Você não está trabalhando ${bot.config.bulldozer}`, null, 'YELLOW')
 		if (bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-
 		if (bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		let minutes = Math.floor((uData.jobTime - currTime) / 1000)
 
-		if (minutes < 0)
-			return bot.createEmbed(message, `Você encerrou seu trabalho e pode receber seu pagamento ${bot.config.bulldozer}`, ";receber", 'GREEN')
-
-		else
-			return bot.createEmbed(message, `${bot.segToHour(minutes)} restantes para encerrar seu trabalho de **${bot.jobs[uData.job].desc}** ${bot.config.bulldozer}`, null, 'GREEN')
+		return minutes < 0 ?
+			bot.createEmbed(message, `Você encerrou seu trabalho e pode receber seu pagamento ${bot.config.bulldozer}`, ";receber", 'YELLOW')
+			: bot.createEmbed(message, `${bot.segToHour(minutes)} restantes para encerrar seu trabalho de **${bot.jobs[uData.job].desc}** ${bot.config.bulldozer}`, null, 'YELLOW')
 
 	}
-	else {
-		if (option === 'parar' || option === 'p' || option === 'stop') {
-			if (uData.job != null) {
-				let minutes = Math.floor((uData.jobTime - currTime) / 1000)
 
-				if (minutes < 0)
-					return bot.createEmbed(message, `Você encerrou seu trabalho e pode receber seu pagamento ${bot.config.bulldozer}`, ";receber", 'GREEN')
+	if (option === 'parar' || option === 'p' || option === 'stop') {
+		if (uData.job != null) {
+			let minutes = Math.floor((uData.jobTime - currTime) / 1000)
 
-				let job = bot.jobs[uData.job]
-				bot.createEmbed(message, `Você desistiu do trabalho de **${job.desc}** ${bot.config.bulldozer}`, null, 'GREEN')
-				uData.jobTime = 0
-				uData.job = null
+			if (minutes < 0)
+				return bot.createEmbed(message, `Você encerrou seu trabalho e pode receber seu pagamento ${bot.config.bulldozer}`, ";receber", 'YELLOW')
 
-				bot.log(message, new Discord.MessageEmbed()
-					.setDescription(`**${uData.username} parou o trabalho ${job.desc}**`)
-					.setColor('YELLOW'))
+			let job = bot.jobs[uData.job]
+			bot.createEmbed(message, `Você desistiu do trabalho de **${job.desc}** ${bot.config.bulldozer}`, null, 'YELLOW')
+			uData.jobTime = 0
+			uData.job = null
 
-			}
-			else
-				bot.createEmbed(message, `Você não pode parar o que nem começou ${bot.config.bulldozer}`, null, 'GREEN')
+			bot.log(message, new Discord.MessageEmbed()
+				.setDescription(`**${uData.username} parou o trabalho ${job.desc}**`)
+				.setColor('YELLOW'))
 
-			return bot.data.set(message.author.id, uData)
 		}
+		else
+			bot.createEmbed(message, `Você não pode parar o que nem começou ${bot.config.bulldozer}`, null, 'YELLOW')
+
+		return bot.data.set(message.author.id, uData)
 	}
+
 
 	if (option < 1 || (option % 1 != 0) || option > Object.keys(bot.jobs).length)
-		return bot.createEmbed(message, `O ID deve ser entre 1 e ${Object.keys(bot.jobs).length} ${bot.config.bulldozer}`, null, 'GREEN')
-
+		return bot.createEmbed(message, `O ID deve ser entre 1 e ${Object.keys(bot.jobs).length} ${bot.config.bulldozer}`, null, 'YELLOW')
+	
 	if (option >= 16 && day !== 0 && day !== 6 && !(day === 5 && hora >= 20) && message.author.id !== bot.config.adminID)
 		return bot.createEmbed(message, `"Parça, este trabalho só fica disponível no final de semana" ${bot.config.thetruth}`, null, 0)
 
-		// if (option == 13)
+	// if (option == 13)
 	// 	return bot.createEmbed(message, `Trabalho em manutenção ${bot.config.bulldozer}`)
+	
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
+	
+	if (bot.isGaloEmRinha(message.author.id))
+		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
-	else {
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
-			return
-		if (bot.isGaloEmRinha(message.author.id))
-			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
+	if (uData.job != null)
+		return bot.msgTrabalhando(message, uData)
 
-		if (uData.job != null)
-			return bot.msgTrabalhando(message, uData)
+	let emotes = ""
+	let jobLugar = null
+	let jobKey = null
 
-		let emotes = ""
-		let jobLugar = null
-		let jobKey = null
-
-		Object.entries(bot.jobs).forEach(([key, job]) => {
-			if (option == job.id) {
-				Object.entries(uData.arma).forEach(([keyArma, arma]) => {
-					if (!Array.isArray(job.arma)) {
-						if (keyArma == job.arma || job.arma == null) {
+	Object.entries(bot.jobs).forEach(([key, job]) => {
+		if (option == job.id) {
+			Object.entries(uData.arma).forEach(([keyArma, arma]) => {
+				if (!Array.isArray(job.arma)) {
+					if (keyArma == job.arma || job.arma == null) {
+						if (arma.tempo < currTime) {
+							Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
+								if (job.arma == key_gun) {
+									let emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
+									return bot.createEmbed(message, `É necessário possuir ${emote} para este trabalho ${bot.config.bulldozer}`, null, 'YELLOW')
+								}
+							})
+						}
+						else {
+							if (uData.jobTime < currTime || !uData.jobTime) {
+								jobLugar = job
+								jobKey = key
+							}
+						}
+					}
+				}
+				else {
+					for (let i = 0; i < job.arma.length; i++) {
+						let jobArma = job.arma[i]
+						if (keyArma == jobArma) {
 							if (arma.tempo < currTime) {
 								Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
-									if (job.arma == key_gun) {
-										let emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
-										return bot.createEmbed(message, `É necessário possuir ${emote} para este trabalho ${bot.config.bulldozer}`, null, 'GREEN')
+									if (jobArma == key_gun) {
+										let temp_emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
+										emotes += `${temp_emote}`
 									}
 								})
 							}
 							else {
-								if (uData.jobTime < currTime || !uData.jobTime) {
+								if (emotes == "" && (uData.jobTime < currTime || !uData.jobTime)) {
 									jobLugar = job
 									jobKey = key
 								}
 							}
 						}
-
 					}
-					else {
-						for (let i = 0; i < job.arma.length; i++) {
-							let jobArma = job.arma[i]
-							if (keyArma == jobArma) {
-								if (arma.tempo < currTime) {
-									Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
-										if (jobArma == key_gun) {
-											let temp_emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
-											emotes += `${temp_emote}`
-										}
-									})
+				}
+			})
+		}
+	})
 
-								}
-								else {
-									if (emotes == "" && (uData.jobTime < currTime || !uData.jobTime)) {
-										jobLugar = job
-										jobKey = key
-									}
-								}
-							}
-						}
-					}
-				})
-			}
-		})
+	return emotes != "" ?
+		bot.createEmbed(message, `É necessário possuir ${emotes} para este trabalho ${bot.config.bulldozer}`, null, 'YELLOW')
+		: trabalhar(bot, message, jobLugar, uData, jobKey)
 
-		if (emotes != "")
-			return bot.createEmbed(message, `É necessário possuir ${emotes} para este trabalho ${bot.config.bulldozer}`, null, 'GREEN')
-		else
-			return trabalhar(bot, message, jobLugar, uData, jobKey)
 
-	}
 }
 exports.config = {
 	alias: ['trab', 'trabalho', 'j', 't', 'trabalhar']

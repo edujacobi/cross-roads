@@ -114,7 +114,7 @@ exports.run = async (bot, message, args) => {
 			.setColor(bot.colors.policia)
 			.setFooter(`${uData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`}`, message.member.user.avatarURL())
 			.setTimestamp()
-		
+
 		let uCasamento = bot.casais.get(uData.casamentoID)
 
 		const row = new Discord.MessageActionRow()
@@ -140,7 +140,7 @@ exports.run = async (bot, message, args) => {
 		let isConjugeParticipando = false
 		let conjuge = false
 
-		let sucessoNecessario = uData.arma.jetpack.tempo  > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
+		let sucessoNecessario = uData.arma.jetpack.tempo > currTime ? chanceJetpack * multiplicador_evento_chance_fuga : chanceBase * multiplicador_evento_chance_fuga
 
 		collector.on('collect', async b => {
 			await b.deferUpdate()
@@ -189,7 +189,7 @@ exports.run = async (bot, message, args) => {
 				embeds: [fugaInicio
 					.setAuthor('Fuga em andamento... O amor pode tudo!', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url)
 					// .addField("Debug", `Chance base: ${chanceBase}\nSucesso necessarario: ${sucessoNecessario}\nSucesso conjuge: ${sucessoConjuge}\nChance calculada: ${chance}`)
-					.setFooter(`${uData.username} e ${cData.username} • ${uData.arma.jetpack.tempo  > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData.arma.jetpack.tempo  > currTime ? `com Jetpack` : `sem Jetpack`}`, message.member.user.avatarURL())
+					.setFooter(`${uData.username} e ${cData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData.arma.jetpack.tempo > currTime ? `com Jetpack` : `sem Jetpack`}`, message.member.user.avatarURL())
 				]
 			})
 
@@ -218,14 +218,14 @@ exports.run = async (bot, message, args) => {
 			const embedFinal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData.arma.jetpack.tempo  > currTime ? bot.shuffle(frasesSucessoJetpack)[0] : bot.shuffle(frasesSucesso)[0]}, mas a polícia ${bot.shuffle(frasesProcurado)[0]} ${bot.config.police}`)
+				.setDescription(`${uData.arma.jetpack.tempo > currTime ? bot.shuffle(frasesSucessoJetpack)[0] : bot.shuffle(frasesSucesso)[0]}, mas a polícia ${bot.shuffle(frasesProcurado)[0]} ${bot.config.police}`)
 				.setFooter(`${uData.username} • Espere 30 minutos para roubar novamente`, message.member.user.avatarURL())
 				.setTimestamp()
 
 			const embedFinalCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData.arma.jetpack.tempo  > currTime && conjuge.arma.jetpack.tempo  > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
+				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge.arma.jetpack.tempo > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
 				.setFooter(`${uData.username} e ${conjuge.username} • Esperem 30 minutos para roubar novamente`, message.member.user.avatarURL())
 				.setTimestamp()
 
@@ -385,7 +385,7 @@ exports.run = async (bot, message, args) => {
 
 			if (isConjugeParticipando && conjuge)
 				logF.addField("Junto de seu conjuge", conjuge.username)
-					.addField(`${bot.guns.jetpack.skins[conjuge.arma.jetpack.skinAtual].emote} Jetpack`, conjuge.arma.jetpack.tempo  > currTime ? `Sim` : `Não`, true)
+					.addField(`${bot.guns.jetpack.skins[conjuge.arma.jetpack.skinAtual].emote} Jetpack`, conjuge.arma.jetpack.tempo > currTime ? `Sim` : `Não`, true)
 
 			return bot.log(message, logF)
 		}
@@ -582,6 +582,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 
 			if (b.customId === message.id + message.author.id + 'presos') {
 				let presos = []
+				let ps = []
 				// let total = 0
 
 				bot.data.forEach((user, id) => {
@@ -598,36 +599,81 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 							// total += 1
 						}
 					}
-				})
+				})					
 
-				presos.sort((a, b) => b.tempo - a.tempo)
+				function getEmbed(start = 0) {
+					const current = presos.slice(start, start + 15)
+					const prisioneiros = new Discord.MessageEmbed()
+						.setTitle(`${bot.config.prisao} Prisioneiros`)
+						.setColor(bot.colors.background)
+						.setFooter(`${bot.user.username} • Mostrando ${start + 1}-${start + current.length} usuários de ${presos.length.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
 
-				const prisioneiros = new Discord.MessageEmbed()
-					.setTitle(`${bot.config.prisao} Prisioneiros`)
-					.setColor(bot.colors.background)
+					if (presos.length > 0) {
+						ps = presos.sort((a, b) => a.tempo - b.tempo).slice(start, start + 15)
+						presos.forEach(preso => prisioneiros.addField(preso.nick, `Livre em ${bot.segToHour((preso.tempo / 1000))}\nPreso ${preso.vezes} vezes\nFugiu ${preso.fugiu} vezes\n${preso.tentou ? `Tentou fugir` : `Não tentou fugir`}`, true))					} else
+						prisioneiros.setDescription("Não há prisioneiros")
 
-				if (presos.length > 0) {
-					presos.forEach(preso => prisioneiros.addField(preso.nick, `Livre em ${bot.segToHour((preso.tempo / 1000))}\nPreso ${preso.vezes} vezes\nFugiu ${preso.fugiu} vezes\n${preso.tentou ? `Tentou fugir` : `Não tentou fugir`}`, true))
+					return prisioneiros
 				}
-				else
-					prisioneiros.setDescription("Não há prisioneiros")
-
-				// prisioneiros.setDescription("Não há prisioneiros")
-				//
-				// let texto = ''
-				// if (presos.length > 0)
-				// 	presos.forEach(preso => texto += `**${preso.nick}**\nLivre em ${bot.segToHour((preso.tempo / 1000))} | Preso ${preso.vezes} vezes | Fugiu ${preso.fugiu} vezes\n`)
-				//
-				// if (texto !== '')
-				// 	prisioneiros.setDescription(texto)
+				
+				let currentIndex = 0
 
 				btnPresos.setDisabled(true)
 
 				msg.edit({
-					embeds: [embed, prisioneiros],
 					components: [row]
+				}).catch(() => console.log("Não consegui editar mensagem `prisao`"))
+
+				let buttonAnterior = new Discord.MessageButton()
+					.setStyle('SECONDARY')
+					.setLabel('Anterior')
+					.setEmoji('⬅️')
+					.setCustomId(message.id + message.author.id + 'prev')
+
+				let buttonProx = new Discord.MessageButton()
+					.setStyle('SECONDARY')
+					.setLabel('Próximo')
+					.setEmoji('➡️')
+					.setCustomId(message.id + message.author.id + 'next')
+				
+				const rowPresos = new Discord.MessageActionRow()
+
+				let msgPresos = await message.channel.send({
+					embeds: [getEmbed()],
+					components: presos.length > 0 ? [rowPresos] : []
 				}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
+				const filterPresos = (button) => [
+					message.id + message.author.id + 'lista',
+					message.id + message.author.id + 'prev',
+					message.id + message.author.id + 'next',
+				].includes(button.customId) && button.user.id === message.author.id
+
+				const collectorPresos = message.channel.createMessageComponentCollector({
+					filter: filterPresos,
+					time: 90000,
+				})
+
+				collectorPresos.on('collect', async b => {
+					await b.deferUpdate()
+					if (b.customId === message.id + message.author.id + 'prev' || b.customId === message.id + message.author.id + 'next') {
+						if (b.customId === message.id + message.author.id + 'prev')
+							currentIndex -= 15
+						else if (b.customId === message.id + message.author.id + 'next')
+							currentIndex += 15
+
+						let rowBtn = new Discord.MessageActionRow()
+						if (currentIndex !== 0)
+							rowBtn.addComponents(buttonAnterior)
+						if (currentIndex + 15 < presos.length)
+							rowBtn.addComponents(buttonProx)
+
+						msg.edit({
+							embeds: [embed, getEmbed(currentIndex)],
+							components: [rowBtn]
+						}).catch(() => console.log("Não consegui editar mensagem `presos`"))
+					}
+				})
 			}
 			else if (b.customId === message.id + message.author.id + 'fugir') {
 				btnFugir.setDisabled(true)
