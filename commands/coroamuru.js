@@ -130,6 +130,7 @@ exports.run = async (bot, message, args) => {
 		await btn.deferUpdate()
 
 		if (btn.customId === message.id + message.author.id + 'attack') {
+			
 			let vidaAtual = bot.coroamuru.get('vidaATUAL')
 			if (vidaAtual <= 0)
 				return bot.createEmbed(message, `COROAMURU FOI DERROTADO! ${coroamuru}`, null, bot.colors.white)

@@ -102,22 +102,22 @@ exports.run = async (bot, message, args) => {
 		const rowOpen = new Discord.MessageActionRow()
 			.addComponents(buttonClose)
 
+		const buttonWhey = new Discord.MessageButton()
+			.setStyle('SECONDARY')
+			.setLabel('Whey Protein')
+			.setEmoji(bot.config.whey)
+			.setCustomId(message.id + message.author.id + 'whey')
+
+		const buttonTreinar = new Discord.MessageButton()
+			.setStyle('SECONDARY')
+			.setLabel(galo.train ? 'Parar' : 'Treinar')
+			.setEmoji('💪')
+			.setCustomId(message.id + message.author.id + 'treinar')
+
+		const desconto = user.classe === 'mafioso' ? 0.95 : 1 // 1 = 0%, 0.7 = 30%
+		let preco_whey = Math.floor((((galo.power - 29) * 5) ** 2.7) * desconto)
+
 		if (isAuthor) {
-			const desconto = user.classe === 'mafioso' ? 0.95 : 1 // 1 = 0%, 0.7 = 30%
-			let preco_whey = Math.floor((((galo.power - 29) * 5) ** 2.7) * desconto)
-
-			const buttonWhey = new Discord.MessageButton()
-				.setStyle('SECONDARY')
-				.setLabel('Whey Protein')
-				.setEmoji(bot.config.whey)
-				.setCustomId(message.id + message.author.id + 'whey')
-
-			const buttonTreinar = new Discord.MessageButton()
-				.setStyle('SECONDARY')
-				.setLabel(galo.train ? 'Parar' : 'Treinar')
-				.setEmoji('💪')
-				.setCustomId(message.id + message.author.id + 'treinar')
-
 			if (galo.emRinha || (galo.power >= 60 && !galo.train) || (galo.descansar > currTime) || (uData.preso > currTime)) {
 				buttonTreinar.setDisabled(true)
 				buttonWhey.setDisabled(true)
@@ -321,16 +321,14 @@ exports.run = async (bot, message, args) => {
 
 			}
 			else if (b.customId === message.id + message.author.id + 'treinar') {
-				if (bot.isUserEmRouboOuEspancamento(message, uData)) {
-					return
-				}
+				if (bot.isUserEmRouboOuEspancamento(message, uData)) 
+					return				
 
 				let uGalo = bot.galos.get(message.author.id)
 
 				if (buttonTreinar.label === 'Parar') {
-					if (!uGalo.train) {
+					if (!uGalo.train) 
 						return bot.createEmbed(message, `Você não pode parar o que nem começou ${bot.config.galo}`, null, bot.colors.white)
-					}
 
 					uGalo.train = 0
 					uGalo.trainTime = 0
