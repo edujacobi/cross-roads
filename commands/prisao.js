@@ -669,7 +669,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 							rowBtn.addComponents(buttonProx)
 
 						msg.edit({
-							embeds: [embed, getEmbed(currentIndex)],
+							embeds: [getEmbed(currentIndex)],
 							components: [rowBtn]
 						}).catch(() => console.log("Não consegui editar mensagem `presos`"))
 					}
