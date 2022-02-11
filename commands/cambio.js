@@ -17,7 +17,7 @@ exports.run = async (bot, message, args) => {
 O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.config.prisao} Prisão é de R$ 40.
 
 \`;cambio [quantidade]\``)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 		
 		return message.channel.send({embeds: [embed]})

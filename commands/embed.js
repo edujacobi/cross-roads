@@ -5,7 +5,7 @@ exports.run = async (bot, message, args) => {
   const embed = new Discord.MessageEmbed()
 			.setColor('GREEN')
 			.setDescription(args.join(" "))
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
   return message.channel.send({ embeds: [embed] }).catch(err => console.log("Não consegui enviar mensagem `embed`"))
 }

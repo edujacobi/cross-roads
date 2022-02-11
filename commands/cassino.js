@@ -25,7 +25,7 @@ exports.run = async (bot, message, args) => {
 			.addField(`Caixa do Cassino`, `R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`) //\nPróximo depósito de R$ ${bot.carregamentoCassino.toLocaleString().replace(/,/g, ".")} em: ${bot.segToHour(proxDeposito)}
 			.addField(`${bot.config.ficha} Fichas`, "Use-as na máquina caça-níquel! Preço por ficha: R$ 100\n`;cassino <quantidade>`", true)
 			.addField("Câmbio", `Troque suas fichas por dinheiro! Cada ficha vale R$ 80.\n\`;cambio [quantidade]\``)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp();
 		message.channel.send({
 			embeds: [embed]

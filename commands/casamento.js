@@ -167,7 +167,7 @@ exports.run = async (bot, message, args) => {
 				.setTitle(`💬 Escrever no mural`)
 				.setDescription(`Escreva sua mensagem para deixar anotado no mural do casamento!`)
 				.setColor(bot.colors.casamento)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			let msgMural = await message.channel.send({embeds: [embedMural]})
@@ -235,7 +235,7 @@ exports.run = async (bot, message, args) => {
 				.setTitle(`${bot.config.flor} Para você!`)
 				.setDescription(`Gostaria de entrar e tomar uma xícara de café?`)
 				.setColor(bot.colors.casamento)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			await message.channel.send({embeds: [embedFlor]})
@@ -303,7 +303,7 @@ exports.run = async (bot, message, args) => {
 				.setThumbnail('https://media.discordapp.net/attachments/895062707684929588/916097951753973771/radar_airYard.png')
 				.addField('🗾 Longe de casa', 'Enquanto estiverem viajando vocês obviamente não estarão na Cidade da Cruz e não poderão realizar nenhuma ação (nem ser alvo de ação de outros usuários)')
 				.setColor(bot.colors.casamento)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			const row = new Discord.MessageActionRow()
@@ -431,7 +431,7 @@ exports.run = async (bot, message, args) => {
 			const embedDiv = new Discord.MessageEmbed()
 				.setDescription(`💔 Vocês desejam realmente se divorciar? Esta ação não poderá ser desfeita!`)
 				.setColor(bot.colors.casamento)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			const row = new Discord.MessageActionRow()
@@ -497,7 +497,7 @@ exports.run = async (bot, message, args) => {
 					.setTitle(`💔 Infelizmente, parece que nosso amor não é eterno...`)
 					.setDescription(`Vocês não são mais um casal e estão livres para encontrar outras pessoas, ou até mesmo se reencontrarem no futuro!`)
 					.setColor(bot.colors.casamento)
-					.setFooter(bot.user.username, bot.user.avatarURL())
+					.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 					.setTimestamp()
 
 				if (confirmados.length === 2) {
@@ -558,7 +558,7 @@ exports.run = async (bot, message, args) => {
 			const embedAnel = new Discord.MessageEmbed()
 				.setDescription(`${bot.aneis[uData.anel].emote} O primeiro passo para um casamento feliz é a inteligência financeira!`)
 				.setColor(bot.colors.casamento)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			const row = new Discord.MessageActionRow()
@@ -641,7 +641,7 @@ exports.run = async (bot, message, args) => {
 				const newEmbedAnel = new Discord.MessageEmbed()
 					.setTitle(`${bot.aneis[uData.anel].emote} Anel melhorado!`)
 					.setColor(bot.colors.casamento)
-					.setFooter(bot.user.username, bot.user.avatarURL())
+					.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 					.setTimestamp()
 
 				if (confirmados.length === 2) {

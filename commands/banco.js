@@ -8,7 +8,7 @@ exports.run = async (bot, message, args) => {
 		.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/757057425735024720/radar_cash.png")
 		// .addField("Segurança aumentada", "Altamente protegido!")
 		.addField("Cofre", `R$ ${bot.banco.get('caixa').toLocaleString().replace(/,/g, ".")}`)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 	
 	message.channel.send({embeds: [embed]})

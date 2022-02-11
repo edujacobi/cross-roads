@@ -50,7 +50,7 @@ exports.run = async (bot, message, args) => {
 								embeds: [new Discord.MessageEmbed()
 									.setColor('GREEN')
 									.setDescription(`✂️ Que corte escolheremos hoje? Use um comando qualquer e escolha sua nova classe!`)
-									.setFooter(uData.username, message.member.user.avatarURL())
+									.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 									.setTimestamp()
 								]
 							}).catch(() => console.log("Não consegui editar mensagem `classes`"))
@@ -60,7 +60,7 @@ exports.run = async (bot, message, args) => {
 								embeds: [new Discord.MessageEmbed()
 									.setColor('GREEN')
 									.setDescription(`✂️ Operação cancelada. Que pena!`)
-									.setFooter(uData.username, message.member.user.avatarURL())
+									.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 									.setTimestamp()
 								]
 							}).catch(() => console.log("Não consegui editar mensagem `classes`"))
@@ -73,7 +73,7 @@ exports.run = async (bot, message, args) => {
 						embeds: [new Discord.MessageEmbed()
 							.setColor('GREEN')
 							.setDescription(`✂️ Operação cancelada. Que pena!`)
-							.setFooter(uData.username, message.member.user.avatarURL())
+							.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 							.setTimestamp()
 						]
 					}).catch(() => console.log("Não consegui editar mensagem `classes`"))

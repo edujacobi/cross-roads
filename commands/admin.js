@@ -14,7 +14,7 @@ exports.run = async (bot, message, args) => {
 		.addField(`💬 Comunicar`, "`;comunicar`", true)
 		.addField(`👥 Trocar conta`, "`;trocarconta`", true)
 		.addField(`<:Classe_Mafioso:823012843288657970> Top classes`, "`;classes top`", true)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp();
 	return message.channel.send({
 			embeds: [embed]

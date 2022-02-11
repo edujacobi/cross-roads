@@ -14,7 +14,7 @@ module.exports = async (bot, message) => {
 
 	if (message.channel.type === 'DM') return
 
-	if (message.mentions.has(bot.user) && !message.content.startsWith(bot.config.prefix) && !message.mentions.everyone) return bot.createEmbed(message, 'Olá! Meu prefixo é `;`. Caso não saiba como começar a jogar, use `;ajuda`!')
+	if (message.mentions.has(bot.user) && !message.content.startsWith(bot.config.prefix) && !message.mentions.everyone) return bot.createEmbed(message, `Olá! Meu prefixo é \`${bot.config.prefix}\`. Caso não saiba como começar a jogar, use \`${bot.config.prefix}ajuda\`!`)
 
 	if (!message.content.startsWith(bot.config.prefix)) return
 
@@ -194,7 +194,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 			embeds: [new Discord.MessageEmbed()
 				.setColor('GREEN')
 				.setDescription(`**${uData.username}** chegou a hora de você escolher uma **Classe**! Te mandei as opções no privado!`)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()],
 		})
 			.catch(() => console.log('Não consegui enviar mensagem `classe`'))
@@ -230,7 +230,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 							embeds: [new Discord.MessageEmbed()
 								.setColor('GREEN')
 								.setDescription(`Você já escolheu uma classe!`)
-								.setFooter(bot.user.username, bot.user.avatarURL())
+								.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 								.setTimestamp()],
 						})
 							.catch(() => console.log('Não consegui enviar mensagem `classe`'))
@@ -290,7 +290,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 				.setDescription(`${uData.username}, parabéns por conseguir sua ${bot.guns.rpg.skins.default.emote} RPG! Prossiga para o servidor oficial para completar seu cadastro anti-fake.`)
 				.setColor(bot.colors.admin)
 				.setTimestamp()
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 
 			const row = new Discord.MessageActionRow()
 				.addComponents(new Discord.MessageButton()

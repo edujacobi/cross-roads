@@ -28,7 +28,9 @@ exports.run = async (bot, message, args) => {
 		let uData = bot.data.get(message.author.id)
 		let bbrs = uData.username
 		bot.beberroes.forEach((user, id) => { //gera lista para top global
-			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 60 * 1000 > Date.now()) bbrs += `, ${bot.data.get(id, "username")}`
+			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 1000 > Date.now()) {
+				bbrs += `, ${bot.data.get(id, "username")}`
+			}
 		})
 
 		return bbrs
@@ -37,7 +39,9 @@ exports.run = async (bot, message, args) => {
 	function getQtBeberroes() {
 		let count = 1
 		bot.beberroes.forEach((user, id) => { //gera lista para top global
-			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 60 * 1000 > Date.now()) count += 1
+			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 1000 > Date.now()) {
+				count += 1
+			}
 		})
 
 		return count
@@ -114,7 +118,7 @@ exports.run = async (bot, message, args) => {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.vadiando} Top Beberrões`)
 				.setColor(bot.colors.background)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			topGlobal.forEach((user, i) => {

@@ -428,7 +428,7 @@ exports.run = async (bot, message, args) => {
 			.setTitle(`${bot.config.police} Subornar`)
 			.setColor(bot.colors.policia)
 			.setDescription(`"Sabemos que você tem um certo dinheiro escondido aí... Nos dê **R$ ${preço.toLocaleString().replace(/,/g, ".")}** e deixaremos você sair de fininho."\n\nConfirmar pagamento?`)
-			.setFooter(uData.username, message.member.user.avatarURL())
+			.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 			.setTimestamp()
 
 		let btnConfirmar = new Discord.MessageButton()
@@ -531,7 +531,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 			.addField(`${bot.badges.deputado_s5} Subornar`, `Os guardas são gananciosos, e quanto melhor sua arma, mais eles pedirão! Eles também podem recusar seu suborno, mas ficarão com seu dinheiro.`)
 			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/817102027183357992/prisao.png') //message.guild.iconURL()
 			.setColor(bot.colors.policia)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 
 		let btnPresos = new Discord.MessageButton()

@@ -30,7 +30,7 @@ exports.run = async (bot, message, args) => {
 			.addField(`${bot.config.flor} Flores`, `Flores precisam ser entregues para manter o nível do casamento alto.\nVocê possui \`${uData._flor}\` ${uData._flor === 1 ? `flor` : `flores`}`)
 			.addField(`${bot.config.aviao} Viagens`, `Com um relacionamento no nível máximo, vocês podem viajar de férias. Após a viagem, os bônus de casal aumentam em 50%.`)
 			.addField("💔 Divórcio", `Caso o casamento fique com um nível muito baixo, os efeitos positivos ficarão desativados até o nível aumentar. Você pode pedir divórcio, se assim preferir.`)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 
 		let msg = await message.channel.send({
@@ -62,7 +62,7 @@ exports.run = async (bot, message, args) => {
 					.addField(`${bot.config.flor} Flores`, `Flores aumentam o nível do casamento em 1. Podem ser entregues a cada 2h por qualquer um dos cônjuges.`)
 					.addField(`${bot.config.aviao} Viagens`, `Enquanto estiverem viajando, os jogadores não podem realizar nenhuma ação nem ser alvo de ações por 24h. Ao voltarem de viagem, os bônus fornecidos pelos aneis são aumentados em 50% por 48 horas.`)
 					.addField("Nível", `A cada 6h, o nível do casamento decai 1 ponto. Se nenhuma ação em dupla tiver sido feita ou nenhuma flor tiver sido entregue, o decaimento aumentará em 1 a cada 6h (\`1 (6h) → 2 (12h) → 3 (18h)\`) até o nível chegar a zero.`)
-					.setFooter(bot.user.username, bot.user.avatarURL())
+					.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 					.setTimestamp()
 
 				return message.channel.send({
@@ -78,7 +78,7 @@ exports.run = async (bot, message, args) => {
 				.setThumbnail(bot.aneis.prata.img)
 				.setDescription(`Quanto melhor o anel que vocês tiverem, maiores os benefícios. Juntos vocês poderão **Roubar locais**, **Fugir da prisão** e **~~Dividir prêmios de sorteios~~**. Os dois precisam ter o mesmo anel.`)
 				.setColor(bot.colors.casamento)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 			
 			if (uData.casamentoID != null){
@@ -146,7 +146,7 @@ exports.run = async (bot, message, args) => {
 				const embed = new Discord.MessageEmbed()
 					.setTitle(`${emoteAnel} Anel de ${anel} adquirido!`)
 					.setColor(bot.colors.casamento)
-					.setFooter(bot.user.username, bot.user.avatarURL())
+					.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 					.setTimestamp()
 
 				uData.anel = anelId
@@ -309,7 +309,7 @@ exports.run = async (bot, message, args) => {
 				embed.setThumbnail('https://media.discordapp.net/attachments/531174573463306240/862135638945824768/radar_girlfriend.png')
 					.setTitle(`${emote} Eu vos declaro Casados!`)
 					.setDescription(`${uData.username}, ${tData.username}, podem se beijar!`)
-					.setFooter(bot.user.username, bot.user.avatarURL())
+					.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 					.setTimestamp()
 
 				msg.edit({

@@ -134,11 +134,11 @@ exports.run = async (bot, message, args) => {
 					}
 					else {
 						for (let i = 0; i < job.arma.length; i++) {
-							let arma = job.arma[i]
-							if (arma.data == arma) {
+							let jobArma = job.arma[i]
+							if (keyArma == jobArma) {
 								if (arma.tempo < currTime) {
 									Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
-										if (arma == key_gun) {
+										if (jobArma == key_gun) {
 											let temp_emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
 											emotes += `${temp_emote}`
 										}
@@ -153,7 +153,6 @@ exports.run = async (bot, message, args) => {
 								}
 							}
 						}
-
 					}
 				})
 			}

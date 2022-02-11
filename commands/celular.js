@@ -244,7 +244,7 @@ exports.run = async (bot, message, args) => {
 			.addField("Prisão", `Tenha cuidado, pois se você for pego utilizando o celular, os policiais poderão aumentar seu tempo preso`)
 			.addField("Adquira créditos", `Cada uso do celular consome um crédito. Cada crédito custa R$ ${credito.toLocaleString().replace(/,/g, ".")}\n\`;celular credito <quantidade>\``, true)
 			.addField("Seus créditos", uData.celularCredito.toString(), true)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 		message.channel.send({
 			embeds: [embed]

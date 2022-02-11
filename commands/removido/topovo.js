@@ -36,14 +36,14 @@ exports.run = async (bot, message, args) => {
 		.setTitle(`${bot.config.ovo} Ranking Ovos`)
 		.setColor('GREEN')
 		.setDescription(topGlobalString)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp();
 
 	const embedWithID = new Discord.MessageEmbed()
 		.setTitle(`${bot.config.ovo} Ranking Ovos`)
 		.setColor('GREEN')
 		.setDescription(topGlobalStringID)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp();
 
 	return message.channel.send({

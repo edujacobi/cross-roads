@@ -75,7 +75,7 @@ Preço para troca: R$ ${custo.toLocaleString().replace(/,/g, ".")}`)
 			.setColor(bot.colors.background)
 			.setDescription(`Confirmar o novo nick **${nick}**?
 Você só poderá alterá-lo novamente em outra temporada ou ao adquirir ${bot.config.vip} VIP.`)
-			.setFooter(uData.username, message.member.user.avatarURL())
+			.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 			.setTimestamp()
 
 		let row = new Discord.MessageActionRow()

@@ -73,7 +73,7 @@ exports.run = async (bot, message, args) => {
 \`/convite\` Adicione ao seu servidor
 \`/updates\` Vê o último Patch Notes
 \`/eventos\` Vê o último registro de Eventos`)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 	
 	message.channel.send({embeds: [embed]})

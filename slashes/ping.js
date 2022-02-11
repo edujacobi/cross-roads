@@ -7,7 +7,7 @@ exports.run = async (bot, interaction) => {
 		.setDescription(`:satellite_orbital: ${botPing}ms API.`)
 		.setColor('GREEN')
 		.setTimestamp()
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 
 	await interaction.reply({embeds: [embed]})
 	

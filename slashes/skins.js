@@ -6,7 +6,7 @@ exports.run = async (bot, interaction) => {
 		.setTitle(`${bot.config.vip} Skins de armas`)
 		.setColor(0xffd700)
 		.setTimestamp()
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 
 	let lista = []
 
@@ -96,7 +96,7 @@ exports.run = async (bot, interaction) => {
 		// 	.setColor(0xffd700)
 		// 	.setDescription(skins)
 		// 	.setTimestamp()
-		// 	.setFooter(bot.user.username, bot.user.avatarURL())
+		// 	.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 
 
 		await interaction.editReply({components: rowSpecial.components.length > 0 ? [rowComprar, rowSpecial] : [rowComprar]})
@@ -125,7 +125,7 @@ exports.run = async (bot, interaction) => {
 						.setColor(0xffd700)
 						.setDescription(`Você precisa ser **VIP** ${bot.config.vip} para usar skins`)
 					// .setTimestamp()
-					// .setFooter(bot.user.username, bot.user.avatarURL())
+					// .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 					return interaction.followUp({embeds: [embed]})
 				}
 				Object.values(bot.guns).forEach(arma => {
@@ -141,7 +141,7 @@ exports.run = async (bot, interaction) => {
 									.setColor(0xffd700)
 									.setDescription(`Você agora está usando a skin ${skin.emote} **${arma.desc} ${skin.nome}**`)
 								// .setTimestamp()
-								// .setFooter(bot.user.username, bot.user.avatarURL())
+								// .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 
 								interaction.editReply({components: [row]})
 

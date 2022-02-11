@@ -20,7 +20,7 @@ exports.run = async (bot, message, args) => {
 		.setDescription(`Você não pode apostar, roubar nem vasculhar enquanto trabalha!`)
 		.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/738106899844562984/radar_bulldozer.png")
 		.setColor('GREEN')
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 
 	Object.entries(bot.jobs).forEach(([key_job, value_job]) => {

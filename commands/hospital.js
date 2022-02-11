@@ -28,14 +28,14 @@ exports.run = async (bot, message, args) => {
 			.setTitle(`${bot.config.hospital} Atendimento particular`)
 			.setColor('RED')
 			.setDescription(`**Você está curado!**`)
-			.setFooter(uData.username, message.member.user.avatarURL())
+			.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 			.setTimestamp()
 
 		const tratamento = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.hospital} Atendimento particular`)
 			.setColor('RED')
 			.setDescription(`Seu tratamento custará **R$ ${preço.toLocaleString().replace(/,/g, ".")}**.\n\nConfirmar pagamento?`)
-			.setFooter(uData.username, message.member.user.avatarURL())
+			.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 			.setTimestamp()
 
 		let btnConfirmar = new Discord.MessageButton()
@@ -91,7 +91,7 @@ exports.run = async (bot, message, args) => {
 			.setColor('RED')
 			.addField("Serviço público", `Infelizmente não temos mais leitos livres, então você precisará esperar no corredor até ser atendido.`)
 			.addField(`${bot.badges.hipocondriaco_s5} Atendimento particular`, `Caso você pague uma certa quantia, poderemos tratá-lo mais rapidamente!`)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 
 		let btnHosp = new Discord.MessageButton()

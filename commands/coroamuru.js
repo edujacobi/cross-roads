@@ -81,7 +81,7 @@ exports.run = async (bot, message, args) => {
 			\nEle não mais absorve energia de todos os jogadores, mas ainda procura pelo seu objetivo neste novo mundo!`)
 			.addField("Ataque o Coroamuru!", `Ele dará recompensas para os galos que ousarem desafiá-lo! Toda vez que ele for derrotado, o Top Dano receberá R$ ${premio.toLocaleString().replace(/,/g, ".")}!`)
 			.addField("Vida atual", `${getLifeBar(vidaAtual, VIDAMAX, hp)} **${vidaAtual}/${VIDAMAX}** _(${~~(vidaAtual / VIDAMAX * 100)}%)_`)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 	}
 
@@ -291,7 +291,7 @@ exports.run = async (bot, message, args) => {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${coroamuru} Top Dano`)
 				.setColor(bot.colors.background)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			topGlobal.forEach((user, i) => {

@@ -305,7 +305,7 @@ exports.run = async (bot, message, args) => {
 									embeds: [new Discord.MessageEmbed()
 										.setDescription(`**${tData.username}** agora faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`)
 										.setColor(uGang.cor)
-										.setFooter(uData.username, message.member.user.avatarURL())
+										.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 										.setTimestamp()
 									]
 								}).catch(() => console.log("Não consegui editar mensagem `gang`"))
@@ -321,7 +321,7 @@ exports.run = async (bot, message, args) => {
 							embeds: [new Discord.MessageEmbed()
 								.setDescription(`**${tData.username}** não respondeu. Ele está offline ou recusou o convite. ${getIcone(uGang.boneco)}`)
 								.setColor(uGang.cor)
-								.setFooter(uData.username, message.member.user.avatarURL())
+								.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 								.setTimestamp()
 							]
 						}).catch(() => console.log("Não consegui editar mensagem `gang`"))
@@ -550,7 +550,7 @@ exports.run = async (bot, message, args) => {
 								return msg.edit({
 									embeds: [new Discord.MessageEmbed()
 										.setDescription(`Você transferiu a posse da gangue **${uGang.nome}** para **${tData.username}**! ${getIcone(uGang.boneco)}`)
-										.setFooter(uData.username, message.member.user.avatarURL())
+										.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 										.setColor(uGang.cor)
 										.setTimestamp()
 									]
@@ -788,7 +788,7 @@ exports.run = async (bot, message, args) => {
 \`;gangue base comprar [id]\` Compra uma base para a gangue
 \`;gangue base upgrade\` Compra melhorias para a base
 \`;gangue base info\` Mostra este menu`, true)
-				.setFooter(uData.username, message.member.user.avatarURL())
+				.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 				.setTimestamp()
 
 			message.channel.send({embeds: [embed]})
@@ -865,7 +865,7 @@ exports.run = async (bot, message, args) => {
 				.addField("Sucessos/Falhas", `${uGang.golpeW}/${uGang.golpeL}`, true)
 				.addField("Carregamentos", `\`${(uGang.base === 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2}h\` tempo de espera\n\`${uGang.base === 'aeroporto' ? `${35 + uGang.baseLevel * 3}` : 35 + uGang.baseLevel * 2}%\` chance de sucesso`, true)
 				.setImage(imagemBase)
-				.setFooter(uData.username, message.member.user.avatarURL())
+				.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 				.setTimestamp()
 
 			if (uGang.carregamentoAtivo)
@@ -2018,7 +2018,7 @@ exports.run = async (bot, message, args) => {
 			.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/754773460873510963/radar_gangP.png')
 			.setDescription(`Escolha o ícone clicando na reação`)
 			.setColor(uGang.cor)
-			.setFooter(uData.username, message.member.user.avatarURL())
+			.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 			.setTimestamp()
 
 		message.channel.send({embeds: [embed]}).then(msg => {
@@ -2047,7 +2047,7 @@ exports.run = async (bot, message, args) => {
 						.setTitle(`${getIcone(uGang.boneco)} Ícone`)
 						.setDescription(`**Ícone alterado**`)
 						.setColor(uGang.cor)
-						.setFooter(uData.username, message.member.user.avatarURL())
+						.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 						.setTimestamp()
 
 					return msg.edit({embeds: [embedEd]})
@@ -2094,7 +2094,7 @@ exports.run = async (bot, message, args) => {
 \`;gangue expulsar <jogador> <motivo>\` Expulsar um jogador 
 \`;gangue transferir <jogador>\` Transfere a liderança
 \`;gangue vice <jogador>/remover\` Indica ou remove um Vice-Líder`)
-				.setFooter(bot.user.username, bot.user.avatarURL())
+				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
 			message.channel.send({embeds: [embed]})

@@ -17,7 +17,7 @@ exports.run = async (bot, message, args) => {
         .setTitle(`🐒 Jogo do Bicho`)
         .setDescription(`Aposte em um número de um animal! Sorteios sem vencedores são acumulados para o prêmio do final de semana!`)
         .setColor(bot.colors.admin)
-        .setFooter(bot.user.username, bot.user.avatarURL())
+        .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
         .setTimestamp()
 
     for (let i = 0; i < animais.length; i++) {

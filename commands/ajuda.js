@@ -13,7 +13,7 @@ exports.run = async (bot, message, args) => {
 		.addField("Notificações e funcionamento", "Para tudo ocorrer belezinha, certifique-se que você pode receber mensagens privadas de usuários que não estão na sua lista de amigos. Se você colocou Cross Roads no seu servidor, certifique-se que a permissão Gerenciar Mensagens está ativa!")
 		.addField("Ajude o bot a continuar online", "Adquira VIP! O VIP não torna o jogo _pay-to-win_, os benefícios são, em sua maioria, somente cosméticos!")
 		.addField("Entre no servidor oficial!", `[Saiba de eventos e atualizações!](https://discord.gg/ruasdacruz)`)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp();
 	return message.channel.send({
 		embeds: [embed]

@@ -25,7 +25,7 @@ exports.run = async (bot, message, args) => {
 		// .addField(`${bot.badges.deputado_s4} Subornadores`, `\`;topsuborno\``, true)
 		// .addField(`${bot.badges.hipocondriaco_s4} Doentes`, `\`;topdoente\``, true)
 		// .addField(`${bot.config.vasculhar} Vasculhadores`, `\`;topvasculhar\``, true)
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 
 	let buttons = [

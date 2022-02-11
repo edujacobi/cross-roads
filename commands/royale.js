@@ -29,7 +29,7 @@ Entre em uma rinha de ${MIN} a ${MAX} galos, onde o vencedor leva tudo! A aposta
 Seu galo precisa estar no mínimo no nível ${LVL_MIN} para participar de uma batalha.
 Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			.addField("\u200b", "`;royale [galos] [valor]`: Inicia um Battle Royale")
-			.setFooter(uData.username, message.member.user.avatarURL())
+			.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 			.setTimestamp()
 
 		return message.channel.send({embeds: [embed]})
@@ -40,7 +40,7 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 		return bot.createEmbed(message, `Você deve inserir o número de galos do Battle Royale e o valor a ser apostado ${bot.config.galo}`, null, bot.colors.white)
 
 	let max_players = args[0]
-	let aposta = args[1]
+	let aposta = parseInt(args[1])
 	let apostaComImposto = parseInt(args[1] * (1 - bot.imposto))
 
 	const multiplicador_tempo_rinha = 1
@@ -127,7 +127,7 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 		if (b.customId === message.id + message.author.id + 'participar') {
 			if (players.includes(b.user.id))
 				return
-			
+
 			let newplayer = b.user
 			let jogador = bot.data.get(newplayer.id)
 			let galo = bot.galos.get(newplayer.id)
@@ -147,7 +147,8 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 						bot.createEmbed(message, `**${jogador.username}**, seu galo está treinando por mais ${bot.segToHour((galo.trainTime - time) / 1000)} ${bot.config.galo}`, null, bot.colors.background)
 					else
 						bot.createEmbed(message, `**${jogador.username}**, seu galo terminou o treinamento. Conclua-o antes de entrar no Battle Royale ${bot.config.galo}`, null, bot.colors.background)
-				} else if (jogador.preso > time)
+				}
+				else if (jogador.preso > time)
 					bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour((jogador.preso - time) / 1000)} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 				else if (jogador.hospitalizado > time)
 					bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour((jogador.hospitalizado - time) / 1000)} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
@@ -190,7 +191,8 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 				}
 			}
 
-		} else if (b.customId === message.id + message.author.id + 'cancelar') {
+		}
+		else if (b.customId === message.id + message.author.id + 'cancelar') {
 			if (b.user.id !== message.author.id)
 				return
 			if (canCancel) {
@@ -229,12 +231,11 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 
 			if (galo.descansar > time)
 				return bot.createEmbed(message, `**${jogador.username}**, seu galo está descansando. Ele poderá lutar em ${bot.segToHour((galo.descansar - time) / 1000)} ${bot.config.galo}`, null, bot.colors.background)
-			else if (galo.train) {
-				if (galo.trainTime > time)
-					return bot.createEmbed(message, `**${jogador.username}**, seu galo está treinando por mais ${bot.segToHour((galo.trainTime - time) / 1000)} ${bot.config.galo}`, null, bot.colors.background)
-				else
-					return bot.createEmbed(message, `**${jogador.username}**, seu galo terminou o treinamento. Conclua-o antes de entrar no Battle Royale ${bot.config.galo}`, null, bot.colors.background)
-			} else if (jogador.preso > time)
+			else if (galo.train)
+				return galo.trainTime > time ? 
+					bot.createEmbed(message, `**${jogador.username}**, seu galo está treinando por mais ${bot.segToHour((galo.trainTime - time) / 1000)} ${bot.config.galo}`, null, bot.colors.background)
+					: bot.createEmbed(message, `**${jogador.username}**, seu galo terminou o treinamento. Conclua-o antes de entrar no Battle Royale ${bot.config.galo}`, null, bot.colors.background)
+			else if (jogador.preso > time)
 				return bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour((jogador.preso - time) / 1000)} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 			else if (jogador.hospitalizado > time)
 				return bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour((jogador.hospitalizado - time) / 1000)} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
@@ -284,7 +285,7 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 		perdedores.pop()
 
 		msg.edit({
-			embeds: [embed.setColor('GREEN')], 
+			embeds: [embed.setColor('GREEN')],
 			components: []
 		})
 
@@ -327,6 +328,9 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			`ficou incapacitado de lutar após ser surpreendido por um arame farpado. Só é finalmente eliminado pelo _Kamehameha_ de`,
 			`trava uma batalha intensa, mas é incapacitado pelas lâminas afiadas nas garras de`,
 			`é ardiloso e causa bastante dano em seu oponente, mas sucumbe ao levar gancho de direita dado por`,
+			`teve sua asa arrancada em uma emboscada preparada por`,
+			`foi eliminado depois de ter a cara arrastada nas bordas da arena por`,
+			`escorregou enquanto lutava, bateu a cabeça e foi eliminado. A eliminação foi contabilizada para`,
 		]
 		// let mensagensBatalhaSolo = [
 		// 	`botou um ${bot.config.ovogranada2} Ovo-Granada, mas acabou explodindo com ela`,
@@ -388,8 +392,8 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 		vencedor.galo.wins += 1
 		vencedor.galo.emRinha = false
 		vencedor.galo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
-		
-		
+
+
 		if (vencedor.galo.power >= 70)
 			mensagemLevelUp = `**${vencedor.galo.nome}** está no nível ${vencedor.galo.power - 30} e não pode mais upar!\n`
 
@@ -414,7 +418,7 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			.setDescription(`${bot.config.galo} **${vencedor.galo.nome}** venceu o Battle Royale, e **${vencedor.data.username}** ganhou R$ ${premio.toLocaleString().replace(/,/g, ".")}`)
 			.setColor('WHITE')
 			.setThumbnail(vencedor.galo.avatar)
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 
 		if (mensagemLevelUp)
@@ -426,16 +430,16 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 
 			if (userGalo.power >= 60) {
 				userGalo.power -= 1
-				userGalo.loses += 1
 				fimRinha.addField(`🔻 **${userGalo.nome}** desceu para o nível ${userGalo.power - 30}.`, '\u200b', true)
 			}
+			userGalo.loses += 1
 			userData.moni -= aposta
 			userGalo.emRinha = false
 			userGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
-			
+
 			bot.data.set(player.id, userData)
 			bot.galos.set(player.id, userGalo)
-			
+
 			console.log(`Lost: ${userData.username} R$ ${bot.data.get(player.id, 'moni')}`)
 		})
 

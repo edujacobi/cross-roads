@@ -6,7 +6,7 @@ exports.run = async (bot, message, args) => {
 			.setTitle(`${bot.config.emmetGun} Armas e Equipamentos`)
 			.setDescription("As seguintes armas e equipamentos estão disponíveis.\nVocê pode ver mais detalhes usando `;arma MP5`, por exemplo.")
 			.setColor('GREEN')
-			.setFooter(bot.user.username, bot.user.avatarURL())
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
 
 		Object.values(bot.guns).forEach(arma => {
@@ -48,7 +48,7 @@ exports.run = async (bot, message, args) => {
 		.setThumbnail(bot.emojis.cache.get(emoji_id).url)
 		.setDescription(`${value.atk != null ? `**Poder de ataque:** ${value.atk}\n` : ""}${value.def != null ? `**Poder de defesa:** ${value.def}\n` : ""}${value.moneyAtk != null ? `**Valor roubado:** ${value.moneyAtk}%\n` : ""}${value.moneyDef != null ? `**Valor defendido:** ${value.moneyDef}%\n` : ""}${value.preço != null ? `**Preço:** R$ ${value.preço.toLocaleString().replace(/,/g, ".")}\n` : ""}${value.utilidade != null ? `${value.utilidade}` : ""}`)
 		.setColor('GREEN')
-		.setFooter(bot.user.username, bot.user.avatarURL())
+		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 
 	return message.channel.send({embeds: [embed]})
