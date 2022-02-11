@@ -642,7 +642,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 
 				let msgPresos = await message.channel.send({
 					embeds: [getEmbed()],
-					components: presos.length > 0 ? [rowPresos] : []
+					components: presos.length > 0 ? [rowPresos.addComponents(buttonProx)] : []
 				}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
 				const filterPresos = (button) => [
