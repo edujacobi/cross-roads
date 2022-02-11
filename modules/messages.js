@@ -111,9 +111,9 @@ module.exports = (bot) => {
 		let currTime = new Date().getTime()
 		let minutes = (uData.jobTime - currTime) / 1000
 		if (minutes < 0)
-			return bot.createEmbed(message, `${username ?? 'Você'} deve receber seu salário antes de fazer isto ${bot.config.bulldozer}`)
+			return bot.createEmbed(message, `${username ?? 'Você'} deve receber seu salário antes de fazer isto ${bot.config.bulldozer}`, null, 'YELLOW')
 
-		return bot.createEmbed(message, `${username ?? 'Você'} está trabalhando por mais ${bot.segToHour(minutes)} e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[uData.job].desc)
+		return bot.createEmbed(message, `${username ?? 'Você'} está trabalhando por mais ${bot.segToHour(minutes)} e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[uData.job].desc, 'YELLOW')
 	}
 
 	bot.msgSemDinheiro = (message, username) => bot.createEmbed(message, `${username ?? 'Você'} não tem dinheiro suficiente para fazer isto`)

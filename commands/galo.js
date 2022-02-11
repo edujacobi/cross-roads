@@ -71,7 +71,7 @@ exports.run = async (bot, message, args) => {
 			.addField("Nível", (galo.power - 30).toString(), true)
 			.addField("Chance de vitória", galo.power + "%", true)
 			.addField("Raça e Nacionalidade", nacionalidade)
-			.addField("Dados", `Vitórias: \`${galo.wins}\`\nDerrotas: \`${galo.loses}\`\nWin rate: \`${winrate}%\``, true)
+			.addField("Dados", `Vitórias: \`${galo.wins}\`\nDerrotas: \`${galo.loses}\`\nWin rate: \`${winrate}%\`${galo.caramuruWins !== 0 ? `\nVenceu o ${bot.config.caramuru} Caramuru ${galo.caramuruWins === 1 ? 'vez' : 'vezez'}` : ''}`, true)
 			.addField("Stats", calcStats(galo), true)
 			.addField("\u200b", `**${getSituation(galo)}**`)
 			.setThumbnail(galo.avatar)
@@ -1919,6 +1919,8 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				vencedor = uGalo
 				perdedor = caramuru
 				vencedorU = uData
+				
+				uGalo.caramuruWins += 1
 
 				if (uGalo.power >= 70)
 					mensagemLevelUp = `**${vencedor.nome}** está no nível ${vencedor.power - 30} e não pode mais upar`
