@@ -400,7 +400,7 @@ exports.run = async (bot, message, args) => {
 			})
 		})
 
-		let preço = Math.floor((20000 + (atkPower * (atkPower / 20)) ** 2) + (uData.moni * (uData.fuga === uData.preso ? 0.05 : 0.1)) + (uData.ficha * 80 * (uData.fuga === uData.preso ? 0.05 : 0.1)))
+		let preço = Math.floor((20000 + (atkPower * (atkPower / 20)) ** 2) + (uData.moni * (uData.fuga === uData.preso ? 0.1 : 0.05)) + (uData.ficha * 80 * (uData.fuga === uData.preso ? 0.1 : 0.05)))
 
 		let chance = bot.getRandom(0, 100)
 		let sucesso = uData.classe === 'advogado' ? true : chance < 75
