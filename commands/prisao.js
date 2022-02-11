@@ -599,7 +599,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 							// total += 1
 						}
 					}
-				})					
+				})
 
 				function getEmbed(start = 0) {
 					const current = presos.slice(start, start + 15)
@@ -610,12 +610,14 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 
 					if (presos.length > 0) {
 						ps = presos.sort((a, b) => a.tempo - b.tempo).slice(start, start + 15)
-						presos.forEach(preso => prisioneiros.addField(preso.nick, `Livre em ${bot.segToHour((preso.tempo / 1000))}\nPreso ${preso.vezes} vezes\nFugiu ${preso.fugiu} vezes\n${preso.tentou ? `Tentou fugir` : `Não tentou fugir`}`, true))					} else
+						ps.forEach(preso => prisioneiros.addField(preso.nick, `Livre em ${bot.segToHour((preso.tempo / 1000))}\nPreso ${preso.vezes} vezes\nFugiu ${preso.fugiu} vezes\n${preso.tentou ? `Tentou fugir` : `Não tentou fugir`}`, true))
+					}
+					else
 						prisioneiros.setDescription("Não há prisioneiros")
 
 					return prisioneiros
 				}
-				
+
 				let currentIndex = 0
 
 				btnPresos.setDisabled(true)
@@ -635,7 +637,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 					.setLabel('Próximo')
 					.setEmoji('➡️')
 					.setCustomId(message.id + message.author.id + 'next')
-				
+
 				const rowPresos = new Discord.MessageActionRow()
 
 				let msgPresos = await message.channel.send({
@@ -668,7 +670,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 						if (currentIndex + 15 < presos.length)
 							rowBtn.addComponents(buttonProx)
 
-						msg.edit({
+						msgPresos.edit({
 							embeds: [getEmbed(currentIndex)],
 							components: [rowBtn]
 						}).catch(() => console.log("Não consegui editar mensagem `presos`"))

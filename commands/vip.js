@@ -88,12 +88,13 @@ exports.run = async (bot, message, args) => {
 		if (vipsTotal.length > 0) {
 			vips = vipsTotal.sort((a, b) => b.tempo - a.tempo).slice(start, start + 15)
 			vips.forEach(vip => membros.addField(vip.nick, `Tempo restante: ${minToDays((vip.tempo / 1000 / 60))}`, true))
-		} else
+		}
+		else
 			membros.setDescription("Não há VIPs")
-		
+
 		return membros
 	}
-	
+
 	let currentIndex = 0
 
 	collector.on('collect', async b => {
@@ -110,26 +111,26 @@ exports.run = async (bot, message, args) => {
 			.setLabel('Próximo')
 			.setEmoji('➡️')
 			.setCustomId(message.id + message.author.id + 'next')
-		
+
 		if (b.customId === message.id + message.author.id + 'lista') {
 			msg.edit({
 				embeds: [embed, getEmbed()],
 				components: vipsTotal.length > 15 ? [new Discord.MessageActionRow().addComponents(buttonProx)] : []
 			}).catch(() => console.log("Não consegui editar mensagem `vip`"))
 		}
-		
+
 		else if (b.customId === message.id + message.author.id + 'prev' || b.customId === message.id + message.author.id + 'next') {
 			if (b.customId === message.id + message.author.id + 'prev')
 				currentIndex -= 15
 			else if (b.customId === message.id + message.author.id + 'next')
 				currentIndex += 15
-			
+
 			let rowBtn = new Discord.MessageActionRow()
 			if (currentIndex !== 0)
 				rowBtn.addComponents(buttonAnterior)
 			if (currentIndex + 15 < vipsTotal.length)
 				rowBtn.addComponents(buttonProx)
-			
+
 			msg.edit({
 				embeds: [embed, getEmbed(currentIndex)],
 				components: [rowBtn]
