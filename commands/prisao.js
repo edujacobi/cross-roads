@@ -646,7 +646,6 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 				}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
 				const filterPresos = (button) => [
-					message.id + message.author.id + 'lista',
 					message.id + message.author.id + 'prev',
 					message.id + message.author.id + 'next',
 				].includes(button.customId) && button.user.id === message.author.id
@@ -675,6 +674,12 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 							components: [rowBtn]
 						}).catch(() => console.log("Não consegui editar mensagem `presos`"))
 					}
+				})
+				collectorPresos.on('end', () => {
+					if (msgPresos)
+						msgPresos.edit({
+							components: []
+						}).catch(() => console.log("Não consegui editar mensagem `presos`"))
 				})
 			}
 			else if (b.customId === message.id + message.author.id + 'fugir') {
