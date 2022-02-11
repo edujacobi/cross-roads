@@ -265,6 +265,7 @@ module.exports = bot => {
 		wins: 0,
 		loses: 0,
 		descansar: 0,
+		caramuruWins: 0
 	}
 
 	bot.defautGang = {
