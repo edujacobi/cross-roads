@@ -120,18 +120,18 @@ exports.run = async (bot, interaction) => {
 					.catch(() => console.log("Não consegui editar mensagem `skins`"))
 
 			else if (c.customId.includes('selecionar')) {
-				if (uData.vipTime < currTime) {
-					const embed = new Discord.MessageEmbed()
-						.setColor(0xffd700)
-						.setDescription(`Você precisa ser **VIP** ${bot.config.vip} para usar skins`)
-					// .setTimestamp()
-					// .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
-					return interaction.followUp({embeds: [embed]})
-				}
 				Object.values(bot.guns).forEach(arma => {
 					if (c.customId.includes(arma.desc)) {
 						Object.entries(arma.skins).forEach(([id, skin]) => {
 							if (c.customId.includes(skin.nome)) {
+								if (uData.vipTime < currTime && !skin.evento && id !== 'default') {
+									const embed = new Discord.MessageEmbed()
+										.setColor(0xffd700)
+										.setDescription(`Você precisa ser ${bot.config.vip} **VIP** para usar skins que não são de eventos!`)
+									// .setTimestamp()
+									// .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
+									return interaction.followUp({embeds: [embed]})
+								}
 								if (!uData.arma[arma.data].skinsCompradas.includes(id))
 									uData.arma[arma.data].skinsCompradas.push(id)
 

@@ -404,9 +404,9 @@ module.exports = bot => {
 	bot.removeSkinsNoVIP = () => {
 		bot.data.forEach((user, id) => {
 			if (user.username != undefined && user.vipTime < Date.now()) {
-				Object.values(user.arma).forEach(arma => {
-					if (arma.skinAtual !== 'default')
-						arma.skinAtual = 'default'
+				Object.entries(user.arma).forEach(arma => {
+					if (arma[1].skinAtual !== 'default' && !bot.guns[arma[0]].evento)
+						arma[1].skinAtual = 'default'
 				})
 				bot.data.set(id, user)
 			}

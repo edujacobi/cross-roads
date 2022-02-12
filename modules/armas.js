@@ -15,12 +15,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Faca:829906312837201970>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:faca:937170775063023636>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -38,12 +40,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Colt45:829906310538723339>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:colt45:937170775117553704>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -61,17 +65,20 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Tec9:829906313743826944>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:tec9:937170775281119262>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'brasil': {
 					nome: 'Brasileira',
 					emote: '<:tec9BR:937437983307595786>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -89,12 +96,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Rifle:829906310983581756>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássico',
 					emote: '<:rifle:937170774727475242>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -112,12 +121,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Escopeta:829906310211567667>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:escopeta:937170774983319552>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -135,12 +146,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:MP5:829906313608691722>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:mp5:937170775050436619>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -158,12 +171,20 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:AK47:829906310099238984>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:ak47:937170774920400957>',
-					compravel: true
+					compravel: true,
+					evento: false
+				},
+				'pauspedras': {
+					nome: 'Zumbilândia',
+					emote: '<:AK47PP:941833509419511868>',
+					compravel: false,
+					evento: false
 				}
 			}
 		},
@@ -181,12 +202,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:M4:829906313374334976>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:M4:937170775100760114>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -204,12 +227,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Sniper:829906314167451648>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:sniper:937170775138508830>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -227,12 +252,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Katana:829906312795521034>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:katanaicon:937170775021068378>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -250,12 +277,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:RPG:829906313126477874>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:rpg:937170775096557588>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -273,12 +302,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Oculos_Noturno:829906313026863104>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássico',
 					emote: '<:goggles:937170774446461008>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -296,7 +327,8 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Colete_Leve:829906314451746836>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 				// 'classic': '<:faca:937170775063023636>'
 			}
@@ -315,7 +347,8 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Colete_Pesado:829906314653204511>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 				// 'classic': '<:faca:937170775063023636>'
 			}
@@ -334,12 +367,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:celular:734247685422579714>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássico',
 					emote: '<:celular:937170774811361331>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -357,12 +392,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Jetpack:829906313034465284>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:jetpack:937170775079792690>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'brasil': {
 					nome: 'Brasileira',
@@ -385,12 +422,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Minigun:829906313580380160>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:minigun:937170775121731604>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -408,12 +447,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Bazuca:829906313315090462>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:bazuca:937170775201439774>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 			}
 		},
@@ -431,7 +472,8 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Exoesqueleto:829906315618025492>',
-					compravel: true
+					compravel: true,
+					evento: false
 				}
 				// 'classic': '<:faca:937170775063023636>'
 			}
@@ -450,12 +492,14 @@ module.exports = (bot) => {
 				'default': {
 					nome: 'Padrão',
 					emote: '<:Granada:829906313239855105>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:granada:937170774152859670>',
-					compravel: true
+					compravel: true,
+					evento: false
 				},
 				'natal': {
 					nome: 'Natalina',

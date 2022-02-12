@@ -40,7 +40,7 @@ exports.run = async (bot, interaction) => {
         .addField("NodeJS", process.version.toString(), true)
         .addField(" Uso de memória", `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`, true)
         .addField(`${online} Online`, count_online.toString(), true)
-        .setFooter("Desenvolvedor: Jacobi#5109\nÍcones: Cesar, nadalao, CassadorEterno e Quantum", avatar);
+        .setFooter("Desenvolvedor: Jacobi#5109\nArte gráfica: Cesar, nadalao, CassadorEterno, Kenny, perriet e Quantum", avatar);
 
     await interaction.reply({embeds: [embed]})
         .catch(err => console.log("Não consegui enviar mensagem `stats`"));

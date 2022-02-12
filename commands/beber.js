@@ -74,7 +74,7 @@ exports.run = async (bot, message, args) => {
 		.setColor('AQUA')
 		.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 
-	if (fds) embed.setAuthor({name: `**Happy Hour ativado! Chance de se embebedar x3**`})
+	if (fds) embed.setAuthor({name: `Happy Hour ativado! Chance de se embebedar x3`})
 
 	const button = new Discord.MessageButton()
 		.setStyle('SECONDARY')
