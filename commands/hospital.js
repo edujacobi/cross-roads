@@ -9,7 +9,7 @@ exports.run = async (bot, message, args) => {
 		if (uData.hospitalizado < currTime)
 			return bot.createEmbed(message, `Você não está hospitalizado ${bot.config.hospital}`, "Quer uma injeçãozinha?", bot.colors.hospital)
 
-		if (uData.hospitalizado < currTime + 5 * 60 * 60 * 1000)
+		if (uData.hospitalizado < currTime + 5 * 60 * 1000)
 			return bot.createEmbed(message, `Você é o próximo da fila, aguarde sua vez ${bot.config.hospital}`, "Uma picadinha não dói.", bot.colors.hospital)
 
 		let defPower = 0

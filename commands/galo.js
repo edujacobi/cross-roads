@@ -71,7 +71,7 @@ exports.run = async (bot, message, args) => {
 			.addField("Nível", (galo.power - 30).toString(), true)
 			.addField("Chance de vitória", galo.power + "%", true)
 			.addField("Raça e Nacionalidade", nacionalidade)
-			.addField("Dados", `Vitórias: \`${galo.wins}\`\nDerrotas: \`${galo.loses}\`\nWin rate: \`${winrate}%\`${galo.caramuruWins !== 0 ? `\nVenceu o ${bot.config.caramuru} Caramuru ${galo.caramuruWins === 1 ? 'vez' : 'vezez'}` : ''}`, true)
+			.addField("Dados", `Vitórias: \`${galo.wins}\`\nDerrotas: \`${galo.loses}\`\nWin rate: \`${winrate}%\`${galo.caramuruWins !== 0 ? `\nVenceu o ${bot.config.caramuru} Caramuru ${galo.caramuruWins === 1 ? 'uma vez' : 'vezez'}` : ''}`, true)
 			.addField("Stats", calcStats(galo), true)
 			.addField("\u200b", `**${getSituation(galo)}**`)
 			.setThumbnail(galo.avatar)
