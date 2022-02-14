@@ -180,10 +180,10 @@ module.exports = (bot) => {
 					compravel: true,
 					evento: false
 				},
-				'pauspedras': {
+				'zumbilandia': {
 					nome: 'Zumbilândia',
 					emote: '<:AK47PP:941833509419511868>',
-					compravel: false,
+					compravel: true,
 					evento: false
 				}
 			}

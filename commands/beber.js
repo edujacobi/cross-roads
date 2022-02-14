@@ -131,7 +131,7 @@ exports.run = async (bot, message, args) => {
 				.catch(() => console.log("Não consegui editar mensagem `beber`"))
 
 			return message.channel.send({embeds: [embed]})
-				.catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
+				// .catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
 		}
 
 		else if (i.customId === message.id + message.author.id + 'beber') {
