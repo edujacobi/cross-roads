@@ -113,7 +113,7 @@ exports.run = async (bot, message, args) => {
 		if (i.user.id !== message.author.id) return
 
 		if (i.customId === message.id + message.author.id + 'top') {
-			let topGlobal = getTop(9)
+			let topGlobal = getTop(6)
 
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.vadiando} Top Beberrões`)
@@ -131,7 +131,7 @@ exports.run = async (bot, message, args) => {
 				.catch(() => console.log("Não consegui editar mensagem `beber`"))
 
 			return message.channel.send({embeds: [embed]})
-				.catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
+				// .catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
 		}
 
 		else if (i.customId === message.id + message.author.id + 'beber') {
