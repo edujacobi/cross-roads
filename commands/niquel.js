@@ -1,225 +1,248 @@
-const wait = require('util').promisify(setTimeout);
-const Discord = require("discord.js");
+const wait = require('util').promisify(setTimeout)
+const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
-    let time = new Date().getTime()
-    let uData = bot.data.get(message.author.id)
-    let multiplicador = args[0] ? parseInt(args[0]) : 1
-    const MULT_INVEST = uData.invest ? bot.investimentos[uData.invest].id : 1
-    const MAX = 5 * MULT_INVEST
-    //	if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return message.channel.send('Comando em manutenção')
+	let time = new Date().getTime()
+	let uData = bot.data.get(message.author.id)
+	let multiplicador = args[0] ? parseInt(args[0]) : 1
+	const MULT_INVEST = uData.invest ? bot.investimentos[uData.invest].id : 1
+	const MAX = 5 * MULT_INVEST
+	const MAX_JOGOS = 100
+	let currentJogos = MAX_JOGOS
+	//	if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return message.channel.send('Comando em manutenção')
 
-    //return bot.createEmbed(message, `🎰 As Máquinas Caça-níqueis estão desativadas durante a primeira semana de temporada`)
+	//return bot.createEmbed(message, `🎰 As Máquinas Caça-níqueis estão desativadas durante a primeira semana de temporada`)
 
-    if (multiplicador <= 0 || (multiplicador % 1 != 0))
-        return bot.msgValorInvalido(message)
+	if (multiplicador <= 0 || (multiplicador % 1 != 0))
+		return bot.msgValorInvalido(message)
 
-    if (multiplicador > MAX) {
-        bot.createEmbed(message, `O limite máximo do multiplicador é ${MAX} :slot_machine:`)
-        multiplicador = MAX
-    }
+	if (multiplicador > MAX) {
+		bot.createEmbed(message, `O limite máximo do multiplicador é ${MAX} :slot_machine:`)
+		multiplicador = MAX
+	}
 
-    if (uData.job != null)
-        return bot.msgTrabalhando(message, uData)
+	if (uData.job != null)
+		return bot.msgTrabalhando(message, uData)
+	if (uData.preso > time)
+		return bot.msgPreso(message, uData)
+	if (uData.hospitalizado > time)
+		return bot.msgHospitalizado(message, uData)
+	if (bot.isUserEmRouboOuEspancamento(message, uData))
+		return
+	if (bot.isGaloEmRinha(message.author.id))
+		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
-    if (uData.preso > time)
-        return bot.msgPreso(message, uData)
+	let embed = new Discord.MessageEmbed()
+		.setDescription(`Jogos restantes: ${currentJogos}`)
+		.addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝`)
+		.setColor(bot.colors.darkGrey)
+		.setFooter({
+			text: `${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`
+		})
 
-    if (uData.hospitalizado > time)
-        return bot.msgHospitalizado(message, uData)
+	if (multiplicador > 1)
+		embed.description += `\n**Multiplicador: ${multiplicador}x**`
 
-    if (bot.isUserEmRouboOuEspancamento(message, uData))
-        return
+	const button = new Discord.MessageButton()
+		.setStyle('SECONDARY')
+		.setLabel('Jogar')
+		.setEmoji('🎰')
+		.setCustomId(message.id + message.author.id)
+		.setDisabled(uData.preso > time || uData.hospitalizado > time || uData.jobTime > time || uData.emRoubo.tempo > time || uData.emEspancamento.tempo > time || bot.isGaloEmRinha(message.author.id))
 
-    if (bot.isGaloEmRinha(message.author.id))
-        return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
+	let row = new Discord.MessageActionRow()
+		.addComponents(button)
 
-    let embed = new Discord.MessageEmbed()
-        .addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝`)
-        .setColor(bot.colors.darkGrey)
-        .setFooter(`${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`)
+	await message.channel.send({
+		components: [row],
+		embeds: [embed]
+	}).then(msg => {
 
-    if (multiplicador > 1)
-        embed.setDescription(`**Multiplicador: ${multiplicador}x**`)
+		const filter = (button) => (message.id + message.author.id) === button.customId && button.user.id === message.author.id
 
-    const button = new Discord.MessageButton()
-        .setStyle('SECONDARY')
-        .setLabel('Jogar')
-        .setEmoji('🎰')
-        .setCustomId(message.id + message.author.id)
+		const collector = message.channel.createMessageComponentCollector({
+			filter,
+			idle: 40000
+		})
 
-    if (uData.preso > time || uData.hospitalizado > time || uData.jobTime > time || uData.emRoubo.tempo > time || uData.emEspancamento.tempo > time || bot.isGaloEmRinha(message.author.id))
-        button.setDisabled(true)
+		collector.on('collect', async r => {
+			await r.deferUpdate()
+			button.setDisabled(true)
+				.setLabel("Jogando...")
 
-    let row = new Discord.MessageActionRow()
-        .addComponents(button);
+			row = new Discord.MessageActionRow()
+				.addComponents(button)
 
-    await message.channel.send({
-        components: [row],
-        embeds: [embed]
-    }).then(msg => {
+			await msg.edit({
+				embeds: [embed],
+				components: [row]
+			}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
 
-        const filter = (button) => (message.id + message.author.id) === button.customId && button.user.id === message.author.id
+			uData = bot.data.get(message.author.id)
 
-        const collector = message.channel.createMessageComponentCollector({
-            filter,
-            idle: 40000
-        });
+			if (uData.preso > time)
+				return bot.msgPreso(message, uData)
+			if (uData.hospitalizado > time)
+				return bot.msgHospitalizado(message, uData)
+			if (bot.isPlayerMorto(uData))
+				return bot.msgPlayerMorto(message)
+			if (bot.isPlayerViajando(uData))
+				return bot.msgPlayerViajando(message)
+			if (uData.jobTime > time)
+				return bot.msgTrabalhando(message, uData)
+			if (bot.isUserEmRouboOuEspancamento(message, uData))
+				return
+			if (bot.isGaloEmRinha(message.author.id))
+				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
-        collector.on('collect', async r => {
-            await r.deferUpdate()
-            button.setDisabled(true)
-                .setLabel("Jogando...")
+			if (uData.ficha < 1 * multiplicador) {
+				const embedSemFicha = new Discord.MessageEmbed()
+					.setDescription(`Jogos restantes: ${currentJogos}`)
+					.addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝\nSuas ${bot.config.ficha} **fichas** acabaram`)
+					.setColor(bot.colors.darkGrey)
+					.setFooter({
+						text: `${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`
+					})
 
-            row = new Discord.MessageActionRow()
-                .addComponents(button);
+				if (multiplicador > 1)
+					embedSemFicha.description += `\n**Multiplicador: ${multiplicador}x**`
 
-            await msg.edit({
-                embeds: [embed],
-                components: [row]
-            }).catch(() => console.log("Não consegui editar mensagem `niquel`"))
+				return r.editReply({
+					embeds: [embedSemFicha],
+					components: []
+				}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
+			}
 
-            uData = bot.data.get(message.author.id)
+			if (currentJogos === 0) {
+				const embedSemJogos = new Discord.MessageEmbed()
+					.setDescription(`Jogos restantes: ${currentJogos}`)
+					.addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝\nSeus jogos neste máquina acabaram`)
+					.setColor(bot.colors.darkGrey)
+					.setFooter({
+						text: `${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`
+					})
 
-            if (uData.preso > time)
-                return bot.msgPreso(message, uData)
+				if (multiplicador > 1)
+					embedSemJogos.description += `\n**Multiplicador: ${multiplicador}x**`
 
-            if (uData.hospitalizado > time)
-                return bot.msgHospitalizado(message, uData)
+				return r.editReply({
+					embeds: [embedSemJogos],
+					components: []
+				}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
+			}
 
-            if (bot.isPlayerMorto(uData))
-                return bot.msgPlayerMorto(message);
+			uData.ficha -= 1 * multiplicador
 
-            if (bot.isPlayerViajando(uData))
-                return bot.msgPlayerViajando(message);
+			let emojis = [
+				bot.config.mercadonegro,
+				bot.badges.bilionario,
+				bot.config.dateDrink,
+				bot.config.loja,
+				bot.config.cash,
+				bot.config.car,
+				bot.config.bulldozer,
+				bot.config.carregamento,
+				bot.config.propertyG,
+				bot.config.propertyR,
+				bot.config.ficha,
+				bot.config.hospital,
+			]
 
-            if (uData.jobTime > time)
-                return bot.msgTrabalhando(message, uData)
+			let visor1 = bot.shuffle(emojis)[0]
+			let visor2 = bot.shuffle(emojis)[0]
+			let visor3 = bot.shuffle(emojis)[0]
 
-            if (bot.isUserEmRouboOuEspancamento(message, uData))
-                return
+			let resultado = `║${visor1}║${visor2}║${visor3}║`
+			
+			currentJogos -= 1
 
-            if (bot.isGaloEmRinha(message.author.id))
-                return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
+			embed = new Discord.MessageEmbed()
+				.setDescription(`Jogos restantes: ${currentJogos}`)
 
-            if (uData.ficha < 1 * multiplicador) {
-                const embedSemFicha = new Discord.MessageEmbed()
-                    .addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝\nSuas ${bot.config.ficha} **fichas** acabaram`)
-                    .setColor(bot.colors.darkGrey)
-                    .setFooter(`${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`)
+			if (visor1 === visor2 && visor2 === visor3) {
+				let premio = 150 * multiplicador
+				if (visor1 === bot.config.propertyR)
+					premio = 50 * multiplicador
 
-                if (multiplicador > 1)
-                    embedSemFicha.setDescription(`**Multiplicador: ${multiplicador}x**`)
+				else if (visor1 === bot.config.propertyG)
+					premio = 300 * multiplicador
 
-                return r.editReply({
-                    embeds: [embedSemFicha],
-                    components: []
-                }).catch(() => console.log("Não consegui editar mensagem `niquel`"))
-            }
+				else if (visor1 === bot.config.cash)
+					premio = 500 * multiplicador
 
-            uData.ficha -= 1 * multiplicador
+				uData.betW += 1
+				uData.ficha += premio
+				uData.cassinoGanhos += premio * 80
 
-            let emojis = [
-                bot.config.mercadonegro,
-                bot.badges.bilionario,
-                bot.config.dateDrink,
-                bot.config.loja,
-                bot.config.cash,
-                bot.config.car,
-                bot.config.bulldozer,
-                bot.config.carregamento,
-                bot.config.propertyG,
-                bot.config.propertyR,
-                bot.config.ficha,
-                bot.config.hospital,
-            ]
+				embed.addField(`Você ganhou ${premio} fichas! ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n${resultado}\n╚══╩══╩══╝`)
+					.setColor('GREEN')
 
-            let visor1 = bot.shuffle(emojis)[0]
-            let visor2 = bot.shuffle(emojis)[0]
-            let visor3 = bot.shuffle(emojis)[0]
+				bot.log(message, new Discord.MessageEmbed()
+					.setDescription(`**${uData.username} ganhou ${premio} fichas na máquina caça-níqueis**`)
+					.addField("Resultado", resultado, true)
+					.addField("Ficou com", uData.ficha.toLocaleString().replace(/,/g, "."), true)
+					.addField("Multiplicador", multiplicador.toString(), true)
+					.setColor('GREEN'))
 
-            let resultado = `║${visor1}║${visor2}║${visor3}║`
+			}
 
-            embed = new Discord.MessageEmbed()
+			else {
+				uData.betL += 1
+				uData.cassinoPerdidos += 80 * multiplicador
 
-            if (visor1 == visor2 && visor2 == visor3) {
-                let premio = 150 * multiplicador
-                if (visor1 == bot.config.propertyR)
-                    premio = 50 * multiplicador
+				bot.banco.set('cassino', bot.banco.get('cassino') + 30 * multiplicador)
+				bot.banco.set('caixa', bot.banco.get('caixa') + 60 * multiplicador)
 
-                else if (visor1 == bot.config.propertyG)
-                    premio = 300 * multiplicador
+				embed.addField(`Você não ganhou ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n${resultado}\n╚══╩══╩══╝`)
+					.setColor('RED')
+			}
 
-                else if (visor1 == bot.config.cash)
-                    premio = 500 * multiplicador
+			uData.betJ += 1
 
-                uData.betW += 1
-                uData.ficha += premio
-                uData.cassinoGanhos += premio * 80
+			bot.data.set(message.author.id, uData)
 
-                embed.addField(`Você ganhou ${premio} fichas! ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n${resultado}\n╚══╩══╩══╝`)
-                    .setColor('GREEN')
+			embed.setFooter({
+				text: `${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`
+			})
 
-                bot.log(message, new Discord.MessageEmbed()
-                    .setDescription(`**${uData.username} ganhou ${premio} fichas na máquina caça-níqueis**`)
-                    .addField("Resultado", resultado, true)
-                    .addField("Ficou com", uData.ficha.toLocaleString().replace(/,/g, "."), true)
-                    .addField("Multiplicador", multiplicador.toString(), true)
-                    .setColor('GREEN'))
+			if (multiplicador > 1)
+				embed.description += `\n**Multiplicador: ${multiplicador}x**`
 
-            } else {
-                uData.betL += 1
-                uData.cassinoPerdidos += 80 * multiplicador
+			await wait(500)
 
-                bot.banco.set('cassino', bot.banco.get('cassino') + 30 * multiplicador)
-                bot.banco.set('caixa', bot.banco.get('caixa') + 60 * multiplicador)
+			button.setDisabled(false)
+				.setLabel("Jogar")
 
-                embed.addField(`Você não ganhou ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n${resultado}\n╚══╩══╩══╝`)
-                    .setColor('RED')
-            }
+			row = new Discord.MessageActionRow()
+				.addComponents(button)
 
-            uData.betJ += 1
+			await r.editReply({
+				embeds: [embed],
+				components: [row]
+			}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
+		})
 
-            bot.data.set(message.author.id, uData)
+		collector.on('end', async () => {
+			const embed = new Discord.MessageEmbed()
+				.setDescription(`Jogos restantes: ${currentJogos}`)
+				.addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝`)
+				.setColor(bot.colors.darkGrey)
+				.setFooter({
+					text: `${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`
+				})
 
-            embed.setFooter(`${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`)
+			if (multiplicador > 1)
+				embed.description += `**Multiplicador: ${multiplicador}x**`
 
-            if (multiplicador > 1)
-                embed.setDescription(`**Multiplicador: ${multiplicador}x**`)
+			await msg.edit({
+				embeds: [embed],
+				components: []
+			}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
+		})
 
-            await wait(500)
+	})
+	// .catch(err => console.log("Não consegui enviar mensagem `niquel`"))
 
-            button.setDisabled(false)
-                .setLabel("Jogar")
-
-            row = new Discord.MessageActionRow()
-                .addComponents(button);
-
-            await r.editReply({
-                embeds: [embed],
-                components: [row]
-            }).catch(() => console.log("Não consegui editar mensagem `niquel`"))
-        })
-
-        collector.on('end', async () => {
-            const embed = new Discord.MessageEmbed()
-                .addField(`Máquina Caça-níqueis ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n║══║══║══║\n╚══╩══╩══╝`)
-                .setColor(bot.colors.darkGrey)
-                .setFooter(`${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`)
-
-            if (multiplicador > 1)
-                embed.setDescription(`**Multiplicador: ${multiplicador}x**`)
-
-            await msg.edit({
-                embeds: [embed],
-                components: []
-            })
-                .catch(() => console.log("Não consegui editar mensagem `niquel`"))
-        })
-
-    })
-    // .catch(err => console.log("Não consegui enviar mensagem `niquel`"))
-
-};
+}
 exports.config = {
-    alias: ['n', 'slot']
-};
+	alias: ['n', 'slot']
+}
