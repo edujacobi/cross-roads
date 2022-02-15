@@ -61,10 +61,14 @@ exports.run = async (bot, message, args) => {
 
 	const invClosed = new Discord.MessageEmbed()
 		.setColor(uGang ? uGang.cor : bot.colors.darkGrey)
-		.setAuthor(`Inventário de ${(uGang && uGang.tag !== '') ? `[${uGang.tag}] ` : ``}${uData.username}`) //, avatar)
+		.setAuthor({
+			name: `Inventário de ${(uGang && uGang.tag !== '') ? `[${uGang.tag}] ` : ``}${uData.username}`
+		}) //, avatar)
 		.setThumbnail(uData.classe ? bot.classes[uData.classe].imagem : 'https://cdn.discordapp.com/attachments/531174573463306240/814662917696782376/Inventario.png')
 		.setDescription(`${badges}R$ ${uData.moni != null ? uData.moni.toLocaleString().replace(/,/g, ".") : 'Bugado'}${investimento}${conjugeClosed}`)
-		.setFooter(`${miniSituation} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`)
+		.setFooter({
+			text: `${miniSituation} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`
+		})
 		.setTimestamp()
 
 	let horaInvestimento = uData.invest != null ? (currTime < uData.investTime + semana ?
@@ -136,7 +140,9 @@ exports.run = async (bot, message, args) => {
 		.setColor(uGang ? uGang.cor : bot.colors.darkGrey)
 		.setThumbnail(uData.classe ? bot.classes[uData.classe].imagem : 'https://cdn.discordapp.com/attachments/691019843159326757/817186806218358784/Inventario_Aberto_20210304205450.png')
 		.setDescription(`${badges}R$ ${uData.moni != null ? uData.moni.toLocaleString().replace(/,/g, ".") : 'Bugado'}${investimento}${horaInvestimento}${conjugeOpen}`)
-		.setFooter(`Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • ${atkPower} ATK • ${defPower} DEF`)
+		.setFooter({
+			text: `Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • ${atkPower} ATK • ${defPower} DEF`
+		})
 		.setTimestamp()
 
 	if (uData.gangID != null) {
@@ -146,7 +152,7 @@ exports.run = async (bot, message, args) => {
 			cargo = "Líder"
 		else if (uGang.membros.find(user => user.cargo === 'vice') && uGang.membros.find(user => user.cargo === 'vice').id == alvo)
 			cargo = "Vice-Líder"
-		invOpen.setAuthor({text: `${cargo} de ${uGang.nome}`, iconURL: uGang.icone})
+		invOpen.setAuthor({name: `${cargo} de ${uGang.nome}`, iconURL: uGang.icone})
 	}
 
 	// let total = 0
