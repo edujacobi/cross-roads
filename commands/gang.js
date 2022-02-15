@@ -263,7 +263,16 @@ exports.run = async (bot, message, args) => {
 		if (tData.depositoGang > currTime)
 			return bot.createEmbed(message, `${tData.username} só poderá entrar em uma nova gangue em ${bot.segToHour((tData.depositoGang - currTime) / 1000)} ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.createEmbed(message, `**${uData.username}** convidou **${tData.username}** para fazer parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}\nO custo para entrar nesta gangue é R$ ${(custo_base + (50000 * uGang.baseLevel)).toLocaleString().replace(/,/g, ".")}\nAceitar convite?`, null, uGang.cor)
+		const embedConvite = new Discord.MessageEmbed()
+			.setDescription(`**${uData.username}** convidou **${tData.username}** para fazer parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}
+O custo para entrar nesta gangue é R$ ${(custo_base + (50000 * uGang.baseLevel)).toLocaleString().replace(/,/g, ".")}
+Aceitar convite?`)
+			.setColor(uGang.cor)
+			.setFooter({text: uData.username, iconURL: message?.member?.user?.avatarURL()})
+			.setTimestamp()
+
+		message.channel.send({embeds: [embedConvite]})
+			.catch(() => console.log("Não consegui enviar mensagem `gang convidar`"))
 			.then(msg => {
 				msg.react('✅').catch(() => console.log("Não consegui reagir mensagem `gang`")).then(() => {
 					const filter = (reaction, user) => reaction.emoji.name === '✅' && user.id === target.id
@@ -1415,15 +1424,15 @@ exports.run = async (bot, message, args) => {
 										currTime = new Date().getTime()
 
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) { // !players_negados.includes(newplayer.id)
-											if (jogador.preso > currTime) 
+											if (jogador.preso > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-											else if (jogador.hospitalizado > currTime) 
+											else if (jogador.hospitalizado > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-											else if (jogador.gangID !== uData.gangID) 
+											else if (jogador.gangID !== uData.gangID)
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, bot.colors.background)
-											else if (jogador.roubo > currTime) 
+											else if (jogador.roubo > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
-											else if (jogador.job != null) 
+											else if (jogador.job != null)
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, bot.jobs[jogador.job].desc, bot.colors.background)
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
 												bot.isUserEmRouboOuEspancamento(message, jogador)
@@ -2064,12 +2073,13 @@ exports.run = async (bot, message, args) => {
 	}
 	else {
 		let uData = bot.data.get(message.author.id)
+		let uGang = bot.gangs.get(uData.gangID)
 
 		if ((uData.gangID == null && !option) || option === 'info') {
 			const embed = new Discord.MessageEmbed()
-				.setTitle(`${bot.config.gang} Gangues`)
+				.setTitle(`${bot.badges.topGangue_s6} Gangues`)
 				.setColor('GREEN')
-				.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/754773460873510963/radar_gangP.png')
+				.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/942895894628536420/TopGangue.png')
 				.setDescription("Crie sua gangue e trabalhe em equipe! Participe de assaltos em grupo e lutas generalizadas [em breve]!\n\n**Custo para criar uma gangue: R$ 2.500.000**")
 				.addField("Comandos Geral",
 					`\`;gangue (gangue)/(@user)\` Exibe informações de uma gangue
@@ -2080,7 +2090,9 @@ exports.run = async (bot, message, args) => {
 \`;gangue base [gangue]\` Mostra a base de uma gangue
 \`;gangue depositar <valor>\` Guarda dinheiro no caixa da gangue
 \`;topgangue\` Exibe as gangues mais fortes`)
-				.addField("Comandos Líder",
+
+			if (isLider(uGang, message.author.id))
+				embed.addField("Comandos Líder",
 					`\`;gangue nome <novo-nome>\` Define um novo nome
 \`;gangue descricao <nova-descrição>\` Define uma descrição
 \`;gangue cor <nova-cor>\` Define uma cor
@@ -2094,8 +2106,16 @@ exports.run = async (bot, message, args) => {
 \`;gangue expulsar <jogador> <motivo>\` Expulsar um jogador 
 \`;gangue transferir <jogador>\` Transfere a liderança
 \`;gangue vice <jogador>/remover\` Indica ou remove um Vice-Líder`)
-				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
-				.setTimestamp()
+
+			if (isVice(uGang, message.author.id))
+				embed.addField("Comandos Vice-líder",
+					`\`;gangue comunicar <mensagem>\` Envia uma mensagem a todos os membros
+\`;gangue importar/exportar\` Compra e vende carregamentos
+\`;gangue golpe\` Realiza golpes/heists
+\`;gangue convidar <jogador>\` Convida um jogador 
+\`;gangue expulsar <jogador> <motivo>\` Expulsar um jogador`)
+					.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
+					.setTimestamp()
 
 			message.channel.send({embeds: [embed]})
 				.catch(() => console.log("Não consegui enviar mensagem `gg info`"))

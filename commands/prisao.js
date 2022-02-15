@@ -40,19 +40,19 @@ exports.run = async (bot, message, args) => {
 		]
 
 		let frasesSucessoJetpack = [
-			`Mesmo com pouco combustível, sua ${bot.config.jetpack} Jetpack funcionou muito bem e você conseguiu fugir`,
-			`Você utilizou sua ${bot.config.jetpack} Jetpack e apesar da dificuldade, consegue fugir sem sofrer nenhum arranhão`,
-			`Sua ${bot.config.jetpack} Jetpack demorou pra pegar e chamou a atenção dos policiais, porém você consegue fugir`,
-			`Durante o banho de sol você simplesmente liga sua ${bot.config.jetpack} Jetpack e foge voando sem problemas`,
-			`Você usou as chamas da sua ${bot.config.jetpack} Jetpack para derreter as barras de ferro da janela e consegue fugir`
+			`Mesmo com pouco combustível, sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack funcionou muito bem e você conseguiu fugir`,
+			`Você utilizou sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack e apesar da dificuldade, consegue fugir sem sofrer nenhum arranhão`,
+			`Sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack demorou pra pegar e chamou a atenção dos policiais, porém você consegue fugir`,
+			`Durante o banho de sol você simplesmente liga sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack e foge voando sem problemas`,
+			`Você usou as chamas da sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack para derreter as barras de ferro da janela e consegue fugir`
 		]
 
 		let frasesSucessoJetpackCasal = [
-			`Mesmo com pouco combustível, suas ${bot.config.jetpack} Jetpacks funcionaram muito bem e vocês conseguiram fugir`,
-			`Vocês utilizaran suas ${bot.config.jetpack} Jetpacks e apesar da dificuldade, conseguem fugir sem sofrer nenhum arranhão`,
-			`Suas ${bot.config.jetpack} Jetpack demoraram pra pegar e chamaram a atenção dos policiais, porém vocês conseguem fugir`,
-			`Durante o banho de sol vocês simplesmente ligam suas ${bot.config.jetpack} Jetpacks e fogem voando sem problemas`,
-			`Vocês usaram as chamas das suas ${bot.config.jetpack} Jetpacks para derreter as barras de ferro da janela e conseguem fugir`
+			`Mesmo com pouco combustível, suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks funcionaram muito bem e vocês conseguiram fugir`,
+			`Vocês utilizaran suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks e apesar da dificuldade, conseguem fugir sem sofrer nenhum arranhão`,
+			`Suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack demoraram pra pegar e chamaram a atenção dos policiais, porém vocês conseguem fugir`,
+			`Durante o banho de sol vocês simplesmente ligam suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks e fogem voando sem problemas`,
+			`Vocês usaram as chamas das suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks para derreter as barras de ferro da janela e conseguem fugir`
 		]
 
 		let frasesProcurado = [
@@ -88,19 +88,19 @@ exports.run = async (bot, message, args) => {
 		]
 
 		let frasesFracassoJetpack = [
-			`Você tentou voar com sua ${bot.config.jetpack} Jetpack, mas ela estava com pouco combustível e você desceu lentamente até os policiais`,
-			`Você usou sua ${bot.config.jetpack} Jetpack para passar pelos portões, mas foi derrubado por uma barreira de choque`,
-			`Você tenta ligar sua ${bot.config.jetpack} Jetpack para fugir, mas alertou os policias`,
-			`Você se prepara para fugir com sua ${bot.config.jetpack} Jetpack, mas outro detento avisou os policiais`,
-			`Você começa a voar com a ${bot.config.jetpack} Jetpack, mas outros detentos se agarram em você na esperança de fugir juntos, mas você é arrastado para o chão`,
+			`Você tentou voar com sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack, mas ela estava com pouco combustível e você desceu lentamente até os policiais`,
+			`Você usou sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack para passar pelos portões, mas foi derrubado por uma barreira de choque`,
+			`Você tenta ligar sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack para fugir, mas alertou os policias`,
+			`Você se prepara para fugir com sua ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack, mas outro detento avisou os policiais`,
+			`Você começa a voar com a ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpack, mas outros detentos se agarram em você na esperança de fugir juntos, mas você é arrastado para o chão`,
 		]
 
 		let frasesFracassoJetpackCasal = [
-			`Vocês tentaram voar com suas ${bot.config.jetpack} Jetpacks, mas elas estavam com pouco combustível e vocês desceram lentamente até os policiais`,
-			`Vocês usaram suas ${bot.config.jetpack} Jetpacks para passar pelos portões, mas foram derrubados por uma barreira de choque`,
-			`Vocês tentam ligar suas ${bot.config.jetpack} Jetpacks para fugir, mas alertaram os policias`,
-			`Vocês se preparam para fugir com suas ${bot.config.jetpack} Jetpacks, mas outro detento avisou os policiais`,
-			`Vocês começam a voar com as ${bot.config.jetpack} Jetpacks, mas outros detentos se agarram em vocês na esperança de fugir juntos, mas vocês são arrastados para o chão`,
+			`Vocês tentaram voar com suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks, mas elas estavam com pouco combustível e vocês desceram lentamente até os policiais`,
+			`Vocês usaram suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks para passar pelos portões, mas foram derrubados por uma barreira de choque`,
+			`Vocês tentam ligar suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks para fugir, mas alertaram os policias`,
+			`Vocês se preparam para fugir com suas ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks, mas outro detento avisou os policiais`,
+			`Vocês começam a voar com as ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} Jetpacks, mas outros detentos se agarram em vocês na esperança de fugir juntos, mas vocês são arrastados para o chão`,
 		]
 
 		let chance = bot.getRandom(0, 100)
@@ -187,9 +187,15 @@ exports.run = async (bot, message, args) => {
 			msgFuga.edit({
 				components: [],
 				embeds: [fugaInicio
-					.setAuthor('Fuga em andamento... O amor pode tudo!', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url)
+					.setAuthor({
+						name: 'Fuga em andamento... O amor pode tudo!',
+						iconURL: bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url
+					})
 					// .addField("Debug", `Chance base: ${chanceBase}\nSucesso necessarario: ${sucessoNecessario}\nSucesso conjuge: ${sucessoConjuge}\nChance calculada: ${chance}`)
-					.setFooter(`${uData.username} e ${cData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData.arma.jetpack.tempo > currTime ? `com Jetpack` : `sem Jetpack`}`, message.member.user.avatarURL())
+					.setFooter({
+						text: `${uData.username} e ${cData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData.arma.jetpack.tempo > currTime ? `com Jetpack` : `sem Jetpack`}`,
+						iconURL: message.member.user.avatarURL()
+					})
 				]
 			})
 
@@ -219,14 +225,20 @@ exports.run = async (bot, message, args) => {
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
 				.setDescription(`${uData.arma.jetpack.tempo > currTime ? bot.shuffle(frasesSucessoJetpack)[0] : bot.shuffle(frasesSucesso)[0]}, mas a polícia ${bot.shuffle(frasesProcurado)[0]} ${bot.config.police}`)
-				.setFooter(`${uData.username} • Espere 30 minutos para roubar novamente`, message.member.user.avatarURL())
+				.setFooter({
+					text: `${uData.username} • Espere 30 minutos para roubar novamente`,
+					iconURL: message.member.user.avatarURL()
+				})
 				.setTimestamp()
 
 			const embedFinalCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
 				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge.arma.jetpack.tempo > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
-				.setFooter(`${uData.username} e ${conjuge.username} • Esperem 30 minutos para roubar novamente`, message.member.user.avatarURL())
+				.setFooter({
+					text: `${uData.username} e ${conjuge.username} • Esperem 30 minutos para roubar novamente`,
+					iconURL: message.member.user.avatarURL()
+				})
 				.setTimestamp()
 
 			msgFuga.edit({
@@ -320,9 +332,7 @@ exports.run = async (bot, message, args) => {
 					.setColor(bot.colors.hospital)
 
 				setTimeout(() => {
-					message.author.send({
-						embeds: [embedPV]
-					})
+					message.author.send({embeds: [embedPV]})
 						.catch(() => message.reply(`você está curado! ${bot.config.hospital}`)
 							.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Prisao fugir\``))
 
@@ -345,14 +355,20 @@ exports.run = async (bot, message, args) => {
 				.setTitle('Fuga fracassada')
 				.setColor(bot.colors.policia)
 				.setDescription(`${uData.arma.jetpack.tempo > currTime ? bot.shuffle(frasesFracassoJetpack)[0] : bot.shuffle(frasesFracasso)[0]}. Você ficará preso por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
-				.setFooter(`${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}`, message.member.user.avatarURL())
+				.setFooter({
+					text: `${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}`,
+					iconURL: message.member.user.avatarURL()
+				})
 				.setTimestamp()
 
 			const embedCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga fracassada')
 				.setColor(bot.colors.policia)
 				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge.arma.jetpack.tempo > currTime ? bot.shuffle(frasesFracassoJetpackCasal)[0] : bot.shuffle(frasesFracassoCasal)[0]}. Vocês ficarão presos por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
-				.setFooter(`${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}\n${conjuge.username} • Tempo preso: ${bot.segToHour((conjuge.preso - currTime) / 1000)}`, message.member.user.avatarURL())
+				.setFooter({
+					text: `${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}\n${conjuge.username} • Tempo preso: ${bot.segToHour((conjuge.preso - currTime) / 1000)}`,
+					iconURL: message.member.user.avatarURL()
+				})
 				.setTimestamp()
 
 			if (chanceBaleado <= 10) {
@@ -370,9 +386,7 @@ exports.run = async (bot, message, args) => {
 				.setColor(bot.colors.policia)
 
 			setTimeout(() => {
-				message.author.send({
-					embeds: [embedPV]
-				})
+				message.author.send({embeds: [embedPV]})
 					.catch(() => message.reply(`você está livre! ${bot.config.prisao}`)
 						.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Prisao\``))
 			}, uData.preso - currTime)

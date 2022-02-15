@@ -4,6 +4,7 @@ exports.run = async (bot, message, args) => {
 	let topWins = []
 	let topWinrate = []
 	let topLevel = []
+	let topCaramuru = []
 
 	bot.data.indexes.forEach(user => { //gera lista para top global
 		if (bot.users.fetch(user)) {
@@ -16,7 +17,8 @@ exports.run = async (bot, message, args) => {
 					wins: uGalo.wins,
 					level: uGalo.power - 30,
 					winrate: uGalo.wins / (uGalo.loses + uGalo.wins) * 100,
-					classe: uData.classe
+					classe: uData.classe,
+					caramuru: uGalo.caramuruWins
 				})
 			}
 		}
@@ -35,6 +37,7 @@ exports.run = async (bot, message, args) => {
 			topWins = top.sort((a, b) => b.wins - a.wins).slice(start, start + 5)
 			topWinrate = top.sort((a, b) => b.winrate - a.winrate).slice(start, start + 5)
 			topLevel = top.sort((a, b) => b.level - a.level).slice(start, start + 5)
+			topCaramuru = top.sort((a, b) => b.caramuru - a.caramuru).slice(start, start + 5)
 
 			let userComando
 			if (!topWins.some(user => user.id === message.author.id))
@@ -43,21 +46,27 @@ exports.run = async (bot, message, args) => {
 			let topWinsString = ""
 			let topWinrateString = ""
 			let topLevelString = ""
+			let topCaramuruString = ""
 
 			topWins.forEach((user, i) => {
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
-				let mod = user.id == message.author.id ? "__" : ""
+				let mod = user.id === message.author.id ? "__" : ""
 				topWinsString += `\`${i + start + 1}.\` ${mod}**${user.galo}**${mod}: \`${user.wins.toLocaleString().replace(/,/g, ".")}\` (${emote} ${user.nick})\n`
 			})
 			topWinrate.forEach((user, i) => {
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
-				let mod = user.id == message.author.id ? "__" : ""
+				let mod = user.id === message.author.id ? "__" : ""
 				topWinrateString += `\`${i + start + 1}.\` ${mod}**${user.galo}**${mod}: \`${user.winrate.toFixed(1)}%\` (${emote} ${user.nick})\n`
 			})
 			topLevel.forEach((user, i) => {
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
-				let mod = user.id == message.author.id ? "__" : ""
+				let mod = user.id === message.author.id ? "__" : ""
 				topLevelString += `\`${i + start + 1}.\` ${mod}**${user.galo}**${mod}: \`${user.level}\` (${emote} ${user.nick})\n`
+			})
+			topCaramuru.forEach((user, i) => {
+				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
+				let mod = user.id === message.author.id ? "__" : ""
+				topCaramuruString += `\`${i + start + 1}.\` ${mod}**${user.galo}**${mod}: \`${user.caramuru}\` (${emote} ${user.nick})\n`
 			})
 
 			if (userComando) {
@@ -68,11 +77,13 @@ exports.run = async (bot, message, args) => {
 				topWinsString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${galo.wins.toLocaleString().replace(/,/g, ".")}\n`;
 				topWinrateString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${(galo.wins / (galo.loses + galo.wins) * 100).toLocaleString().replace(/,/g, ".")} %\n`;
 				topLevelString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${(galo.power - 30).toLocaleString().replace(/,/g, ".")}\n`;
+				topCaramuruString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${(galo.caramuru).toLocaleString().replace(/,/g, ".")}\n`;
 			}
 
 			resultado.addField("Vitórias", topWinsString)
 				.addField("Win rate", topWinrateString)
 				.addField("Level", topLevelString)
+				.addField("Vitórias vs Caramuru", topCaramuruString)
 
 		} else
 			resultado.addField("\u200b", 'Ninguém tem galo nessa porra?')

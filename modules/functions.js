@@ -328,9 +328,13 @@ module.exports = bot => {
 					//se o investimento ainda não completou uma semana
 					// user.investNotification += 1
 
+					const embedPV = new Discord.MessageEmbed()
+						.setTitle(`${bot.config.propertyG} Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} de seu investimento ${bot.investimentos[user.invest].desc}`)
+						.setColor('GREEN')
+
 					if (user.investNotification)
 						bot.users.fetch(id).then(user_send => {
-							user_send.send(`Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} de seu investimento **${bot.investimentos[user.invest].desc}** ${bot.config.propertyG}`)
+							user_send.send({embeds: [embedPV]})
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
 					user.moni += praSacar
@@ -343,14 +347,22 @@ module.exports = bot => {
 					//linhaInvest = `Seu investimento **${bot.investimentos[user.invest].desc}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, ".")} dele ${bot.config.propertyR}`
 					let invest = bot.investimentos[user.invest].desc
 					if (user.investNotification) {
+						const embedPV = new Discord.MessageEmbed()
+							.setTitle(`${bot.config.propertyR} Seu investimento ${invest} acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} dele`)
+							.setColor('RED')
+						
 						bot.users.fetch(id).then(user_send => {
-							user_send.send(`Seu investimento **${invest}** acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} dele ${bot.config.propertyR}`)
+							user_send.send({embeds: [embedPV]})
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
 					}
 					else {
+						const embedPV = new Discord.MessageEmbed()
+							.setTitle(`${bot.config.propertyR} Seu investimento ${invest} acabou.`)
+							.setColor('RED')
+						
 						bot.users.fetch(id).then(user_send => {
-							user_send.send(`Seu investimento **${invest}** acabou ${bot.config.propertyR}`)
+							user_send.send({embeds: [embedPV]})
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
 						})
 					}

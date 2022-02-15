@@ -146,7 +146,7 @@ exports.run = async (bot, message, args) => {
 			cargo = "Líder"
 		else if (uGang.membros.find(user => user.cargo === 'vice') && uGang.membros.find(user => user.cargo === 'vice').id == alvo)
 			cargo = "Vice-Líder"
-		invOpen.setAuthor(`${cargo} de ${uGang.nome}`, uGang.icone)
+		invOpen.setAuthor({text: `${cargo} de ${uGang.nome}`, iconURL: uGang.icone})
 	}
 
 	// let total = 0
@@ -235,7 +235,7 @@ exports.run = async (bot, message, args) => {
 	*/
 
 	let isAberto = false
-	
+
 	const rowActions = new Discord.MessageActionRow()
 	const rowAbrir = new Discord.MessageActionRow()
 		.addComponents(new Discord.MessageButton()
@@ -261,7 +261,7 @@ exports.run = async (bot, message, args) => {
 		.setStyle('SUCCESS')
 		.setLabel('Anúncio')
 		.setCustomId(message.id + message.author.id + 'anuncio')
-	
+
 	let boneco = uGang?.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang?.boneco]
 	const buttonGang = new Discord.MessageButton()
 		.setStyle('SECONDARY')
@@ -280,7 +280,7 @@ exports.run = async (bot, message, args) => {
 	}
 
 	let userD = bot.data.get(message.author.id)
-	
+
 	const buttonInvest = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		// .setLabel(bot.investimentos[uData.invest].desc)
@@ -288,7 +288,7 @@ exports.run = async (bot, message, args) => {
 		.setEmoji(bot.config.propertyG)
 		.setDisabled(!bot.isComandoUsavelViagem(message, 'investir'))
 		.setCustomId(message.id + message.author.id + 'invest')
-	
+
 	const buttonRoubar = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		.setLabel('Roubar')

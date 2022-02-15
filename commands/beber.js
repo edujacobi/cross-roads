@@ -2,6 +2,15 @@ const Discord = require("discord.js")
 
 exports.run = async (bot, message, args) => {
 	// if (message.author.id != bot.config.adminID) return message.reply("Comando em manutenção")
+	let currTime = new Date().getTime()
+	
+	function isHappyHour() {
+		let dia = new Date().getDay()
+		let hora = new Date().getHours()
+		
+		// if (dia === 0 || dia === 6 || (dia === 5 && hora >= 20)) //FDS
+		return hora >= 20 && hora <= 22 || dia === 0 || dia === 6
+	}
 
 	function getTop(max) {
 		let top = []
@@ -16,10 +25,8 @@ exports.run = async (bot, message, args) => {
 				})
 			}
 		})
-
-		top.sort((a, b) => b.maximo.normal - a.maximo.normal)
-
-		return top.sort((a, b) => b.maximo.happyHour - a.maximo.happyHour).slice(0, max)
+		
+		return isHappyHour() ? top.sort((a, b) => b.maximo.happyHour - a.maximo.happyHour).slice(0, max) : top.sort((a, b) => b.maximo.normal - a.maximo.normal).slice(0, max)
 	}
 
 	const MINUTOS = 3
@@ -55,14 +62,6 @@ exports.run = async (bot, message, args) => {
 
 	let count = 1
 
-	let dia = new Date().getDay()
-	let hora = new Date().getHours()
-	let currTime = new Date().getTime()
-
-	let fds = false
-	if (dia === 0 || dia === 6 || (dia === 5 && hora >= 20)) //FDS
-		fds = true
-
 	let canal = message.channel.name.replace(/-/g, " ")
 	canal = canal.charAt(0).toUpperCase() + canal.slice(1)
 
@@ -74,7 +73,7 @@ exports.run = async (bot, message, args) => {
 		.setColor('AQUA')
 		.setFooter({text: uData.username, iconURL: message.member.user.avatarURL()})
 
-	if (fds) embed.setAuthor({name: `Happy Hour ativado! Chance de se embebedar x3`})
+	if (isHappyHour) embed.setAuthor({name: `Happy Hour! Chance de se embebedar x3`})
 
 	const button = new Discord.MessageButton()
 		.setStyle('SECONDARY')
@@ -94,17 +93,13 @@ exports.run = async (bot, message, args) => {
 
 	let msg = await message.channel.send({
 		components: [row], embeds: [embed]
-	})
-
-	// .catch(err => console.log("Não consegui enviar mensagem `beber`"))
+	}).catch(() => console.log("Não consegui enviar mensagem `beber`"))
 
 	const filter = (button) => [message.id + message.author.id + 'beber', message.id + message.author.id + 'top'].includes(button.customId) && button.user.id === message.author.id
 
 	const collector = message.channel.createMessageComponentCollector({
 		filter, idle: 60000
 	})
-
-	button.setLabel('Beber mais!')
 
 	let textoComa = ''
 
@@ -116,14 +111,19 @@ exports.run = async (bot, message, args) => {
 			let topGlobal = getTop(15)
 
 			const embed = new Discord.MessageEmbed()
-				.setTitle(`${bot.config.vadiando} Top Beberrões`)
+				.setTitle(`${bot.config.vadiando} Top Beberrões ${isHappyHour() ? `(Happy Hour)` : ''}`)
 				.setColor(bot.colors.background)
 				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
-			topGlobal.forEach((user, i) => {
-				embed.addField(`\`${i + 1}.\` **${user.nick}**`, `Bebeu máx \`${user.maximo.normal}\`\n\`${user.maximo.happyHour}\` no Happy Hour\nBebeu <t:${user.ultima}:R>`, true)
-			})
+			if (!isHappyHour())
+				topGlobal.forEach((user, i) => {
+					embed.addField(`\`${i + 1}.\` **${user.nick}**`, `Bebeu máx \`${user.maximo.normal}\`\nBebeu <t:${user.ultima}:R>`, true)
+				})
+			else
+				topGlobal.forEach((user, i) => {
+					embed.addField(`\`${i + 1}.\` **${user.nick}**`, `Bebeu máx \`${user.maximo.happyHour}\` no Happy Hour\nBebeu <t:${user.ultima}:R>`, true)
+				})
 
 			buttonTop.setDisabled(true)
 
@@ -156,6 +156,7 @@ exports.run = async (bot, message, args) => {
 				bot.beberroes.set(message.author.id, obj)
 			}
 
+			button.setLabel('Beber mais!')
 			let bebidas = ['whisky', 'vodka', 'vinho', 'gin', 'tônica', 'amarula', 'caipirinha', 'cerveja', 'sakê', 'cachaça', 'água da torneira', 'rum', 'caipiroska', 'sidra', 'cerveja', 'catuaba', 'corote', 'champanha', 'licor', 'água sanitária', 'cerveja', 'tequila', 'tubaína', 'água do miojo', 'absinto', 'Jägermeister', 'cerveja', 'gasolina', 'cerveja artesanal', 'Red Ale', 'American Pale Ale', 'Belgian Wheat Ale', 'cerveja', // 'água mineral', 'whisky', 'café', 'vodka', 'vinho', 'gin', 'tônica', 'caipirinha', 'cerveja', 'chá',
 				// 'sakê', 'leite', 'energético', 'refrigerante', 'suco', 'cachaça', 'água da torneira', 'chimarrão',
 				// 'tererê', 'nescau', 'toddynho', 'catuaba', 'limonada', 'corote', 'champanha', 'licor', 'água sanitária',
@@ -171,13 +172,13 @@ exports.run = async (bot, message, args) => {
 
 			bot.beberroes.set(message.author.id, Date.now(), 'ultimaBebida')
 
-			if (!fds && count > bot.beberroes.get(message.author.id, 'maximo.normal')) bot.beberroes.set(message.author.id, count, 'maximo.normal')
+			if (!isHappyHour() && count > bot.beberroes.get(message.author.id, 'maximo.normal')) bot.beberroes.set(message.author.id, count, 'maximo.normal')
 
-			if (fds && count > bot.beberroes.get(message.author.id, 'maximo.happyHour')) bot.beberroes.set(message.author.id, count, 'maximo.happyHour')
-			
+			if (isHappyHour() && count > bot.beberroes.get(message.author.id, 'maximo.happyHour')) bot.beberroes.set(message.author.id, count, 'maximo.happyHour')
+
 			count++
-			
-			let chanceComa = fds ? 15 : 5
+
+			let chanceComa = isHappyHour() ? 15 : 5
 
 			if (bot.getRandom(0, 100) < chanceComa) {
 				// uData.qtHospitalizado += 1

@@ -15,7 +15,7 @@ module.exports = (bot) => {
 				iconURL: message?.member?.user ? message?.member?.user?.avatarURL() : ''
 			})
 		
-		message.channel.send({embeds: [embed]})
+		return message.channel.send({embeds: [embed]})
 			.catch(() => {
 				console.log('Não consegui enviar createEmbed', str)
 				message.author.send('Desculpe, não consegui responder seu comando. Verifique as permissões do servidor/canal.\n\nAs seguintes permissões são necessárias:\n`Gerenciar mensagens`, `Enviar mensagens`, `Inserir links`, `Usar emojis externos` e `Adicionar reações`')
