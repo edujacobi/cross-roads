@@ -17,7 +17,10 @@ exports.run = async (bot, message, args) => {
 			.setDescription("Você receberá lucros a cada hora. Cada investimento dura 7 dias.\nPossuir um investimento aumenta seu prestígio social, permitindo receber maiores quantias no `;daily`, `;weekly` e multiplicadores maiores no `;niquel`.")
 			.setThumbnail("https://cdn.discordapp.com/attachments/719677144133009478/734264171511676969/radar_propertyG.png")
 			.setColor('GREEN')
-			.setFooter(`${uData.username} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
+			.setFooter({
+				text: `${uData.username} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+				iconURL: message.member.user.avatarURL()
+			})
 			.setTimestamp()
 
 		let investimentos = []
@@ -259,7 +262,7 @@ exports.run = async (bot, message, args) => {
 			await b.deferUpdate()
 
 			if (b.customId === message.id + message.author.id + 'notificar') {
-				if (uData.invest == null) 
+				if (uData.invest == null)
 					return bot.createEmbed(message, `Você não possui um investimento para receber notificações ${bot.config.propertyG}`, null, 'GREEN')
 
 				uData.investNotification = !uData.investNotification

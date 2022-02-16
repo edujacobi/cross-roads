@@ -1,18 +1,9 @@
 function getPercent(percent, from) {
 	return (from / 100) * percent
 }
-
 const Discord = require("discord.js")
 const wait = require('util').promisify(setTimeout)
 
-let emoji_1 = '769667860141178920'
-let emoji_2 = '769667860090847273'
-let emoji_3 = '769667860145504256'
-let emoji_4 = '769667859985989633'
-let emoji_5 = '769667859739049986'
-let emoji_6 = '769667859902103553'
-let emoji_7 = '884900223695093771'
-let emoji_8 = '884900223195947119'
 let multiplicador_evento_tempo_hospitalizado = 1
 let multiplicador_evento_tempo_roubar = 1
 let multiplicador_evento_tempo_preso = 1
@@ -35,9 +26,14 @@ async function roubarLugar(bot, message, lugar, uData) {
 	bot.data.set(message.author.id, uData)
 
 	const embed_robb_inicio = new Discord.MessageEmbed()
-		.setAuthor('Roubo em andamento...', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name == 'roubar').url)
+		.setAuthor({
+			name: 'Roubo em andamento...',
+			iconURL: bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'roubar').url
+		})
 		.setColor(bot.colors.roubar)
-		.setFooter(`${uData.username} • ${lugar.desc}`, membro.avatarURL())
+		.setFooter({
+			text: `${uData.username} • ${lugar.desc}`, iconURL: membro.avatarURL()
+		})
 		.setTimestamp()
 
 	let uCasamento = bot.casais.get(uData.casamentoID)
@@ -55,7 +51,7 @@ async function roubarLugar(bot, message, lugar, uData) {
 		components: uData.casamentoID != null ? [row] : []
 	}).catch(() => console.log("Não consegui enviar mensagem `roubar`"))
 
-	const filter = (button) => message.id + 'participar' == button.customId && button.user.id === uData.conjuge
+	const filter = (button) => message.id + 'participar' === button.customId && button.user.id === uData.conjuge
 
 	const collector = message.channel.createMessageComponentCollector({
 		filter,
@@ -71,19 +67,14 @@ async function roubarLugar(bot, message, lugar, uData) {
 		let cData = bot.data.get(uData.conjuge)
 
 		if (isConjugeParticipando) return
-
 		if (cData.preso > currTime)
 			return bot.msgPreso(message, cData, cData.username)
-
 		if (cData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, cData, cData.username)
-
 		if (cData.roubo > currTime)
 			return bot.createEmbed(message, `**${cData.username}** está sendo procurado pela polícia por mais ${bot.segToHour((cData.roubo - currTime) / 1000)} ${bot.config.police}`, null, bot.colors.policia)
-
 		if (cData.job != null)
 			return bot.msgTrabalhando(message, cData)
-
 		if (bot.isUserEmRouboOuEspancamento(message, cData)) return
 
 		let emotes = ""
@@ -106,27 +97,17 @@ async function roubarLugar(bot, message, lugar, uData) {
 								lugarRoubo = _lugar
 							}
 						}
-
 					}
 					else {
-						let ou = false
-						let ou2 = false
 						for (let i = 0; i < _lugar.necessario.length; i++) {
 							let arma = _lugar.necessario[i]
 							if (key_udata == arma) {
 								if (currTime > value_udata) {
 									Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
 										if (arma == key_gun && lugarRoubo == null) {
-											let temp_emote = value_gun.skins[cData.arma[value_gun.data].skinAtual].emote
-											emotes += `${temp_emote}`
-											if (ou && _lugar.necessario.length == 3 && !ou2) {
+											emotes += value_gun.skins[cData.arma[value_gun.data].skinAtual].emote
+											if (i < lugar.necessario.length - 1)
 												emotes += " ou "
-												ou2 = true
-											}
-											if (!ou) {
-												emotes += " ou "
-												ou = true
-											}
 										}
 									})
 								}
@@ -169,8 +150,11 @@ async function roubarLugar(bot, message, lugar, uData) {
 		message_robb.edit({
 			components: [],
 			embeds: [embed_robb_inicio
-				.setAuthor('Roubo em andamento... Juntos somos mais fortes!', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name == 'roubar').url)
-				.setFooter(`${uData.username} e ${cData.username} • ${lugar.desc}`, membro.avatarURL())
+				.setAuthor({
+					name: 'Roubo em andamento... Juntos somos mais fortes!',
+					iconURL: bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'roubar').url
+				})
+				.setFooter({text: `${uData.username} e ${cData.username} • ${lugar.desc}`, iconURL: membro.avatarURL()})
 			]
 		})
 
@@ -193,7 +177,7 @@ async function roubarLugar(bot, message, lugar, uData) {
 		if (isConjugeParticipando)
 			recompensa = ~~(recompensa * 0.5)
 		if (uData.classe === 'ladrao')
-			recompensa = ~~(recompensa * 1.15)
+			recompensa = ~~(recompensa * 1.1)
 		uData.roubosW += 1
 		uData.roubo = currTime + 60 * (uData.classe === 'ladrao' ? 1.15 : (uData.classe === 'advogado' ? 0.85 : 1)) * 60 * 1000 * multiplicador_evento_tempo_roubar //+60m
 		uData.moni += recompensa
@@ -229,13 +213,19 @@ async function roubarLugar(bot, message, lugar, uData) {
 		const embed_robb_final = new Discord.MessageEmbed()
 			.setDescription(`Você roubou R$ ${recompensa.toLocaleString().replace(/,/g, ".")} de **${lugar.desc}** ${bot.config.roubar}`)
 			.setColor(bot.colors.roubar)
-			.setFooter(`${uData.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, membro.avatarURL())
+			.setFooter({
+				text: `${uData.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+				iconURL: membro.avatarURL()
+			})
 			.setTimestamp()
 
 		const embed_robb_final_casal = new Discord.MessageEmbed()
 			.setDescription(`Vocês roubaram R$ ${(recompensa * 2).toLocaleString().replace(/,/g, ".")} de **${lugar.desc}** ${bot.config.roubar}\nCada um recebeu R$ ${recompensa.toLocaleString().replace(/,/g, ".")}`)
 			.setColor(bot.colors.roubar)
-			.setFooter(`${uData.username} e ${conjuge.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, membro.avatarURL())
+			.setFooter({
+				text: `${uData.username} e ${conjuge.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+				iconURL: membro.avatarURL()
+			})
 			.setTimestamp()
 
 		message_robb.edit({
@@ -294,13 +284,19 @@ async function roubarLugar(bot, message, lugar, uData) {
 		const embed_robb_final = new Discord.MessageEmbed()
 			.setDescription(`Você falhou em roubar **${lugar.desc}** e ficará preso por ${bot.segToHour(tempo_preso * 60)} ${bot.config.police}`)
 			.setColor(bot.colors.policia)
-			.setFooter(`${uData.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, membro.avatarURL())
+			.setFooter({
+				text: `${uData.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+				iconURL: membro.avatarURL()
+			})
 			.setTimestamp()
 
 		const embed_robb_final_casal = new Discord.MessageEmbed()
 			.setDescription(`Vocês falharam em roubar **${lugar.desc}** e ficarão presos por ${bot.segToHour(tempo_preso * 60)} ${bot.config.police}`)
 			.setColor(bot.colors.policia)
-			.setFooter(`${uData.username} e ${conjuge.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, membro.avatarURL())
+			.setFooter({
+				text: `${uData.username} e ${conjuge.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+				iconURL: membro.avatarURL()
+			})
 			.setTimestamp()
 
 		message_robb.edit({
@@ -321,40 +317,26 @@ async function roubarLugar(bot, message, lugar, uData) {
 }
 
 
-function verifyRoubo(bot, message, emoji_id) {
+function verifyRoubo(bot, message, idLugar) {
 	let uData = bot.data.get(message.author.id)
 	let currTime = new Date().getTime()
 
 	if (uData.preso > currTime)
 		return bot.msgPreso(message, uData)
-
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
-
 	if (uData.roubo > currTime)
 		return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour((uData.roubo - currTime) / 1000)} ${bot.config.police}`, null, bot.colors.policia)
-
 	if (uData.job != null)
 		return bot.msgTrabalhando(message, uData)
-
 	if (bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 
 	let emotes = ""
 	let lugarRoubo = null
-	let lugar_id
-
-	if (emoji_id == emoji_1) lugar_id = 1
-	else if (emoji_id == emoji_2) lugar_id = 2
-	else if (emoji_id == emoji_3) lugar_id = 3
-	else if (emoji_id == emoji_4) lugar_id = 4
-	else if (emoji_id == emoji_5) lugar_id = 5
-	else if (emoji_id == emoji_6) lugar_id = 6
-	else if (emoji_id == emoji_7) lugar_id = 7
-	else if (emoji_id == emoji_8) lugar_id = 8
 
 	Object.values(bot.robbery).forEach(lugar => {
-		if (lugar_id == lugar.id) {
+		if (idLugar == lugar.id) {
 			Object.entries(uData.arma).forEach(([key_udata, value_udata]) => {
 				if (!Array.isArray(lugar.necessario)) {
 					if (key_udata == lugar.necessario) {
@@ -371,27 +353,17 @@ function verifyRoubo(bot, message, emoji_id) {
 							lugarRoubo = lugar
 						}
 					}
-
 				}
 				else {
-					let ou = false
-					let ou2 = false
 					for (let i = 0; i < lugar.necessario.length; i++) {
 						let arma = lugar.necessario[i]
-						if (key_udata == arma) {
+						if (key_udata === arma) {
 							if (currTime > value_udata.tempo) {
 								Object.entries(bot.guns).forEach(([key_gun, value_gun]) => {
 									if (arma == key_gun && lugarRoubo == null) {
-										let temp_emote = value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
-										emotes += `${temp_emote}`
-										if (ou && lugar.necessario.length == 3 && !ou2) {
+										emotes += value_gun.skins[uData.arma[value_gun.data].skinAtual].emote
+										if (i < lugar.necessario.length - 1)
 											emotes += " ou "
-											ou2 = true
-										}
-										if (!ou) {
-											emotes += " ou "
-											ou = true
-										}
 									}
 								})
 							}
@@ -406,7 +378,7 @@ function verifyRoubo(bot, message, emoji_id) {
 			})
 		}
 	})
-	if (emotes != "")
+	if (emotes !== "")
 		return bot.createEmbed(message, `É necessário possuir ${emotes} para este roubo ${bot.config.roubar}`, null, bot.colors.roubar)
 
 	return roubarLugar(bot, message, lugarRoubo, uData)
@@ -421,7 +393,13 @@ exports.run = async (bot, message, args) => {
 
 	if (!option) {
 		let uData = bot.data.get(message.author.id)
-		let emotes = ""
+
+		let texto = "Você pode roubar!"
+		if (uData.roubo > currTime)
+			texto = `Você só poderá roubar novamente em ${bot.segToHour((uData.roubo - currTime) / 1000)}`
+		if (uData.preso > currTime)
+			texto = `Você está preso por mais ${bot.segToHour((uData.preso - currTime) / 1000)}`
+
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.roubar} Roubar`)
 			.setThumbnail("https://media.discordapp.net/attachments/691019843159326757/791444366727708672/roubar_20201223201323.png")
@@ -430,79 +408,102 @@ exports.run = async (bot, message, args) => {
 Quanto melhor a arma, maior a chance de roubo contra outros jogadores e mais protegido você estará.
 Se falhar, você será preso por um tempo definido pelo poder de sua arma.
 Se conseguir, deverá esperar 1 hora para roubar novamente.
-Há uma pequena chance do alvo ser também espancado!`)
-			.addField('\u200b', `${(uData.roubo > currTime) ? `Você só poderá roubar novamente em ${bot.segToHour((uData.roubo - currTime) / 1000)}` : `**Lugares disponíveis para roubar**`}`)
-			.setFooter(uData.username, membro.avatarURL())
+Há uma pequena chance do alvo ser também espancado!
+
+Quando alguém tentar te roubar, você pode ${bot.config.emmetGun} **Reagir**, ${bot.config.police} **Chamar a polícia** ou <:fazer_nada:758817091872096267> **Fazer nada**!
+
+Você já roubou jogadores \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes e foi roubado \`${uData.roubosL.toLocaleString().replace(/,/g, ".")}\` vezes`)
+			.addField(`Comando`, `\`;roubar [user]\``, true)
+			.setFooter({text: `${uData.username} • ${texto}`, iconURL: membro.avatarURL()})
 			.setTimestamp()
 
-		Object.values(bot.robbery).forEach(lugar => {
-			let ou = false
-			let ou2 = false
-			let emote
-			Object.entries(bot.guns).forEach(([key, value]) => {
-				if (!Array.isArray(lugar.necessario)) {
-					if (key == lugar.necessario)
-						emote = value.skins[uData.arma[value.data].skinAtual].emote
+		// Object.values(bot.robbery).forEach(lugar => {
+		// 	let emotes = ""
+		// 	Object.entries(bot.guns).forEach(([key, value]) => {
+		// 		if (!Array.isArray(lugar.necessario)) {
+		// 			if (key === lugar.necessario)
+		// 				emotes = value.skins.default.emote
+		// 		}
+		// 		else {
+		// 			for (let i = 0; i < lugar.necessario.length; i++) {
+		// 				let arma = lugar.necessario[i]
+		// 				if (key === arma) {
+		// 					emotes += value.skins.default.emote
+		// 					if (i < lugar.necessario.length - 1)
+		// 						emotes += " ou "
+		// 				}
+		// 			}
+		// 		}
+		// 	})
+		//
+		// 	embed.addField(`${lugar.desc}`, `Necessário: ${emotes}`, true)
+		// })
 
-				}
-				else {
-					for (let i = 0; i < lugar.necessario.length; i++) {
-						let arma = lugar.necessario[i]
-						if (key == arma) {
-							emotes += value.skins[uData.arma[value.data].skinAtual].emote
-							if (ou && lugar.necessario.length == 3 && !ou2) {
-								emotes += " ou "
-								ou2 = true
-							}
-							if (!ou) {
-								emotes += " ou "
-								ou = true
-							}
-						}
-					}
-				}
+		let locais = []
+
+		Object.values(bot.robbery).forEach(local => {
+			let MIN = local.min
+			let MAX = local.max
+			if (uData.classe === 'ladrao') {
+				MIN = ~~(MIN * 1.1)
+				MAX = ~~(MAX * 1.1)
+			}
+
+			let necessario = !Array.isArray(local.necessario) ? local.necessario : local.necessario[0]
+
+			locais.push({
+				label: local.desc,
+				description: `Sucesso: ${local.sucesso}% • R$ ${MIN.toLocaleString().replace(/,/g, ".")} - R$ ${MAX.toLocaleString().replace(/,/g, ".")}`,
+				emoji: bot.guns[necessario].skins[uData.arma[necessario].skinAtual].emote,
+				value: local.id.toString()
 			})
-
-			necessario = emotes != "" ? `Necessário: ${emotes}` : `Necessário: ${emote}`
-
-			embed.addField(`${lugar.id}: ${lugar.desc}`, `Sucesso: ${lugar.sucesso}%\n${necessario}\nR$ ${lugar.min.toLocaleString().replace(/,/g, ".")} - R$ ${lugar.max.toLocaleString().replace(/,/g, ".")}`, true)
-			emotes = ""
 		})
 
-		return message.channel.send({
-			embeds: [embed]
+
+		const row = new Discord.MessageActionRow().addComponents(new Discord.MessageSelectMenu()
+			.setCustomId(message.id + message.author.id + 'select')
+			.setPlaceholder('Lugares disponíveis para roubar')
+			.addOptions(locais))
+
+		let msg = await message.channel.send({
+			embeds: [embed],
+			components: uData.roubo > currTime || uData.preso > currTime ? [] : [row]
 		})
-			.then(msg => {
-				const filter = (reaction, user) => [emoji_1, emoji_2, emoji_3, emoji_4, emoji_5, emoji_6, emoji_7, emoji_8].includes(reaction.emoji.id) && user.id == message.author.id
+			.catch(() => console.log("Não consegui enviar mensagem `roubar`"))
 
-				const collector = msg.createReactionCollector({
-					filter,
-					time: 60000,
-					errors: ['time'],
-				})
+		const filter = (select) => [
+			message.id + message.author.id + 'select',
+		].includes(select.customId) && select.user.id === message.author.id
 
-				collector.on('collect', r => r.users.remove(message.author.id).then(() => verifyRoubo(bot, message, r.emoji.id)))
+		const collector = message.channel.createMessageComponentCollector({
+			filter,
+			time: 90000,
+		})
 
-				msg.react(emoji_1)
-					.then(() => msg.react(emoji_2))
-					.then(() => msg.react(emoji_3))
-					.then(() => msg.react(emoji_4))
-					.then(() => msg.react(emoji_5))
-					.then(() => msg.react(emoji_6))
-					.then(() => msg.react(emoji_7))
-					.then(() => msg.react(emoji_8))
-					.catch(() => console.log("Não consegui reagir mensagem `roubar`"))
-			}).catch(() => console.log("Não consegui enviar mensagem `roubar`"))
+		collector.on('collect', async s => {
+			await s.deferUpdate()
+
+			uData = bot.data.get(message.author.id)
+
+			verifyRoubo(bot, message, s.values[0])
+
+			// msg.edit({components: []})
+			// 	.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+		})
+
+		collector.on('end', async () => {
+			msg.edit({components: []})
+				.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+		})
+		return
 	}
 
 	let uData = bot.data.get(message.author.id)
 
 	if (uData.preso > currTime)
 		return bot.msgPreso(message, uData)
-
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
-
 	if (uData.roubo > currTime)
 		return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour((uData.roubo - currTime) / 1000)} ${bot.config.police}`, null, bot.colors.policia)
 

@@ -2091,7 +2091,7 @@ Aceitar convite?`)
 \`;gangue depositar <valor>\` Guarda dinheiro no caixa da gangue
 \`;topgangue\` Exibe as gangues mais fortes`)
 
-			if (isLider(uGang, message.author.id))
+			if (uGang && isLider(uGang, message.author.id))
 				embed.addField("Comandos Líder",
 					`\`;gangue nome <novo-nome>\` Define um novo nome
 \`;gangue descricao <nova-descrição>\` Define uma descrição
@@ -2107,7 +2107,7 @@ Aceitar convite?`)
 \`;gangue transferir <jogador>\` Transfere a liderança
 \`;gangue vice <jogador>/remover\` Indica ou remove um Vice-Líder`)
 
-			if (isVice(uGang, message.author.id))
+			if (uGang && isVice(uGang, message.author.id))
 				embed.addField("Comandos Vice-líder",
 					`\`;gangue comunicar <mensagem>\` Envia uma mensagem a todos os membros
 \`;gangue importar/exportar\` Compra e vende carregamentos
