@@ -412,7 +412,7 @@ Há uma pequena chance do alvo ser também espancado!
 
 Quando alguém tentar te roubar, você pode ${bot.config.emmetGun} **Reagir**, ${bot.config.police} **Chamar a polícia** ou <:fazer_nada:758817091872096267> **Fazer nada**!
 
-Você já roubou jogadores \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes e foi roubado \`${uData.roubosL.toLocaleString().replace(/,/g, ".")}\` vezes`)
+Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes, falhou \`${uData.roubosL.toLocaleString().replace(/,/g, ".")}\` vezes e foi roubado \`${uData.qtRoubado.toLocaleString().replace(/,/g, ".")}\``)
 			.addField(`Comando`, `\`;roubar [user]\``, true)
 			.setFooter({text: `${uData.username} • ${texto}`, iconURL: membro.avatarURL()})
 			.setTimestamp()
