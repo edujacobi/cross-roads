@@ -1734,21 +1734,18 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 			let dia = new Date().getDay()
 			let hora = new Date().getHours()
 
-			// if (dia != 0 && dia != 6 && !(dia == 5 && hora >= 20)) {
-			// 	return bot.createEmbed(message, `**Caramuru** só pode ser desafiado aos finais de semana ${bot.config.caramuru}`, null, bot.colors.white)
-			// }
+			if (dia !== 0 && dia !== 6 && !(dia === 5 && hora >= 20)) 
+				return bot.createEmbed(message, `**Caramuru** só pode ser desafiado aos finais de semana ${bot.config.caramuru}`, null, bot.colors.white)
 
 			//return bot.createEmbed(message, `**Caramuru** está de folga durante a primeira semana da temporada ${bot.config.caramuru}`, null, bot.colors.white)
-			if (bot.isUserEmRouboOuEspancamento(message, uData)) {
+			if (bot.isUserEmRouboOuEspancamento(message, uData)) 
 				return
-			}
+			
 			let uGalo = bot.galos.get(message.author.id)
 			let caramuru = bot.galos.get('526203502318321665')
 
-			if (uGalo.descansar > currTime) {
+			if (uGalo.descansar > currTime) 
 				return bot.msgGaloDescansando(message, uGalo)
-			}
-
 			if (uGalo.train)
 				return uGalo.trainTime > currTime ?
 					bot.createEmbed(message, `Seu galo está treinando por mais ${bot.segToHour((uGalo.trainTime - currTime) / 1000)} ${bot.config.caramuru}`, null, bot.colors.white)

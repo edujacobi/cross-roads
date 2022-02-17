@@ -154,7 +154,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 						)
 
 					}
-					else if (b.customId === message.id + message.author.id + 'confirmar') {
+					else if (b.customId === message.id + message.author.id + 'cancelar') {
 						return msg.edit({
 							embeds: [embed.setDescription(`Cadastro cancelado. Para começar novamente, use qualquer comando (como \`;ajuda\`, por exemplo)!`).setColor('RED')],
 							components: []
@@ -282,9 +282,10 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 	}
 
 	let isServerCrossRoads = message.member?.guild?.id === '529674666692837378'
+	let isServerCrossRoadsBanidos = message.member?.guild?.id === '943677762537926746'
 
 	if (!uData.registrado && uData.arma.rpg.tempo > 0) {
-		if (!isServerCrossRoads) {
+		if (!isServerCrossRoads && !isServerCrossRoadsBanidos) {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)
 				.setDescription(`${uData.username}, parabéns por conseguir sua ${bot.guns.rpg.skins.default.emote} RPG! Prossiga para o servidor oficial para completar seu cadastro anti-fake.`)
