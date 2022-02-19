@@ -1365,7 +1365,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 					// mensagemLevelUp += `\n\n**${vencedor.galoNome}** ganhou ${bot.config.ovo} ${ovosGanhos} Ovos de páscoa do ${bot.config.caramuru} Caramuru`
 
-					const multiplicador_tempo_rinha = 0.5
+					const multiplicador_tempo_rinha = 0.75
 					uGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
 					uGalo.emRinha = false
 					tGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)

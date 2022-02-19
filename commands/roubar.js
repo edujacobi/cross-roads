@@ -5,7 +5,7 @@ const Discord = require("discord.js")
 const wait = require('util').promisify(setTimeout)
 
 let multiplicador_evento_tempo_hospitalizado = 1
-let multiplicador_evento_tempo_roubar = 0.5
+let multiplicador_evento_tempo_roubar = 0.75
 let multiplicador_evento_tempo_preso = 1
 
 async function roubarLugar(bot, message, lugar, uData) {
