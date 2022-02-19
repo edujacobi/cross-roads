@@ -1365,7 +1365,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 					// mensagemLevelUp += `\n\n**${vencedor.galoNome}** ganhou ${bot.config.ovo} ${ovosGanhos} Ovos de páscoa do ${bot.config.caramuru} Caramuru`
 
-					const multiplicador_tempo_rinha = 1
+					const multiplicador_tempo_rinha = 0.5
 					uGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
 					uGalo.emRinha = false
 					tGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
@@ -1659,7 +1659,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 	}
 	else if (option === "boss") {
-		let premio = 100000 //2000000
+		let premio = 150000 //2000000
 		if (!aposta) {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.caramuru} O mestre dos galos`)

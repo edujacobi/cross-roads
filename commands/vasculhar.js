@@ -1,7 +1,7 @@
 const Discord = require('discord.js')
 exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
-	let multiplicador_evento = 1
+	let multiplicador_evento = 0.5
 	const hora = 3600000
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 

@@ -63,7 +63,7 @@ exports.run = async (bot, message, args) => {
 	let face1 = (Math.random() < 0.50 ? "cara" : "coroa")
 	// let face2 = (Math.random() < 0.50 ? "cara" : "coroa")
 
-	let valor_imposto = uData.classe === 'mafioso' ? 0 : Math.floor(valor * bot.imposto * 3)
+	let valor_imposto = uData.classe === 'mafioso' ? 0 : Math.floor(valor * bot.imposto * 2)
 
 	if (valor >= 10) {
 		valor -= valor_imposto

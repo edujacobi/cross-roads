@@ -6,7 +6,7 @@ const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let option = args[0]
-	let multiplicador_evento_tempo = 1
+	let multiplicador_evento_tempo = 0.5
 	let multiplicador_evento_espancado_tempo = 1
 	let uData = bot.data.get(message.author.id)
 
