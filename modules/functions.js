@@ -3,7 +3,7 @@ module.exports = bot => {
 	bot.imposto = 0.05 // 5% do bet
 	bot.carregamentoCassino = 0
 	bot.moderators = ['145466251496390656', '843955033543540756', '606290632725626940', '555414232989040661', '731765213237346357', '274726815476744192']
-	bot.ajudantes = ['593444673297580042', '761236646116982844']
+	bot.ajudantes = ['593444673297580042', '761236646116982844', '736646173225385985', '666077411615572031']
 
 	bot.palavrasBanidas = [
 		'arrombado', 'viado', 'fdp', 'buceta', 'puta', 'caralh', 'filhadaputagem', 'filhodaputa', 'nazista',
