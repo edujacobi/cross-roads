@@ -77,7 +77,7 @@ module.exports = (bot) => {
 				'brasil': {
 					nome: 'Brasileira',
 					emote: '<:tec9BR:937437983307595786>',
-					compravel: true,
+					compravel: false,
 					evento: false
 				}
 			}
@@ -182,8 +182,8 @@ module.exports = (bot) => {
 				},
 				'zumbilandia': {
 					nome: 'Zumbilândia',
-					emote: '<:AK47PP:941833509419511868>',
-					compravel: true,
+					emote: '<:AK47Zumbilandia:947665280224591894>',
+					compravel: false,
 					evento: false
 				}
 			}
@@ -258,6 +258,12 @@ module.exports = (bot) => {
 				'classic': {
 					nome: 'Clássica',
 					emote: '<:katanaicon:937170775021068378>',
+					compravel: true,
+					evento: false
+				},
+				'flamejante': {
+					nome: 'Flamejante',
+					emote: '<:KatanaFlamejante:947665278936948776>',
 					compravel: true,
 					evento: false
 				}
