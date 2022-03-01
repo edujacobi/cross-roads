@@ -474,7 +474,7 @@ exports.run = async (bot, message, args) => {
 							components: [row]
 						}).catch(() => console.log("Não consegui enviar mensagem `galo nome`"))
 
-						bot.commands.get('galo').run(bot, message, ['nome'])
+						bot.commands.get('galo').run(bot, message)
 
 					}
 					else if (b.customId === message.id + message.author.id + 'titulo') {
@@ -484,7 +484,7 @@ exports.run = async (bot, message, args) => {
 							components: [row]
 						}).catch(() => console.log("Não consegui enviar mensagem `galo titulo`"))
 
-						bot.commands.get('galo').run(bot, message, ['titulo'])
+						bot.commands.get('galo').run(bot, message)
 
 					}
 					else if (b.customId === message.id + message.author.id + 'avatar') {
@@ -494,7 +494,7 @@ exports.run = async (bot, message, args) => {
 							components: [row]
 						}).catch(() => console.log("Não consegui enviar mensagem `galo avatar`"))
 
-						bot.commands.get('galo').run(bot, message, ['avatar'])
+						bot.commands.get('galo').run(bot, message)
 					}
 				})
 
@@ -1709,11 +1709,11 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				await b.deferUpdate()
 				if (b.customId === message.id + message.author.id + 'ver') {
 					btnVer.setDisabled(true)
-					bot.commands.get('galo').run(bot, message, ['526203502318321665'])
+					bot.commands.get('galo').run(bot, message)
 				}
 				else if (b.customId === message.id + message.author.id + 'desafiar') {
 					btnDesafiar.setDisabled(true)
-					bot.commands.get('galo').run(bot, message, ['boss', 'desafiar'])
+					bot.commands.get('galo').run(bot, message)
 				}
 
 				if (msg)

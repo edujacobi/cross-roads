@@ -202,7 +202,7 @@ exports.run = async (bot, message, args) => {
 		if (uData.job != null)
 			return bot.msgTrabalhando(message, uData)
 		if (tData.job != null)
-			return bot.createEmbed(message, `**${tData.username}** está trabalhando e não pode fazer isto ${bot.config.bulldozer}`, null, bot.colors.casamento)
+			return bot.createEmbed(message, `**${tData.username}** está trabalhando e não pode fazer isto ${bot.config.trabalhando}`, null, bot.colors.casamento)
 		if (message.author.id === target.id)
 			return bot.createEmbed(message, `${emote} Por mais que você se ame mais que tudo no mundo, não pode casar consigo mesmo`, null, bot.colors.casamento)
 		if (target.id === '526203502318321665') // bot

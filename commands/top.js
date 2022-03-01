@@ -72,7 +72,7 @@ exports.run = async (bot, message, args) => {
 		await r.deferUpdate()
 		// let comando = r.customId.replace(message.id + message.author.id, '')
 		let comando = r.values[0]
-		bot.commands.get(comando).run(bot, message, args)
+		bot.commands.get(comando).run(bot, message)
 	})
 
 	collector.on('end', () => {

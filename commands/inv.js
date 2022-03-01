@@ -222,14 +222,14 @@ exports.run = async (bot, message, args) => {
 	else if (uData.preso > currTime)
 		textSituation = `${bot.config.prisao} Preso por mais ${bot.segToHour((uData.preso - currTime) / 1000)}`
 	else if (uData.jobTime > currTime)
-		textSituation = `${bot.config.bulldozer} Trabalhando como ${bot.jobs[uData.job].desc} por mais ${bot.segToHour((uData.jobTime - currTime) / 1000)}`
+		textSituation = `${bot.config.trabalhando} Trabalhando como ${bot.jobs[uData.job].desc} por mais ${bot.segToHour((uData.jobTime - currTime) / 1000)}`
 	else if (uData.hospitalizado > currTime)
 		textSituation = `${bot.config.hospital} Hospitalizado por mais ${bot.segToHour((uData.hospitalizado - currTime) / 1000)}`
 
 	if (uData.roubo > currTime && uData.preso < currTime)
 		textSituation += ` e ${bot.config.police} Procurado por mais ${bot.segToHour((uData.roubo - currTime) / 1000)}`
 	if (uData.jobTime < currTime && uData.job)
-		textSituation += ` e ${bot.config.bulldozer} pode receber salário`
+		textSituation += ` e ${bot.config.trabalhando} pode receber salário`
 	if (bot.isPlayerViajando(uData))
 		textSituation = `${bot.config.aviao} Viajando por mais ${bot.segToHour((bot.casais.get(uData.casamentoID, 'viagem') - currTime) / 1000)}`
 	invOpen.addField("\u200b󠀀󠀀", textSituation)
@@ -415,27 +415,27 @@ exports.run = async (bot, message, args) => {
 		}
 		else if (b.customId === message.id + message.author.id + 'invest') {
 			buttonInvest.setDisabled(true)
-			bot.commands.get('investir').run(bot, message, args)
+			bot.commands.get('investir').run(bot, message)
 		}
 		else if (b.customId === message.id + message.author.id + 'userinfo') {
 			buttonUI.setDisabled(true)
-			bot.commands.get('userinfo').run(bot, message, [alvo])
+			bot.commands.get('userinfo').run(bot, message)
 		}
 		else if (b.customId === message.id + message.author.id + 'roubar') {
 			buttonRoubar.setDisabled(true)
-			bot.commands.get('roubar').run(bot, message, [alvo])
+			bot.commands.get('roubar').run(bot, message)
 		}
 		else if (b.customId === message.id + message.author.id + 'espancar') {
 			buttonEspancar.setDisabled(true)
-			bot.commands.get('espancar').run(bot, message, [alvo])
+			bot.commands.get('espancar').run(bot, message)
 		}
 		else if (b.customId === message.id + message.author.id + 'esmola') {
 			buttonEsmola.setDisabled(true)
-			bot.commands.get('esmola').run(bot, message, [alvo])
+			bot.commands.get('esmola').run(bot, message)
 		}
 		else if (b.customId === message.id + message.author.id + 'gang') {
 			buttonGang.setDisabled(true)
-			bot.commands.get('gang').run(bot, message, [uGang?.nome])
+			bot.commands.get('gang').run(bot, message)
 		}
 		else if (b.customId === message.id + message.author.id + 'anuncio') {
 			buttonAnuncio.setDisabled(true)

@@ -1,5 +1,5 @@
 exports.run = async (bot, message, args) => {
-	return bot.commands.get('galo').run(bot, message, ['526203502318321665'])
+	return bot.commands.get('galo').run(bot, message)
 };
 exports.config = {
 	alias: ['cara']

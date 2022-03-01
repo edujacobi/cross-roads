@@ -1,21 +1,21 @@
 const config = {
-	
+
 	"prefix": process.env.NODE_ENV === "test" ? "," : ";",
 	"adminID": "332228051871989761",
 
 	"ficha": "<:ficha:757021259451203665>",
 	"coin": "<:coin:539572031436619777>",
-	
+
 	// ações
-	"vasculhar": "<:vasculhar:816407267581886575>",
+	"vasculhar": "<:Vasculhar:948017139833516062>",
 	"roubar": '<:roubar:791447877997297665>',
 	"espancar": "<:espancar:820088112357179453>",
 
 	// outros
 	"flor": "<:Flor:879107094010290266>",
 	"namoro": '<:girlfriend:799053368189911081>',
-	"whey": "<:Whey_Protein:825828797265739798>",
-	"superWhey": '<:Super_Whey:829906315434393631>',
+	"whey": "<:Whey:948015474501906452>",
+	"superWhey": '<:SuperWhey:948015473235198012>',
 	//"tshirt": "<:tshirt:799040747172134963>",
 	//"saveGame": "<:saveGame:799040747206213632>",
 	"propertyG": "<:investimento:539497344996212736>",
@@ -27,7 +27,8 @@ const config = {
 	"vadiando": "<:Vadiando:854877539537125377>",
 	//"burgerShot": " <:burgerShot:799040747147624468>",
 	//"pizza": " <:pizza:799040747181310002>",
-	"bulldozer": "<:trabalho:539497343905431552>",
+	"trabalhos": "<:Trabalhos:948015474975846511>",
+	"trabalhando": "<:Trabalhando:948015474782912563>",
 	"mafiaCasino": "<:cassino:539497634780676107>",
 	"spray": "<:spray:799040746853761035>",
 	"qmark": "<:Interrogacao:854877538596945920>",

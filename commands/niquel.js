@@ -139,7 +139,7 @@ exports.run = async (bot, message, args) => {
 				bot.config.loja,
 				bot.config.cash,
 				bot.config.car,
-				bot.config.bulldozer,
+				bot.config.trabalhando,
 				bot.config.carregamento,
 				bot.config.propertyG,
 				bot.config.propertyR,

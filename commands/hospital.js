@@ -173,7 +173,7 @@ exports.run = async (bot, message, args) => {
 					components: [row]
 				}).catch(() => console.log("Não consegui enviar mensagem `hospital`"))
 
-				bot.commands.get('hospital').run(bot, message, ['particular'])
+				bot.commands.get('hospital').run(bot, message)
 			}
 		})
 

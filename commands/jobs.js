@@ -16,9 +16,9 @@ exports.run = async (bot, message, args) => {
 	let uData = bot.data.get(message.author.id)
 
 	const embed = new Discord.MessageEmbed()
-		.setTitle(`${bot.config.bulldozer} Trabalhos`)
+		.setTitle(`${bot.config.trabalhos} Trabalhos`)
 		.setDescription(`Você não pode apostar, roubar nem vasculhar enquanto trabalha!`)
-		.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/738106899844562984/radar_bulldozer.png")
+		.setThumbnail("https://media.discordapp.net/attachments/937437946024435794/948018320974692402/Trabalhos.png")
 		.setColor('YELLOW')
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()

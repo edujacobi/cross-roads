@@ -846,7 +846,7 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 										return bot.users.fetch(alvo).then(user => user.send(`Você está hospitalizado por mais ${bot.segToHour((tData.hospitalizado - currTime) / 1000)} e não pode fazer isto ${bot.config.hospital}`))
 
 									if (tData.jobTime > currTime)
-										return bot.users.fetch(alvo).then(user => user.send(`Você está trabalhando por mais ${bot.segToHour((tData.jobTime - currTime) / 1000)} e não pode fazer isto ${bot.config.bulldozer}`))
+										return bot.users.fetch(alvo).then(user => user.send(`Você está trabalhando por mais ${bot.segToHour((tData.jobTime - currTime) / 1000)} e não pode fazer isto ${bot.config.trabalhando}`))
 
 									if (moneyDefPower == null)
 										return bot.users.fetch(alvo).then(user => user.send(`Você não pode reagir sem uma arma ${bot.config.roubar}`))

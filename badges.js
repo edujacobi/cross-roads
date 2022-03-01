@@ -96,6 +96,9 @@ const badges = {
 	"topGrana1_s1": "<:badge_top1grana_s1:819694112319078401> ",
 	"topGrana2_s1": "<:badge_top2grana_s1:819694112625917963> ",
 	"topGrana3_s1": "<:badge_top3grana_s1:819694112676118528> ",
+	
+	
+	// OUTRAS
 
 	"cataBug": "<:badge_cata_bug:799043225557008474> ",
 	"vip": "<:vip:778572312215027744> ",
@@ -115,7 +118,8 @@ const badges = {
 
 	"dev": "<:Desenvolvedor:925465898414899241> ",//"<:dev:801248050071994418> ",
 	"mod": "<:mod:823251404742721578> ",
-	"ajd": "<:Ajudante:801248050071994418> "
+	"ajd": "<:Ajudante:801248050071994418> ",
+	"art": "<:Artista:948007343365427201> ",
 }
 
 module.exports = badges;

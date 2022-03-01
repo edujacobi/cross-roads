@@ -441,7 +441,7 @@ exports.run = async (bot, message, args) => {
 				msg.edit({components: []})
 					.catch(() => console.log("Não consegui enviar mensagem `investir outros`"))
 
-				bot.commands.get('investir').run(bot, message, ['outros'])
+				bot.commands.get('investir').run(bot, message)
 			}
 		})
 

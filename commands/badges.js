@@ -1,7 +1,9 @@
 exports.run = async (bot, message, args) => {
 	const Discord = require('discord.js')
 	const embed1 = new Discord.MessageEmbed()
-		.setAuthor(`Badges`)
+		.setAuthor({
+			name: `Badges`
+		})
 		.setTitle(`Badges de final de temporada`)
 		.setDescription("Fique em destaque no final de uma temporada e ganhe uma badge por toda a duração da seguinte")
 		.setColor('GREEN')
@@ -46,9 +48,12 @@ exports.run = async (bot, message, args) => {
 		.addField(`${bot.badges.bilionario} Bilionário`, "Tenha R$ 1.000.000.000 em mãos", true)
 		.addField(`${bot.badges.cataBug} Cata Bug`, "Reporte um bug gravíssimo que poderia quebrar o jogo", true)
 		.addField(`${bot.badges.vip} VIP`, "Adquira VIP", true)
-		.setFooter(`${bot.user.username} • Badges criadas por Cesar e Jacobi`, bot.user.avatarURL())
+		.addField(`${bot.badges.art} Artista`, "Crie artes para o Cross Roads", true)
+		.setFooter({
+			text: `${bot.user.username} • Badges criadas por Cesar e Jacobi`, iconURL: bot.user.avatarURL()
+		})
 		.setTimestamp()
-	
+
 	return message.channel.send({embeds: [embed1, embed2, embed3]})
 		.catch(() => console.log("Não consegui enviar mensagem `badges`"))
 }

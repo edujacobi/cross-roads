@@ -433,8 +433,10 @@ module.exports = bot => {
 			textoBadge += bot.badges.dev
 		if (bot.moderators.includes(userId)) //MOD
 			textoBadge += bot.badges.mod
-		if (bot.ajudantes.includes(userId)) //MOD
+		if (bot.ajudantes.includes(userId)) //AJUDANTE
 			textoBadge += bot.badges.ajd
+		if (['592022325835202600', '565928906356424705', '666077411615572031'].includes(userId)) //ARTISTA
+			textoBadge += bot.badges.art
 		if (bot.data.get(userId, 'vipTime') > new Date().getTime()) // VIP
 			textoBadge += bot.badges.vip
 

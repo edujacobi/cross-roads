@@ -43,7 +43,7 @@ exports.run = async (bot, message, args) => {
 	else if (uData.preso > currTime)
 		emojiSituação = bot.config.prisao
 	else if (trabalhando)
-		emojiSituação = bot.config.bulldozer
+		emojiSituação = bot.config.trabalhando
 	else if (uData.hospitalizado > currTime)
 		emojiSituação = bot.config.hospital
 	if (bot.isPlayerViajando(uData))

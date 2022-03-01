@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-exports.run = async (bot, message, args) => {
+exports.run = async (bot, message) => {
 	let currTime = new Date().getTime()
 	let uData = bot.data.get(message.author.id)
 	const MULT = uData.invest ? bot.investimentos[uData.invest].id : 1
@@ -26,13 +26,9 @@ exports.run = async (bot, message, args) => {
 		let aviso = Math.random() < 0.5 ? '' : '\nHabilite mensagens privadas com o Cross Roads e seja avisado sobre notificações importantes!'
 
 		setTimeout(() => {
-			message.author
-				.send(`Seu daily está disponível novamente ${bot.config.coin}`)
-				.catch((err) =>
-					message
-						.reply(`seu daily está disponível novamente ${bot.config.coin}${aviso}`)
-						.catch((er) => `Não consegui responder ${bot.data.get(message.author.id, 'username')} nem no PV nem no canal. \`Daily\``)
-				)
+			message.author.send(`Seu daily está disponível novamente ${bot.config.coin}`)
+				.catch(() => message.reply(`seu daily está disponível novamente ${bot.config.coin}${aviso}`)
+					.catch(() => `Não consegui responder ${bot.data.get(message.author.id, 'username')} nem no PV nem no canal. \`Daily\``))
 		}, dia)
 
 		let textEvent = evento ? ` e ${bot.config.ovo} ${ovo} ${isVip ? 'Presentes' : 'Presente'}` : ''

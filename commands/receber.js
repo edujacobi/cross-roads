@@ -23,7 +23,7 @@ exports.run = async (bot, message, args) => {
 	// let linhaInvest = ''
 
 	if (uData.job == null) {
-		linhaTrabalho = `Você não está trabalhando ${bot.config.bulldozer}`
+		linhaTrabalho = `Você não está trabalhando ${bot.config.trabalhando}`
 
 	} else {
 		let job = bot.jobs[uData.job]
@@ -36,7 +36,7 @@ exports.run = async (bot, message, args) => {
 			pagamento *= 1.05
 
 		if (currTime > uData.jobTime) {
-			linhaTrabalho = `Você recebeu seu pagamento de R$ ${Math.round(pagamento).toLocaleString().replace(/,/g, ".")} ${bot.config.bulldozer}`
+			linhaTrabalho = `Você recebeu seu pagamento de R$ ${Math.round(pagamento).toLocaleString().replace(/,/g, ".")} ${bot.config.trabalhando}`
 
 			uData.moni += Math.round(pagamento)
 			uData.jobGanhos += Math.round(pagamento)
@@ -50,7 +50,7 @@ exports.run = async (bot, message, args) => {
 				.setColor('YELLOW'))
 
 		} else
-			linhaTrabalho = `Você ainda está trabalhando de **${job.desc}** ${bot.config.bulldozer}`
+			linhaTrabalho = `Você ainda está trabalhando de **${job.desc}** ${bot.config.trabalhando}`
 
 	}
 

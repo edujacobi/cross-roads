@@ -9,7 +9,7 @@ exports.run = async (bot, message, args) => {
 \`;loja [ID]\` ou \`;l [ID]\` Compra um item
 \`;mercadonegro\` ou \`;mn\` Produtos ilegais e trabalhos perigosos`)
 
-		.addField(`${bot.config.bulldozer} Trabalhar`,
+		.addField(`${bot.config.trabalhando} Trabalhar`,
 			`\`;trabalhos\`ou  \`;ts\` Abre a lista de trabalhos
 \`;trabalho [ID]\` ou \`;t [ID]\` Inicia um trabalho
 \`;trabalho parar\` ou \`;t p\` Pára um trabalho

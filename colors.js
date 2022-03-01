@@ -3,6 +3,7 @@ const colors = {
 	"roubar": "DARK_RED",
 	"policia": 0x000080,
 	"hospital": "RED",
+	"vasculhar": "LIGHT_GREY",
 
 	"white": 0xebebeb,
 
@@ -12,6 +13,7 @@ const colors = {
 	"admin": 0x80e893,
 
 	"casamento": 0xf3e5ab,
+	
 }
 
 module.exports = colors;
