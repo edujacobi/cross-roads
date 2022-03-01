@@ -703,7 +703,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 					components: [row]
 				}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
-				bot.commands.get('prisao').run(bot, message)
+				bot.commands.get('prisao').run(bot, message, ['fugir'])
 
 			}
 			else if (b.customId === message.id + message.author.id + 'subornar') {
@@ -713,7 +713,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 					components: [row]
 				}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
-				bot.commands.get('prisao').run(bot, message)
+				bot.commands.get('prisao').run(bot, message, ['subornar'])
 			}
 		})
 		collector.on('end', () => {

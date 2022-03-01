@@ -425,7 +425,7 @@ Confirmando, você concorda com todas as regras da <#529676890454360074> e que e
 	}
 	// console.log(message.author.username, command, args)
 
-	cmd.run(bot, message)
+	cmd.run(bot, message, args)
 
 	const embed = new Discord.MessageEmbed()
 		.setAuthor(bot.data.has(message.author.id, 'username') ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())

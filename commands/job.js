@@ -85,7 +85,7 @@ exports.run = async (bot, message, args) => {
 	}
 
 
-	if (option < 1 || (option % 1 !== 0) || option > Object.keys(bot.jobs).length)
+	if (option < 1 || (option % 1 != 0) || option > Object.keys(bot.jobs).length)
 		return bot.createEmbed(message, `O ID deve ser entre 1 e ${Object.keys(bot.jobs).length} ${bot.config.trabalhos}`, null, 'YELLOW')
 	
 	if (option >= 16 && day !== 0 && day !== 6 && !(day === 5 && hora >= 20) && message.author.id !== bot.config.adminID)

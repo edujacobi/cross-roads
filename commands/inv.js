@@ -415,27 +415,27 @@ exports.run = async (bot, message, args) => {
 		}
 		else if (b.customId === message.id + message.author.id + 'invest') {
 			buttonInvest.setDisabled(true)
-			bot.commands.get('investir').run(bot, message)
+			bot.commands.get('investir').run(bot, message, args)
 		}
 		else if (b.customId === message.id + message.author.id + 'userinfo') {
 			buttonUI.setDisabled(true)
-			bot.commands.get('userinfo').run(bot, message)
+			bot.commands.get('userinfo').run(bot, message, [alvo])
 		}
 		else if (b.customId === message.id + message.author.id + 'roubar') {
 			buttonRoubar.setDisabled(true)
-			bot.commands.get('roubar').run(bot, message)
+			bot.commands.get('roubar').run(bot, message, [alvo])
 		}
 		else if (b.customId === message.id + message.author.id + 'espancar') {
 			buttonEspancar.setDisabled(true)
-			bot.commands.get('espancar').run(bot, message)
+			bot.commands.get('espancar').run(bot, message, [alvo])
 		}
 		else if (b.customId === message.id + message.author.id + 'esmola') {
 			buttonEsmola.setDisabled(true)
-			bot.commands.get('esmola').run(bot, message)
+			bot.commands.get('esmola').run(bot, message, [alvo])
 		}
 		else if (b.customId === message.id + message.author.id + 'gang') {
 			buttonGang.setDisabled(true)
-			bot.commands.get('gang').run(bot, message)
+			bot.commands.get('gang').run(bot, message, [uGang?.nome])
 		}
 		else if (b.customId === message.id + message.author.id + 'anuncio') {
 			buttonAnuncio.setDisabled(true)

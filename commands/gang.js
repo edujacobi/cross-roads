@@ -936,13 +936,13 @@ Aceitar convite?`)
 			collector.on('collect', async b => {
 				await b.deferUpdate()
 				if (b.customId === message.id + message.author.id + 'importar')
-					bot.commands.get('gang').run(bot, message)
+					bot.commands.get('gang').run(bot, message, ['importar'])
 				else if (b.customId === message.id + message.author.id + 'exportar')
-					bot.commands.get('gang').run(bot, message)
+					bot.commands.get('gang').run(bot, message, ['exportar'])
 				else if (b.customId === message.id + message.author.id + 'upgrade')
-					bot.commands.get('gang').run(bot, message)
+					bot.commands.get('gang').run(bot, message, ['base', 'upgrade'])
 				else if (b.customId === message.id + message.author.id + 'membros')
-					bot.commands.get('gang').run(bot, message)
+					bot.commands.get('gang').run(bot, message, [uGang.nome])
 			})
 
 			collector.on('end', async () => {
@@ -2341,7 +2341,7 @@ Aceitar convite?`)
 
 				}
 				else if (b.customId === message.id + message.author.id + 'base')
-					bot.commands.get('gang').run(bot, message)
+					bot.commands.get('gang').run(bot, message, ['base', uGang.nome])
 
 			})
 
