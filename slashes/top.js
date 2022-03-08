@@ -563,5 +563,5 @@ exports.commandData = new SlashCommandBuilder()
 
 exports.conf = {
 	permLevel: "User",
-	guildOnly: true
+	guildOnly: false
 }
