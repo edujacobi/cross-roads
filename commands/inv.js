@@ -264,8 +264,8 @@ exports.run = async (bot, message, args) => {
 		.setCustomId(message.id + message.author.id + 'userinfo')
 
 	const buttonAnuncio = new Discord.MessageButton()
-		.setStyle('SUCCESS')
-		.setLabel('Slashes')
+		.setStyle('PRIMARY')
+		.setLabel('Slashes!')
 		.setCustomId(message.id + message.author.id + 'anuncio')
 
 	let boneco = uGang?.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang?.boneco]
