@@ -18,7 +18,7 @@ const badges = {
 	"patricinha_s6": "<:badge_patricinha:934631819255615599> ",
 	"topGangue_s6": "<:badge_top_gangue:934631819435974717> ",
 	"traderElite_s6": "<:badge_trader_elite:934631819536637993> ",
-	"xeroqueHolmes_s6": "<:badge_xeroqueHolmes:934632286337503264>	",
+	"xeroqueHolmes_s6": "<:badge_xeroqueHolmes:934632286337503264> ",
 	
 	// S5 ---------------------------------
 	"topGrana1_s5": "<:Top1_Grana_S5:889681658167558154> ",

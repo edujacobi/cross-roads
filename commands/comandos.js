@@ -46,10 +46,10 @@ exports.run = async (bot, message, args) => {
 		.addField(`${bot.config.car} Informações`,
 			`\`;inventario [jogador]\` ou \`;i\` Abre o inventário do jogador
 \`;userinfo [jogador]\` ou \`;ui\` Informações relevantes sobre o jogador
-\`;top\` Rankings da temporada
+\`/top\` Rankings da temporada
 \`;badges\` Todas as badges existentes
 \`;arma (nome)\` Informações das armas
-\`;stats\` Estatísticas interessantes
+\`/stats\` Estatísticas interessantes
 \`;vip\` Informações sobre o VIP`)
 
 		.addField(`${bot.config.gang} Gangues`,

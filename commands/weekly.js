@@ -13,7 +13,7 @@ exports.run = async (bot, message, args) => {
 		uData.moni += parseInt(weekly_moni)
 		// uData.ficha += parseInt(weekly_ficha)
 		bot.data.set(message.author.id, uData)
-		bot.createEmbed(message, `Você recebeu seus R$ ${weekly_moni.toLocaleString().replace(/,/g, ".")} semanais ${bot.config.coin}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}, 'GREEN`)
+		bot.createEmbed(message, `Você recebeu seus R$ ${weekly_moni.toLocaleString().replace(/,/g, ".")} semanais ${bot.config.coin}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
 
 		return bot.log(message, new Discord.MessageEmbed()
 			.setDescription(`${uData.username} recebeu seus R$ ${weekly_moni.toLocaleString().replace(/,/g, ".")} semanais`)

@@ -1,7 +1,7 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js")
 
 exports.run = async (bot, interaction, args) => {
-	await interaction.deferReply();
+	// await interaction.deferReply()
 	const embed = new Discord.MessageEmbed()
 		.setColor('GREEN')
 		.setTitle("Convites")
@@ -9,12 +9,12 @@ exports.run = async (bot, interaction, args) => {
 		.setDescription("Adicione o Cross Roads em seu servidor!\nOu entre no servidor oficial e jogue com outras pessoas!\n\nPrecisa copiar o link? Ó ele aqui → discord.gg/sNf8avn")
 		// .addField("\u200b", "[Clique aqui e adicione Cross Roads em seu servidor!](https://discord.com/api/oauth2/authorize?client_id=526203502318321665&permissions=288832&scope=bot)\n\n[Clique aqui e entre também no server do Cross Roads!](https://discord.gg/sNf8avn)")
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
-		.setTimestamp();
+		.setTimestamp()
 
 	const button1 = new Discord.MessageButton()
 		.setStyle('LINK')
 		.setLabel('Adicionar em meu servidor!')
-		.setURL('https://discord.com/api/oauth2/authorize?client_id=526203502318321665&permissions=288832&scope=bot')
+		.setURL('https://discord.com/api/oauth2/authorize?client_id=526203502318321665&permissions=288832&scope=bot%20applications.commands')
 
 	const button2 = new Discord.MessageButton()
 		.setStyle('LINK')
@@ -25,11 +25,10 @@ exports.run = async (bot, interaction, args) => {
 		.addComponents(button1)
 		.addComponents(button2)
 
-	await interaction.editReply({
+	await interaction.reply({
 		components: [row],
 		embeds: [embed]
-	})
-	// .catch(err => console.log("Não consegui enviar mensagem `invite`"))
+	}).catch(() => console.log("Não consegui enviar mensagem `invite`"))
 
 }
 exports.commandData = {
@@ -37,9 +36,9 @@ exports.commandData = {
 	description: "Convide o Cross Roads para seu servidor ou entre no servidor oficial",
 	options: [],
 	defaultPermission: true,
-};
+}
 
 exports.conf = {
 	permLevel: "User",
 	guildOnly: false
-};
+}

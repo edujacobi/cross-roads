@@ -1,5 +1,5 @@
 exports.run = async (bot, interaction) => {
-	const Discord = require('discord.js');
+	const Discord = require('discord.js')
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`${bot.config.qmark} Ajuda`)
 		.setDescription("*Bem vindo à Cidade da Cruz! Aqui, todos os caminhos se cruzam, sejam eles bons ou ruins. Decida seu caminho e molde seu futuro nesse jogo de RPG!*")
@@ -11,24 +11,22 @@ exports.run = async (bot, interaction) => {
 		.addField("Novidades", "Atualizações são publicadas toda semana! `;updates`.", true)
 		.addField("Notificações e funcionamento", "Para tudo ocorrer belezinha, certifique-se que você pode receber mensagens privadas de usuários que não estão na sua lista de amigos. Se você colocou Cross Roads no seu servidor, certifique-se que a permissão Gerenciar Mensagens está ativa!")
 		.addField("Ajude o bot a continuar online", "Adquira VIP! O VIP não torna o jogo _pay-to-win_, os benefícios são, em sua maioria, somente cosméticos!")
-		.addField("Entre no servidor oficial!", `[Saiba de eventos e atualizações!](https://discord.gg/ruasdacruz)`)
+		.addField("Entre no servidor oficial!", `[Saiba de eventos e atualizações!](https://discord.gg/sNf8avn)`)
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
-		.setTimestamp();
+		.setTimestamp()
 
-	await interaction.reply({
-		embeds: [embed]
-	})
-	// .catch(err => console.log("Não consegui enviar mensagem `ajuda`"));
-};
+	await interaction.reply({embeds: [embed]})
+		.catch(() => console.log("Não consegui enviar mensagem `ajuda`"))
+}
 
 exports.commandData = {
 	name: "ajuda",
 	description: "Mostra informações iniciais de como jogar",
 	options: [],
 	defaultPermission: true,
-};
+}
 
 exports.conf = {
 	permLevel: "User",
 	guildOnly: false
-};
+}

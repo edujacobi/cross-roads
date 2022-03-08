@@ -265,7 +265,7 @@ exports.run = async (bot, message, args) => {
 
 	const buttonAnuncio = new Discord.MessageButton()
 		.setStyle('SUCCESS')
-		.setLabel('Anúncio')
+		.setLabel('Slashes')
 		.setCustomId(message.id + message.author.id + 'anuncio')
 
 	let boneco = uGang?.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang?.boneco]
@@ -370,7 +370,7 @@ exports.run = async (bot, message, args) => {
 			rowFechar.addComponents(buttonInvest)
 		}
 
-		if (bot.getRandom(0, 100) < 20) {
+		if (bot.getRandom(0, 100) < 75) {
 			rowAbrir.addComponents(buttonAnuncio)
 			rowFechar.addComponents(buttonAnuncio)
 		}
@@ -450,12 +450,14 @@ exports.run = async (bot, message, args) => {
 			})
 
 			const embedAnuncio = new Discord.MessageEmbed()
-				.setTitle(`<:CrossRoadsLogo:757021182020157571> Entre no servidor oficial!`)
-				.setDescription("Quer acompanhar novos updates? Saber quando e como serão os próximos eventos?\nReceba benefícios por dar boost!\n\n[Entre no servidor oficial do Cross Roads clicando aqui!](https://discord.gg/sNf8avn)")
+				.setTitle(`<:CrossRoadsLogo:757021182020157571> Comandos Slash!`)
+				// .setDescription("Quer acompanhar novos updates? Saber quando e como serão os próximos eventos?\nReceba benefícios por dar boost!\n\n[Entre no servidor oficial do Cross Roads clicando aqui!](https://discord.gg/sNf8avn)")
 				// .addField("A Temporada 6 encerrou dia 23/01 às 00h00min!", `Quer entender o porquê de existir temporadas? Acompanhar updates e eventos? [Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)`)
 				// .addField("A Temporada 7 iniciou dia 31/01!", `Um reset total aconteceu!`)
+				.setDescription("Vários comandos estão sendo convertidos para os novos *Slash Commands*. Para utilizá-los, talvez seja necessário que você atualize as permissões do Cross Roads (você pode clicar novamente no botão de convidá-lo para o servidor).\n\n[Entre no servidor oficial do Cross Roads!](https://discord.gg/sNf8avn)")
 				.setColor(bot.colors.admin)
-				.setFooter(`Atenciosamente, Jacobi`, avatar)
+				.setFooter({text: `Atenciosamente, Jacobi`, iconURL: avatar})
+
 			message.channel.send({embeds: [embedAnuncio]})
 				.catch(() => console.log("Não consegui enviar mensagem `comunicado`"))
 		}
@@ -487,9 +489,8 @@ exports.run = async (bot, message, args) => {
 
 	collector.on('end', () => {
 		if (msg)
-			msg.edit({
-				components: []
-			}).catch(() => console.log("Não consegui editar mensagem `inv`"))
+			msg.edit({components: []})
+				.catch(() => console.log("Não consegui editar mensagem `inv`"))
 	})
 
 
