@@ -9,11 +9,11 @@ module.exports = async bot => {
 	});
 
 	const hora = 3600000
-
+	
 	// bot.user.setActivity(`EM MANUTENÇÃO`, {
 	// 	type: "LISTENING"
 	// });
-
+	
 	setInterval(() => {
 		bot.user.setActivity(`${bot.data.indexes.length} jogadores | ;ajuda`, {
 			type: "LISTENING"
@@ -24,22 +24,22 @@ module.exports = async bot => {
 			});
 		}, hora)
 	}, hora * 2)
-
+	
 	setInterval(() => {
 		bot.decrescimoNivelCasal()
 		bot.removeSkinsNoVIP()
 	}, hora * 6)
 	
-
+	
 	// setInterval(() => {
 	// 	// bot.putMoneyCassino()
 	// 	bot.sortearBilhete()
 	// 	// if (global.gc)
 	// 	// 	global.gc()
 	// }, (hora / 2))
-
+	
 	// bot.informRinhaRouboCancelado()
-
+	
 	setInterval(() => bot.investReceber(), hora) // 1h
 
 	const embed = new Discord.MessageEmbed()
