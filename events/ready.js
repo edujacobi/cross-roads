@@ -31,14 +31,14 @@ module.exports = async bot => {
 	}, hora * 6)
 	
 
-	setInterval(() => {
-		// bot.putMoneyCassino()
-		bot.sortearBilhete()
-		// if (global.gc)
-		// 	global.gc()
-	}, (hora / 2))
+	// setInterval(() => {
+	// 	// bot.putMoneyCassino()
+	// 	bot.sortearBilhete()
+	// 	// if (global.gc)
+	// 	// 	global.gc()
+	// }, (hora / 2))
 
-	bot.informRinhaRouboCancelado()
+	// bot.informRinhaRouboCancelado()
 
 	setInterval(() => bot.investReceber(), hora) // 1h
 
