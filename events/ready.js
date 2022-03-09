@@ -38,7 +38,7 @@ module.exports = async bot => {
 	// 	// 	global.gc()
 	// }, (hora / 2))
 	
-	// bot.informRinhaRouboCancelado()
+	bot.informRinhaRouboCancelado()
 	
 	setInterval(() => bot.investReceber(), hora) // 1h
 

@@ -87,15 +87,15 @@ const init = async () => {
 	})
 
 	// Now we load any **slash** commands you may have in the ./slash directory.
-	// const slashFiles = readdirSync("./slashes").filter(file => file.endsWith(".js"))
-	// for (const file of slashFiles) {
-	// 	const command = require(`./slashes/${file}`)
-	// 	const commandName = file.split(".")[0]
-	// 	console.log(`Loading Slash command: ${commandName}. 👌`, "log")
-	//
-	// 	// Now set the name of the command with it's properties.
-	// 	bot.slashes.set(command.commandData.name, command)
-	// }
+	const slashFiles = readdirSync("./slashes").filter(file => file.endsWith(".js"))
+	for (const file of slashFiles) {
+		const command = require(`./slashes/${file}`)
+		const commandName = file.split(".")[0]
+		console.log(`Loading Slash command: ${commandName}. 👌`, "log")
+
+		// Now set the name of the command with it's properties.
+		bot.slashes.set(command.commandData.name, command)
+	}
 
 	bot.on('shardError', error => {
 		console.warn(new Date() + '.\nA websocket connection encountered an error:', error)
