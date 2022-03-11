@@ -267,7 +267,7 @@ exports.run = async (bot, interaction) => {
 						objeto.parametros.push(objeto.galo.caramuruWins)
 					}
 					if (mytop === 'topsortudo') {
-						objeto.parametros.push(((user.betW / user.betJ) * 100).toFixed(1))
+						objeto.parametros.push((user.betW / user.betJ) * 100)
 						objeto.parametros.push(user.cassinoGanhos)
 					}
 					// if (mytop === 'topgang') {

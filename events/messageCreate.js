@@ -14,7 +14,7 @@ module.exports = async (bot, message) => {
 
 	if (message.channel.type === 'DM') return
 
-	if (message.mentions.has(bot.user) && !message.content.startsWith(bot.config.prefix) && !message.mentions.everyone) return bot.createEmbed(message, `Olá! Meu prefixo é \`${bot.config.prefix}\`. Caso não saiba como começar a jogar, use \`${bot.config.prefix}ajuda\`!`)
+	if (message.mentions.has(bot.user) && !message.content.startsWith(bot.config.prefix) && !message.mentions.everyone) return bot.createEmbed(message, `Olá! Meu prefixo é \`${bot.config.prefix}\`. Caso não saiba como começar a jogar, use \`/ajuda\`!`, null, 'GREEN')
 
 	if (!message.content.startsWith(bot.config.prefix)) return
 
@@ -312,7 +312,7 @@ Confirmando, você concorda com todas as regras da <#529676890454360074> e que e
 			.setColor(bot.colors.admin)
 			.setTimestamp()
 			.setFooter(`${bot.user.username} • KKK eae fake!`, bot.user.avatarURL())
-		
+
 		let msg = await message.reply({embeds: [embed], ephemeral: true})
 			.catch(() => console.log("Não consegui enviar mensagem `cadastro`"))
 
@@ -348,9 +348,9 @@ Confirmando, você concorda com todas as regras da <#529676890454360074> e que e
 					.setColor(bot.colors.admin)
 					.setTimestamp()
 					.setFooter(`${bot.user.username} • Circulando, circulando!`, bot.user.avatarURL())
-				
+
 				uData.registrado = true
-				
+
 				bot.data.set(message.author.id, uData)
 
 				return await msg.edit({embeds: [embed], components: []})
@@ -369,9 +369,9 @@ Confirmando, você concorda com todas as regras da <#529676890454360074> e que e
 				bot.users.fetch(bot.config.adminID).then(user => {
 					user.send(`Cancelou cadastro anti-fake: ${uData.username} (${c.user.id})`)
 				})
-				
+
 				return await msg.edit({embeds: [embed], components: []})
-					.catch(() => console.log("Não consegui editar mensagem `cadastro`"))				
+					.catch(() => console.log("Não consegui editar mensagem `cadastro`"))
 			}
 
 		})
@@ -428,10 +428,16 @@ Confirmando, você concorda com todas as regras da <#529676890454360074> e que e
 	cmd.run(bot, message, args)
 
 	const embed = new Discord.MessageEmbed()
-		.setAuthor(bot.data.has(message.author.id, 'username') ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`, message.author.avatarURL())
-		.setDescription(`${bot.data.has(message.author.id, 'username') ? uData.username : message.author.username} **${message.content}**`)
+		.setAuthor({
+			name: uData.username ? `${uData.username} (${message.author.id})` : `${message.author.username} (${message.author.id})`,
+			iconURL: message.author.avatarURL()
+		})
+		.setDescription(`${uData.username ? uData.username : message.author.username} **${message.content}**`)
 		.setColor(bot.colors.background)
-		.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
+		.setFooter({
+			text: `Servidor ${message.guild.name}. Canal #${message.channel.name}`,
+			iconURL: message.guild.iconURL()
+		})
 		.setTimestamp()
 
 	bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
