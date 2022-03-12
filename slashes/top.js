@@ -114,10 +114,10 @@ exports.run = async (bot, interaction) => {
 			objeto.emote = bot.badges.esmagaCranio_s6
 			objeto.coisas = [{
 				unit: '',
-				subtitulo: 'Espancadores'
+				subtitulo: 'Espancados'
 			},{
 				unit: '',
-				subtitulo: 'Espancados'
+				subtitulo: 'Espancadores'
 			}]
 		}
 		if (ranking === 'topesmola') {
@@ -474,12 +474,11 @@ exports.run = async (bot, interaction) => {
 
 		collector.on('collect', async r => {
 			await r.deferUpdate()
-			console.log(r.values)
 			let myTop = getMyTop(r.values[0])
 			let myRankingData = getRankingData(r.values[0])
 			let currentIndex = 0
 
-			await interaction.followUp({
+			await interaction.editReply({
 				embeds: [embed, generateEmbed({
 					start: 0,
 					top: myTop,
@@ -527,7 +526,7 @@ exports.run = async (bot, interaction) => {
 					rowBtn.addComponents(buttonProx)
 
 
-				await interaction.followUp({
+				await interaction.editReply({
 					embeds: [embed, generateEmbed({
 						start: currentIndex,
 						top: myTop,

@@ -14,7 +14,7 @@ exports.run = async (bot, message, args) => {
 	if (uData.invest == null || args[0] === 'outros') {
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.propertyG} Investimentos`)
-			.setDescription("Você receberá lucros a cada hora. Cada investimento dura 7 dias.\nPossuir um investimento aumenta seu prestígio social, permitindo receber maiores quantias no `;daily`, `;weekly` e multiplicadores maiores no `;niquel`.")
+			.setDescription("Você receberá lucros a cada hora. Cada investimento dura 7 dias.\nPossuir um investimento aumenta seu prestígio social, permitindo receber maiores quantias no `/daily`, `;weekly` e multiplicadores maiores no `;niquel`.")
 			.setThumbnail("https://cdn.discordapp.com/attachments/719677144133009478/734264171511676969/radar_propertyG.png")
 			.setColor('GREEN')
 			.setFooter({

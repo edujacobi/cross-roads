@@ -55,7 +55,7 @@ exports.run = async (bot, message, args) => {
 	}
 
 	let coroamuru = '<:Coroamuru2:881007505717751858>'
-	let premio = 150000
+	let premio = 500000
 
 	const HORA = 2700000 //45 min
 	const TRINTA_SEG = 30000

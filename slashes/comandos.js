@@ -51,7 +51,7 @@ exports.run = async (bot, interaction) => {
 \`;badges\` Todas as badges existentes
 \`;arma (nome)\` Informações das armas
 \`/stats\` Estatísticas interessantes
-\`;vip\` Informações sobre o VIP`)
+\`/vip\` Informações sobre o VIP`)
 
 		.addField(`${bot.config.gang} Gangues`,
 			`\`;gangue (info)\` ou \`;gg\` Informações sobre gangues
@@ -62,7 +62,7 @@ exports.run = async (bot, interaction) => {
 \`;casamento\` ou \`;nós\` Visualiza seu casamento`)
 
 		.addField(`${bot.config.vadiando} Úteis`,
-			`\`;daily\` ou \`;d\` Recebe o bônus diário
+			`\`/daily\` Recebe o bônus diário
 \`;weekly\` ou \`;w\` Recebe o bônus semanal
 \`;me [ação]\` Realiza uma ação
 \`;nick\` Altera seu nick

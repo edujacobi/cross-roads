@@ -1,6 +1,6 @@
 module.exports = (bot) => {
 
-	let multiplicador_tempo_evento = 1
+	let multiplicador_tempo_evento = 0.75
 
 	bot.jobs = {
 		pedreiro: {

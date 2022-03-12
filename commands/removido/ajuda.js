@@ -6,7 +6,7 @@ exports.run = async (bot, message, args) => {
 		.setDescription("*Bem vindo à Cidade da Cruz! Aqui, todos os caminhos se cruzam, sejam eles bons ou ruins. Decida seu caminho e molde seu futuro nesse jogo de RPG!*")
 		.setColor('GREEN')
 		.setThumbnail("https://media.discordapp.net/attachments/531174573463306240/854876909564461066/Interrogacao.png")
-		.addField("Jogue agora mesmo!", "Veja seu inventário usando `;inv`.\nVocê pode usar `;daily` diariamente para receber um pequeno valor e `;weekly` semanalmente para mais!")
+		.addField("Jogue agora mesmo!", "Veja seu inventário usando `;inv`.\nVocê pode usar `/daily` diariamente para receber um pequeno valor e `;weekly` semanalmente para mais!")
 		.addField("Ganhe dinheiro", "Há muitas maneiras de ganhar dinheiro no jogo. Trabalhando, investindo, apostando, roubando e até vasculhando lugares.")
 		.addField("Comandos", "Para ver todos os comandos, use `;comandos`.", true)
 		.addField("Novidades", "Atualizações são publicadas toda semana! `;updates`.", true)

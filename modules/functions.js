@@ -809,8 +809,11 @@ module.exports = bot => {
 
 	bot.log = async (message, logMessage) => {
 		if (!logMessage || !message) return
+		
+		let user = message.author ? message.author : message.user
+		
 		logMessage
-			.setAuthor(`${bot.data.get(message.author.id, 'username')} (${message.author.id})`, message.author.avatarURL())
+			.setAuthor(`${bot.data.get(user.id, 'username')} (${user.id})`, user.avatarURL())
 			.setTimestamp()
 			.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
 

@@ -11,7 +11,7 @@ const minToDays = (minutes) => {
 const beneficios = () => {
 	let lista = [
 		"Badge exclusiva no inventário",
-		"Bônus de 50% no `;daily` e `;weekly`",
+		"Bônus de 50% no `/daily` e `;weekly`",
 		"Recarga na alteração de nick",
 		"Avatar GIF do galo",
 		"Dobro de limite de caracteres no título do galo",
