@@ -25,5 +25,6 @@ exports.run = async (bot, message, args) => {
   })
 
   let text = args.join(" ")
-  return message.channel.send(piii.filter(text)).catch(err => console.log("Não consegui enviar mensagem `say`"))
+  return message.channel.send(piii.filter(text))
+	  .catch(() => console.log("Não consegui enviar mensagem `say`"))
 }

@@ -90,10 +90,10 @@ exports.run = async (bot, interaction) => {
 			objeto.coisas = [{
 				unit: '',
 				subtitulo: 'Top Ladrões'
-			},{
+			}, {
 				unit: '',
 				subtitulo: 'Top Roubados'
-			},{
+			}, {
 				unit: 'R$ ',
 				subtitulo: 'Quantidade roubada'
 			}]
@@ -104,7 +104,7 @@ exports.run = async (bot, interaction) => {
 			objeto.coisas = [{
 				unit: '',
 				subtitulo: 'Top Presos'
-			},{
+			}, {
 				unit: '',
 				subtitulo: 'Top Fujão'
 			}]
@@ -115,7 +115,7 @@ exports.run = async (bot, interaction) => {
 			objeto.coisas = [{
 				unit: '',
 				subtitulo: 'Espancados'
-			},{
+			}, {
 				unit: '',
 				subtitulo: 'Espancadores'
 			}]
@@ -126,7 +126,7 @@ exports.run = async (bot, interaction) => {
 			objeto.coisas = [{
 				unit: 'R$ ',
 				subtitulo: 'Top Filantropos'
-			},{
+			}, {
 				unit: 'R$ ',
 				subtitulo: 'Top Mendigos'
 			}]
@@ -137,14 +137,14 @@ exports.run = async (bot, interaction) => {
 			objeto.coisas = [{
 				unit: '',
 				subtitulo: 'Vitórias'
-			},{
+			}, {
 				unit: '',
 				subtitulo: 'Level'
-			},{
+			}, {
 				unit: '%',
 				subtitulo: 'Win rate',
 				isPercent: true
-			},{
+			}, {
 				unit: '',
 				subtitulo: 'Vitórias vs Caramuru'
 			}]
@@ -157,7 +157,7 @@ exports.run = async (bot, interaction) => {
 				unit: '%',
 				subtitulo: 'Top Winrate',
 				isPercent: true,
-			},{
+			}, {
 				unit: 'R$ ',
 				subtitulo: 'Top Ganhos'
 			}]
@@ -177,11 +177,11 @@ exports.run = async (bot, interaction) => {
 		return objeto
 	}
 
-	function getMyTop(mytop) {
+	async function getMyTop(mytop) {
 		let top = []
 		let teste = true
-		
-		for (let [id, user] of bot.data) {
+
+		await bot.data.filter(async (user, id) => {
 			if (mytop === 'topvalor')
 				teste = user.moni !== 0 || user.ficha !== 0
 			if (mytop === 'topgrana')
@@ -209,7 +209,7 @@ exports.run = async (bot, interaction) => {
 			if (mytop === 'topesmola')
 				teste = user.qtEsmolasDadas > 0 || user.qtEsmolasRecebidas > 0
 			if (mytop === 'topgalo') {
-				let galo = bot.galos.get(id)
+				let galo = await bot.galos.get(id)
 				teste = (galo.wins + galo.loses) >= 20
 			}
 			if (mytop === 'topsortudo')
@@ -217,12 +217,13 @@ exports.run = async (bot, interaction) => {
 
 			if (user.username != undefined && teste) {
 				if (id !== bot.config.adminID) {
+					
 					let objeto = {
 						nick: user.username,
 						id: id,
 						classe: user.classe,
 						parametros: [],
-						galo: bot.galos.get(id)
+						galo: await bot.galos.get(id)
 					}
 
 					if (mytop === 'topvalor')
@@ -280,12 +281,12 @@ exports.run = async (bot, interaction) => {
 					top.push(objeto)
 				}
 			}
-		}
+		})
 
 		return top
 	}
 
-	const generateEmbed = ({start, top, rankingData, isID}) => {
+	const generateEmbed = async ({start, top, rankingData, isID}) => {
 		const current = top.slice(start, start + 10)
 		let topGlobal = []
 
@@ -310,30 +311,32 @@ exports.run = async (bot, interaction) => {
 				let topGlobalString = ""
 				let topGlobalStringID = ""
 
-				topGlobal.forEach((user, j) => {
-					let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id === bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
+				for (let j in topGlobal) {
+					let user = topGlobal[j]
+					let emote = user.classe ? bot.classes[user.classe].emote : `<:Inventario:814663379536052244>`
 					let mod = user.id === interaction.user.id ? "__" : ""
-					let viagem = bot.isPlayerViajando(bot.data.get(user.id)) ? `${bot.config.aviao} ` : ''
-					
-					if (rankingData.titulo === 'Ranking Galos'){
+					let viagem = await bot.isPlayerViajando(await bot.data.get(user.id)) ? `${bot.config.aviao} ` : ''
+
+					if (rankingData.titulo === 'Ranking Galos') {
 						if (rankingData.coisas[i].isPercent)
-							topGlobalString += `\`${j + start + 1}.\` ${mod}**${user.galo.nome}**${mod}: \`${user.parametros[i].toFixed(1).toLocaleString().replace(/,/g, ".")}\` (${viagem}${emote} ${user.nick})\n`
+							topGlobalString += `\`${+j + start + 1}.\` ${mod}**${user.galo.nome}**${mod}: \`${user.parametros[i].toFixed(1).toLocaleString().replace(/,/g, ".")}\` (${viagem}${emote} ${user.nick})\n`
 						else
-							topGlobalString += `\`${j + start + 1}.\` ${mod}**${user.galo.nome}**${mod}: \`${user.parametros[i].toLocaleString().replace(/,/g, ".")}${rankingData.coisas[i].unit}\` (${viagem}${emote} ${user.nick})\n`
-						topGlobalStringID += `\`${j + start + 1}.\` ${mod}**${user.galo.nome}**${mod}: ${user.id}\n`
-					} else {
-						if (rankingData.coisas[i].isPercent)
-							topGlobalString += `\`${j + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${user.parametros[i].toFixed(1).toLocaleString().replace(/,/g, ".")}${rankingData.coisas[i].unit}\n`
-						else
-							topGlobalString += `\`${j + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${rankingData.coisas[i].unit}${user.parametros[i].toLocaleString().replace(/,/g, ".")}\n`
-						topGlobalStringID += `\`${j + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${user.id}\n`
+							topGlobalString += `\`${+j + start + 1}.\` ${mod}**${user.galo.nome}**${mod}: \`${user.parametros[i].toLocaleString().replace(/,/g, ".")}${rankingData.coisas[i].unit}\` (${viagem}${emote} ${user.nick})\n`
+						topGlobalStringID += `\`${+j + start + 1}.\` ${mod}**${user.galo.nome}**${mod}: ${user.id}\n`
 					}
-				})
+					else {
+						if (rankingData.coisas[i].isPercent)
+							topGlobalString += `\`${+j + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${user.parametros[i].toFixed(1).toLocaleString().replace(/,/g, ".")}${rankingData.coisas[i].unit}\n`
+						else
+							topGlobalString += `\`${+j + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${rankingData.coisas[i].unit}${user.parametros[i].toLocaleString().replace(/,/g, ".")}\n`
+						topGlobalStringID += `\`${+j + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} ${user.id}\n`
+					}
+				}
 
 				// if (userComando) {
 				// 	let user = bot.data.get(userComando.id)
 				// 	const i = top.indexOf(userComando)
-				// 	let viagem = bot.isPlayerViajando(user) ? `${bot.config.aviao} ` : ''
+				// 	let viagem = await bot.isPlayerViajando(user) ? `${bot.config.aviao} ` : ''
 				// 	let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id === bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
 				// 	topGlobalString += `\`${i + 1}.\` ${viagem}${emote} __**${user.username}**__ R$ ${(user.moni + user.ficha * 80).toLocaleString().replace(/,/g, ".")}\n`
 				// }
@@ -376,19 +379,33 @@ exports.run = async (bot, interaction) => {
 
 	if (seletorSlash) {
 		let currentIndex = 0
-		let myTop = getMyTop(seletorSlash)
-
+		let myRankingData = getRankingData(seletorSlash)
+		
 		const row = new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageSelectMenu()
 				.setCustomId(interaction.id + interaction.user.id + 'select')
 				.setPlaceholder('Selecione o ranking')
 				.addOptions(buttons))
 
-		interaction.reply({
-			embeds: [generateEmbed({
+		const resultado = new Discord.MessageEmbed()
+			.setTitle(`${myRankingData.emote} ${myRankingData.titulo}`)
+			.setColor('GREEN')
+			.setDescription("**Carregando...**")
+			.setFooter({
+				text: `${bot.user.username} • ${myRankingData.footer !== '' ? `${myRankingData.footer} • ` : ''}`,
+				iconURL: bot.user.avatarURL()
+			})
+			.setTimestamp()
+
+		await interaction.deferReply({embeds: [resultado]})
+
+		let myTop = await getMyTop(seletorSlash)
+
+		await interaction.editReply({
+			embeds: [await generateEmbed({
 				start: currentIndex,
-				top: getMyTop(seletorSlash),
-				rankingData: getRankingData(seletorSlash),
+				top: myTop,
+				rankingData: myRankingData,
 				isID: false
 			})],
 			components: myTop.length > 10 ? [new Discord.MessageActionRow().addComponents(buttonId).addComponents(buttonProx)] : [row, new Discord.MessageActionRow().addComponents(buttonId)]
@@ -432,10 +449,10 @@ exports.run = async (bot, interaction) => {
 				rowBtn.addComponents(buttonProx)
 
 			await interaction.editReply({
-				embeds: [generateEmbed({
+				embeds: [await generateEmbed({
 					start: currentIndex,
 					top: myTop,
-					rankingData: getRankingData(seletorSlash),
+					rankingData: myRankingData,
 					isID
 				})],
 				components: [rowBtn]
@@ -474,19 +491,32 @@ exports.run = async (bot, interaction) => {
 
 		collector.on('collect', async r => {
 			await r.deferUpdate()
-			let myTop = getMyTop(r.values[0])
 			let myRankingData = getRankingData(r.values[0])
 			let currentIndex = 0
 
+			const resultado = new Discord.MessageEmbed()
+				.setTitle(`${myRankingData.emote} ${myRankingData.titulo}`)
+				.setColor('GREEN')
+				.setDescription("**Carregando...**")
+				.setFooter({
+					text: `${bot.user.username} • ${myRankingData.footer !== '' ? `${myRankingData.footer} • ` : ''}`,
+					iconURL: bot.user.avatarURL()
+				})
+				.setTimestamp()
+
+			await interaction.editReply({embeds: [resultado]})
+
+			let myTop = await getMyTop(r.values[0])
+
 			await interaction.editReply({
-				embeds: [embed, generateEmbed({
+				embeds: [embed, await generateEmbed({
 					start: 0,
 					top: myTop,
 					rankingData: myRankingData
 				})],
 				components: myTop.length > 10 ? [row, new Discord.MessageActionRow().addComponents(buttonId).addComponents(buttonProx)] : [row, new Discord.MessageActionRow().addComponents(buttonId)]
 			})
-			.catch(() => console.log("Não consegui editar mensagem `top`"))
+				.catch(() => console.log("Não consegui editar mensagem `top`"))
 
 			const filter = (button) => [
 				interaction.id + interaction.user.id + 'prev',
@@ -527,7 +557,7 @@ exports.run = async (bot, interaction) => {
 
 
 				await interaction.editReply({
-					embeds: [embed, generateEmbed({
+					embeds: [embed, await generateEmbed({
 						start: currentIndex,
 						top: myTop,
 						rankingData: myRankingData,

@@ -5,7 +5,7 @@ exports.run = async (bot, message, args) => {
 	// 	return
 
 	let time = new Date().getTime()
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let option1 = args[0]
 	const MAX = 10000
 	const MIN = 10
@@ -22,10 +22,10 @@ exports.run = async (bot, message, args) => {
 	if (uData.hospitalizado > time)
 		return bot.msgHospitalizado(message, uData)
 
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 	if (args[1] === 'allin') {
@@ -57,8 +57,8 @@ exports.run = async (bot, message, args) => {
 	if (uData.ficha < valor)
 		return bot.createEmbed(message, `Você não possui esta quantidade de ${bot.config.ficha} fichas para apostar ${bot.config.mafiaCasino}`)
 
-	if (valor * 100 > bot.banco.get('cassino'))
-		return bot.createEmbed(message, `O Cassino não tem caixa suficiente para apostar com você`, `Caixa: R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
+	if (valor * 100 > await bot.banco.get('cassino'))
+		return bot.createEmbed(message, `O Cassino não tem caixa suficiente para apostar com você`, `Caixa: R$ ${await bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
 
 	let face1 = (Math.random() < 0.50 ? "cara" : "coroa")
 	// let face2 = (Math.random() < 0.50 ? "cara" : "coroa")
@@ -68,7 +68,7 @@ exports.run = async (bot, message, args) => {
 	if (valor >= 10) {
 		valor -= valor_imposto
 		if (message.author.id !== bot.config.adminID)
-			bot.banco.set('caixa', bot.banco.get('caixa') + valor_imposto * 80)
+			await bot.banco.set('caixa', await bot.banco.get('caixa') + valor_imposto * 80)
 	}
 
 	if (face1 === option1) {
@@ -76,7 +76,7 @@ exports.run = async (bot, message, args) => {
 		uData.cassinoGanhos += parseInt(valor) * 80
 		uData.betW++
 		bot.createEmbed(message, `Caiu **${face1}** \nVocê **ganhou** ${bot.config.ficha} ${parseInt(valor).toLocaleString().replace(/,/g, ".")} fichas ${bot.config.mafiaCasino}`, `${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`, 'GREEN')
-		bot.banco.set('cassino', bot.banco.get('cassino') - valor * 80)
+		await bot.banco.set('cassino', await bot.banco.get('cassino') - valor * 80)
 
 		bot.log(message, new Discord.MessageEmbed()
 			.setDescription(`**${uData.username} apostou em ${option1} ganhou ${parseInt(valor).toLocaleString().replace(/,/g, ".")} fichas**`)
@@ -90,7 +90,7 @@ exports.run = async (bot, message, args) => {
 		uData.cassinoPerdidos += parseInt(valor + valor_imposto) * 80
 		uData.betL++
 		bot.createEmbed(message, `Caiu **${face1}** \nVocê **perdeu** ${bot.config.ficha} ${parseInt(valor + valor_imposto).toLocaleString().replace(/,/g, ".")} fichas ${bot.config.mafiaCasino}`, `${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`, 'RED')
-		bot.banco.set('cassino', bot.banco.get('cassino') + valor * 80)
+		await bot.banco.set('cassino', await bot.banco.get('cassino') + valor * 80)
 
 		bot.log(message, new Discord.MessageEmbed()
 			.setDescription(`**${uData.username} apostou em ${option1} e perdeu ${parseInt(valor + valor_imposto).toLocaleString().replace(/,/g, ".")} fichas**`)
@@ -100,7 +100,7 @@ exports.run = async (bot, message, args) => {
 	}
 
 	uData.betJ++
-	bot.data.set(message.author.id, uData)
+	await bot.data.set(message.author.id, uData)
 
 }
 exports.config = {

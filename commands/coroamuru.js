@@ -27,7 +27,8 @@ function getLifeBar(vidaAtual, VIDAMAX, hp) {
 }
 
 exports.run = async (bot, message, args) => {
-	// if (message.author.id != bot.config.adminID) return message.reply("Comando em manutenção").catch(er => `Não consegui responder ${bot.data.get(btn.user.id, "username")} nem no PV nem no canal. \`Coroamuru\``)
+	// if (message.author.id != bot.config.adminID) return message.reply("Comando em manutenção")
+	// .catch(() => `Não consegui responder ${await bot.data.get(btn.user.id + ".username")} nem no PV nem no canal. \`Coroamuru\``)
 	const hp = {
 		esqFull: '<:HP_L:852210883240263691>',
 		esqEmpty: '<:noHP_L:852210883505553440>',
@@ -37,16 +38,16 @@ exports.run = async (bot, message, args) => {
 		rigEmpty: '<:noHP_R:852210883429007370>',
 	}
 
-	function getTop(bot, max) {
+	async function getTop(bot, max) {
 		let top = []
 
-		bot.coroamuru.indexes.forEach(user => { //gera lista para top global
-			if (user !== 'vidaMAX' && user !== 'vidaATUAL' && bot.data.get(user) && user !== bot.config.adminID) {
+		await bot.coroamuru.filter(async (user, key) => {
+			if (key !== 'vidaMAX' && key !== 'vidaATUAL' && await bot.data.get(key) && key !== bot.config.adminID) {
 				top.push({
-					nick: bot.data.get(user, "username"),
-					id: user,
-					galo: bot.galos.get(user, "nome"),
-					dano: parseInt(bot.coroamuru.get(user, "danoCausado"))
+					nick: await bot.data.get(key + ".username"),
+					id: key,
+					galo: await bot.galos.get(key + ".nome"),
+					dano: parseInt(user.danoCausado)
 				})
 			}
 		})
@@ -63,9 +64,9 @@ exports.run = async (bot, message, args) => {
 	let dia = new Date().getDay()
 	let hora = new Date().getHours()
 
-	function getEmbed() {
-		const VIDAMAX = bot.coroamuru.get('vidaMAX')
-		let vidaAtual = bot.coroamuru.get('vidaATUAL')
+	async function getEmbed() {
+		const VIDAMAX = await bot.coroamuru.get('vidaMAX')
+		let vidaAtual = await bot.coroamuru.get('vidaATUAL')
 
 		return new Discord.MessageEmbed()
 			.setTitle(`${coroamuru} Coroamuru`)
@@ -85,43 +86,43 @@ exports.run = async (bot, message, args) => {
 			.setTimestamp()
 	}
 
-	function getRow() {
-		let vidaAtual = bot.coroamuru.get('vidaATUAL')
+	async function getRow() {
+		let vidaAtual = await bot.coroamuru.get('vidaATUAL')
 
 		return new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageButton()
 				.setStyle('DANGER')
 				.setLabel('Atacar!')
 				.setDisabled(vidaAtual <= 0 || (dia !== 0 && dia !== 6 && !(dia === 5 && hora >= 20)))
-				.setCustomId(message.id + message.author.id + 'attack'))
+				.setCustomId('attack'))
 
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Top dano')
-				.setCustomId(message.id + message.author.id + 'top'))
+				.setCustomId('top'))
 	}
 
 	// return bot.createEmbed(message, `${coroamuru} Coroamuru está viajando de férias durante a primeira semana de temporada`)
 
 	if (args[0] === 'reset' && message.author.id === bot.config.adminID) {
-		bot.coroamuru.clear()
-		bot.coroamuru.set("vidaMAX", '200000')
-		bot.coroamuru.set("vidaATUAL", '200000')
+		await bot.coroamuru.clear()
+		await bot.coroamuru.set("vidaMAX", '200000')
+		await bot.coroamuru.set("vidaATUAL", '200000')
 
 		return bot.createEmbed(message, `${coroamuru} Coroamuru descansou e está curado!`, `Quem vai encarar?`, 0x0e64d1)
 	}
 
 	let msg = await message.channel.send({
-		components: [getRow()],
-		embeds: [getEmbed()]
+		components: [await getRow()],
+		embeds: [await getEmbed()]
 	}).catch(() => console.log("Não consegui enviar mensagem `coroamuru`"))
 
 	const filter = (button) => [
-		message.id + message.author.id + 'attack',
-		message.id + message.author.id + 'top'
+		'attack',
+		'top'
 	].includes(button.customId) && button.user.id === message.author.id
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter,
 		time: 90000,
 	})
@@ -129,24 +130,24 @@ exports.run = async (bot, message, args) => {
 	collector.on('collect', async btn => {
 		await btn.deferUpdate()
 
-		if (btn.customId === message.id + message.author.id + 'attack') {
-			
-			let vidaAtual = bot.coroamuru.get('vidaATUAL')
+		if (btn.customId === 'attack') {
+
+			let vidaAtual = await bot.coroamuru.get('vidaATUAL')
 			if (vidaAtual <= 0)
 				return bot.createEmbed(message, `COROAMURU FOI DERROTADO! ${coroamuru}`, null, bot.colors.white)
 
-			let uData = bot.data.get(btn.user.id)
+			let uData = await bot.data.get(btn.user.id)
 			if (!uData)
 				return bot.createEmbed(message, `${btn.user.id}, você não é registrado! Use qualquer comando e registre-se para jogar!`)
-			let uGalo = bot.galos.get(btn.user.id)
-			let galoData = bot.coroamuru.get(btn.user.id)
+			let uGalo = await bot.galos.get(btn.user.id)
+			let galoData = await bot.coroamuru.get(btn.user.id)
 			if (!galoData) {
 				let obj = {
 					danoCausado: 0,
 					tempoNovoAtaque: 0,
 				}
-				bot.coroamuru.set(btn.user.id, obj)
-				galoData = bot.coroamuru.get(btn.user.id)
+				await bot.coroamuru.set(btn.user.id, obj)
+				galoData = await bot.coroamuru.get(btn.user.id)
 			}
 			let currTime = new Date().getTime()
 
@@ -162,7 +163,7 @@ exports.run = async (bot, message, args) => {
 					bot.createEmbed(message, `${uData.username}, seu galo terminou o treinamento. Conclua-o antes de atacar ${coroamuru}`, null, bot.colors.white)
 			}
 
-			if (bot.isGaloEmRinha(message.author.id))
+			if (await bot.isGaloEmRinha(message.author.id))
 				return bot.createEmbed(message, `${uData.username}, seu galo não pode atacar enquanto está em uma rinha ${coroamuru}`, null, bot.colors.white)
 
 			if (uData.preso > currTime)
@@ -174,7 +175,7 @@ exports.run = async (bot, message, args) => {
 			if (uData.job != null)
 				return bot.msgTrabalhando(message, uData)
 
-			if (bot.isUserEmRouboOuEspancamento(message, uData))
+			if (await bot.isUserEmRouboOuEspancamento(message, uData))
 				return
 
 			if (galoData.tempoNovoAtaque > currTime)
@@ -228,7 +229,7 @@ exports.run = async (bot, message, args) => {
 					setTimeout(() => {
 						user.send(`Você pode atacar o Coroamuru novamente! ${coroamuru}`)
 							.catch(() => message.reply(`você pode atacar o Coroamuru novamente! ${coroamuru}`)
-								.catch(() => `Não consegui responder ${bot.data.get(btn.user.id, "username")} nem no PV nem no canal. \`Coroamuru\``))
+								.catch(() => `Não consegui responder ${uData.username} nem no PV nem no canal. \`Coroamuru\``))
 					}, galoData.tempoNovoAtaque - currTime)
 				})
 			}
@@ -242,7 +243,7 @@ exports.run = async (bot, message, args) => {
 					setTimeout(() => {
 						user.send(`Seu galo descansou! ${coroamuru}`)
 							.catch(() => message.reply(`seu galo descansou ${coroamuru}`)
-								.catch(() => `Não consegui responder ${bot.data.get(btn.user.id, "username")} nem no PV nem no canal. \`Coroamuru\``))
+								.catch(() => `Não consegui responder ${uData.username} nem no PV nem no canal. \`Coroamuru\``))
 					}, uGalo.descansar - currTime)
 				})
 			}
@@ -263,10 +264,10 @@ exports.run = async (bot, message, args) => {
 					.setColor(0x0e64d1)
 					.setDescription(`Você recebeu ${premio.toLocaleString().replace(/,/g, ".")} por ser o Top Dano na derrota de Coroamuru!\nSeu galo ${topDano.galo} causou ${topDano.dano}`)
 
-				let uDataWin = bot.data.get(topDano[0].id)
+				let uDataWin = await bot.data.get(topDano[0].id)
 
 				uDataWin.moni += premio
-				bot.data.set(topDano[0].id, uDataWin)
+				await bot.data.set(topDano[0].id, uDataWin)
 
 				bot.users.fetch(topDano[0].id).then(user => {
 					user.send({embeds: [embedWin]})
@@ -274,20 +275,20 @@ exports.run = async (bot, message, args) => {
 			}
 
 			msg.edit({
-				embeds: [getEmbed()],
-				components: [getRow()],
+				embeds: [await getEmbed()],
+				components: [await getRow()],
 			}).catch(() => console.log("Não consegui editar mensagem `coroamuru`"))
 
-			bot.coroamuru.set('vidaATUAL', vidaAtual)
-			bot.coroamuru.set(btn.user.id, galoData)
-			bot.galos.set(btn.user.id, uGalo)
+			await bot.coroamuru.set('vidaATUAL', vidaAtual)
+			await bot.coroamuru.set(btn.user.id, galoData)
+			await bot.galos.set(btn.user.id, uGalo)
 
 			message.channel.send({embeds: [embedATK]})
 				.catch(() => console.log("Não consegui enviar mensagem `coroamuru`"))
 
 		}
-		else if (btn.customId === message.id + message.author.id + 'top') {
-			let topGlobal = getTop(bot, 15)
+		else if (btn.customId === 'top') {
+			let topGlobal = await getTop(bot, 15)
 
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${coroamuru} Top Dano`)
@@ -295,9 +296,10 @@ exports.run = async (bot, message, args) => {
 				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
 
-			topGlobal.forEach((user, i) => {
-				embed.addField(`\`${i + 1}.\` **${user.galo}**`, `Galo de ${user.nick}\n${user.dano.toLocaleString().replace(/,/g, ".")}`, true)
-			})
+			for (let i in topGlobal) {
+				let user = topGlobal[i]
+				embed.addField(`\`${+i + 1}.\` **${user.galo}**`, `Galo de ${user.nick}\n${user.dano.toLocaleString().replace(/,/g, ".")}`, true)
+			}
 
 			message.channel.send({embeds: [embed]})
 				.catch(() => console.log("Não consegui enviar mensagem `coroamuru`"))

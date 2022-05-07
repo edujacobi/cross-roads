@@ -43,9 +43,9 @@ exports.run = async (bot, message, args) => {
 
 		if (uData.hospitalizado > currTime) return bot.msgHospitalizado(message, uData)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData)) return
+		if (await bot.isUserEmRouboOuEspancamento(message, uData)) return
 
-		if (bot.isGaloEmRinha(message.author.id)) return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
+		if (await bot.isGaloEmRinha(message.author.id)) return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		uData._ovo -= prices[option - 1]
 
@@ -55,7 +55,7 @@ exports.run = async (bot, message, args) => {
 					return bot.createEmbed(message, `${bot.config.ovo} Seu galo já possui esta badge! ${bot.config.galo}`, null, bot.colors.white)
 
 				uData.badgeNatal2021Galoel = true
-				bot.createEmbed(message, `${bot.config.ovo} Você comprou a badge ${bot.badges.evento_natal_galo_2021} **Papai Galoel** para ${bot.galos.get(message.author.id, 'nome')}!`, `Presentes: ${uData._ovo.toLocaleString().replace(/,/g, ".")}`, cor)
+				bot.createEmbed(message, `${bot.config.ovo} Você comprou a badge ${bot.badges.evento_natal_galo_2021} **Papai Galoel** para ${await bot.galos.get(message.author.id + '.nome')}!`, `Presentes: ${uData._ovo.toLocaleString().replace(/,/g, ".")}`, cor)
 
 				bot.log(message, new Discord.MessageEmbed()
 					.setDescription(`${bot.config.ovo} **${uData.username} comprou a badge para galo Galoel!**`)
@@ -94,7 +94,7 @@ exports.run = async (bot, message, args) => {
 
 			case 4:
 				//whey
-				let uGalo = bot.galos.get(message.author.id)
+				let uGalo = await bot.galos.get(message.author.id)
 
 				if (uGalo.power < 70)
 					return bot.createEmbed(message, `Seu galo está muito fraco para tomar ${bot.config.superWhey} **Super Whey** ${bot.config.galo}`, null, bot.colors.white)

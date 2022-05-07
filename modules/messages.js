@@ -1,9 +1,9 @@
 const Discord = require("discord.js")
 module.exports = (bot) => {
 
-	bot.createEmbed = (message, str, str_footer, color) => {
-		let uData = bot.data.get(message.author.id)
-		
+	bot.createEmbed = async (message, str, str_footer, color) => {
+		let uData = await bot.data.get(message.author.id)
+
 		const embed = new Discord.MessageEmbed()
 			.setDescription(str)
 			.setColor(color ? color : bot.colors.darkGrey) //message.member.displayColor)
@@ -14,7 +14,7 @@ module.exports = (bot) => {
 					(uData?.username ? uData.username : message.author.username),
 				iconURL: message?.member?.user ? message?.member?.user?.avatarURL() : ''
 			})
-		
+
 		return message.channel.send({embeds: [embed]})
 			.catch(() => {
 				console.log('Não consegui enviar createEmbed', str)
@@ -23,7 +23,7 @@ module.exports = (bot) => {
 			})
 	}
 
-	bot.isUserEmRouboOuEspancamento = (message, user) => {
+	bot.isUserEmRouboOuEspancamento = async (message, user) => {
 		let currTime = new Date().getTime()
 		if (!user)
 			return console.error("Informe o usuário")
@@ -31,28 +31,26 @@ module.exports = (bot) => {
 			return console.error("Informe a mensagem")
 
 		if (user.emRoubo.tempo > currTime) {
-			let roubado = !isNaN(user.emRoubo.user) ? bot.data.get(user.emRoubo.user, 'username') : user.emRoubo.user
-
+			let roubado = !isNaN(user.emRoubo.user) ? await bot.data.get(`${user.emRoubo.user}.username`) : user.emRoubo.user
 			if (user.emRoubo.isAlvo) {
-				bot.createEmbed(message, `Você está sendo roubado por **${roubado}** e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.roubar)
+				await bot.createEmbed(message, `Você está sendo roubado por **${roubado}** e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.roubar)
 				return true
 
 			}
 			else {
-				bot.createEmbed(message, `Você está roubando **${roubado}** e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.roubar)
+				await bot.createEmbed(message, `Você está roubando **${roubado}** e não pode fazer isto ${bot.config.roubar}`, null, bot.colors.roubar)
 				return true
 			}
 		}
 		if (user.emEspancamento.tempo > currTime) {
-			let espancado = !isNaN(user.emEspancamento.user) ? bot.data.get(user.emEspancamento.user, 'username') : user.emEspancamento.user
-
+			let espancado = !isNaN(user.emEspancamento.user) ?  await bot.data.get(`${user.emEspancamento.user}.username`) : user.emEspancamento.user
 			if (user.emEspancamento.isAlvo) {
-				bot.createEmbed(message, `Você está sendo espancado por **${espancado}** e não pode fazer isto ${bot.config.espancar}`, null, bot.colors.espancar)
+				await bot.createEmbed(message, `Você está sendo espancado por **${espancado}** e não pode fazer isto ${bot.config.espancar}`, null, bot.colors.espancar)
 				return true
 
 			}
 			else {
-				bot.createEmbed(message, `Você está espancando **${espancado}** e não pode fazer isto ${bot.config.espancar}`, null, bot.colors.espancar)
+				await bot.createEmbed(message, `Você está espancando **${espancado}** e não pode fazer isto ${bot.config.espancar}`, null, bot.colors.espancar)
 				return true
 			}
 		}
@@ -60,7 +58,7 @@ module.exports = (bot) => {
 		return false
 	}
 
-	bot.isAlvoEmRouboOuEspancamento = (message, user) => {
+	bot.isAlvoEmRouboOuEspancamento = async (message, user) => {
 		let currTime = new Date().getTime()
 		if (!user)
 			return console.error("Informe o usuário")
@@ -68,28 +66,28 @@ module.exports = (bot) => {
 			return console.error("Informe a mensagem")
 
 		if (user.emRoubo.tempo > currTime) {
-			let roubado = !isNaN(user.emRoubo.user) ? bot.data.get(user.emRoubo.user, 'username') : user.emRoubo.user
+			let roubado = !isNaN(user.emRoubo.user) ? await bot.data.get(`${user.emRoubo.user}.username`) : user.emRoubo.user
 
 			if (user.emRoubo.isAlvo) {
-				bot.createEmbed(message, `**${user.username}** está sendo roubado por **${roubado}**. Espere mais ${bot.segToHour((user.emRoubo.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.roubar}`, null, bot.colors.roubar)
+				await bot.createEmbed(message, `**${user.username}** está sendo roubado por **${roubado}**. Espere mais ${bot.segToHour((user.emRoubo.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.roubar}`, null, bot.colors.roubar)
 				return true
 
 			}
 			else {
-				bot.createEmbed(message, `**${user.username}** está roubando **${roubado}.** Espere mais ${bot.segToHour((user.emRoubo.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.roubar}`, null, bot.colors.roubar)
+				await bot.createEmbed(message, `**${user.username}** está roubando **${roubado}.** Espere mais ${bot.segToHour((user.emRoubo.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.roubar}`, null, bot.colors.roubar)
 				return true
 			}
 		}
 		if (user.emEspancamento.tempo > currTime) {
-			let espancado = !isNaN(user.emEspancamento.user) ? bot.data.get(user.emEspancamento.user, 'username') : user.emEspancamento.user
+			let espancado = !isNaN(user.emEspancamento.user) ? await bot.data.get(`${user.emEspancamento.user}.username`) : user.emEspancamento.user
 
 			if (user.emEspancamento.isAlvo) {
-				bot.createEmbed(message, `**${user.username}** está sendo espancado por **${espancado}**. Espere mais ${bot.segToHour((user.emEspancamento.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.espancar}`, null, bot.colors.espancar)
+				await bot.createEmbed(message, `**${user.username}** está sendo espancado por **${espancado}**. Espere mais ${bot.segToHour((user.emEspancamento.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.espancar}`, null, bot.colors.espancar)
 				return true
 
 			}
 			else {
-				bot.createEmbed(message, `**${user.username}** está espancando **${espancado}**. Espere mais ${bot.segToHour((user.emEspancamento.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.espancar}`, null, bot.colors.espancar)
+				await bot.createEmbed(message, `**${user.username}** está espancando **${espancado}**. Espere mais ${bot.segToHour((user.emEspancamento.tempo - currTime) / 1000)} para iniciar sua ação ${bot.config.espancar}`, null, bot.colors.espancar)
 				return true
 			}
 		}
@@ -134,12 +132,12 @@ module.exports = (bot) => {
 		'ping', 'me', 'vip', ' setvip', 'reload', 'say', 'embed', 'top', 'topv', 'tpv', 'tpg', 'topg', 'topvalor', 'topgrana', 'tpf', 'topf', 'topficha',
 		'banco', 'casamento', 'casal', 'nos', 'nós', 'investir', 'topnatal', 'topn', 'tpn', 'toppresente', 'avatar']
 
-	bot.isComandoUsavelViagem = (message, args) => {
+	bot.isComandoUsavelViagem = async (message, args) => {
 		if (!message)
 			return console.error("Informe a mensagem")
 
-		let user = bot.data.get(message.author.id)
-		let uCasamento = bot.casais.get(user.casamentoID)
+		let user = await bot.data.get(message.author.id)
+		let uCasamento = await bot.casais.get(user.casamentoID?.toString())
 
 		if (!uCasamento || uCasamento.viagem < Date.now()) return true
 
@@ -149,26 +147,29 @@ module.exports = (bot) => {
 
 		if (comandosViagem.includes(command)) return true
 
-		if (!args) bot.msgPlayerViajando(message, user)
+		if (!args) await bot.msgPlayerViajando(message, user)
 
 		return false
 	}
 
-	bot.msgPlayerViajando = (message, user, username) => {
-		let uCasamento = bot.casais.get(user.casamentoID)
-		bot.createEmbed(message, `${bot.config.aviao} ${username ?? 'Você'} está viajando com ${bot.data.get(user.conjuge, 'username')} e ${username ? 'você não pode fazer nada' : 'não pode realizar nenhuma ação'}`, `Tempo restante: Viajando por mais ${bot.segToHour((uCasamento.viagem - Date.now()) / 1000)}`, bot.colors.casamento)
+	bot.msgPlayerViajando = async (message, user, username) => {
+		let uCasamento = await bot.casais.get(user.casamentoID?.toString())
+		await bot.createEmbed(message, `${bot.config.aviao} ${username ?? 'Você'} está viajando com ${await bot.data.get(`${user.conjuge}.username`)} e ${username ? 'você não pode fazer nada' : 'não pode realizar nenhuma ação'}`, `Tempo restante: Viajando por mais ${bot.segToHour((uCasamento.viagem - Date.now()) / 1000)}`, bot.colors.casamento)
 	}
 
-	bot.isPlayerViajando = (user) => {
+	bot.isPlayerViajando = async (user) => {
 		if (!user)
 			return console.error("Informe o usuário")
+		
+		if (!user.casamentoID)
+			return false
 
-		let uCasamento = bot.casais.get(user.casamentoID)
-
+		let uCasamento = await bot.casais.get(user.casamentoID?.toString())
+		
 		return !(!uCasamento || uCasamento.viagem < Date.now())
 	}
 
-	bot.isPlayerMorto = (user) => {
+	bot.isPlayerMorto = async (user) => {
 		if (!user)
 			return console.error("Informe o usuário")
 

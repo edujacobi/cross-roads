@@ -17,15 +17,15 @@ exports.run = async (bot, message, args) => {
 	let {
 		uData,
 		alvo
-	} = bot.findUser(message, args)
+	} = await bot.findUser(message, args)
 
 	if (!uData) return
 
 	let investimento = uData.invest != null ? bot.investimentos[uData.invest].desc : ''
 
-	let uGang = bot.gangs.get(uData.gangID)
+	let uGang = uData.gangID != null ? await bot.gangs.get(uData.gangID.toString()) : null
 
-	let badges = bot.getUserBadges(alvo, false)
+	let badges = await bot.getUserBadges(alvo, false)
 
 	let trabalhando = (uData.jobTime > currTime) && uData.job != null
 
@@ -46,20 +46,20 @@ exports.run = async (bot, message, args) => {
 		emojiSituação = bot.config.trabalhando
 	else if (uData.hospitalizado > currTime)
 		emojiSituação = bot.config.hospital
-	if (bot.isPlayerViajando(uData))
+	if (await bot.isPlayerViajando(uData))
 		emojiSituação = bot.config.aviao
 
-	let conjuge = uData.conjuge != null ? `\n<:girlfriend:799053368189911081> Casado com ${bot.data.get(uData.conjuge, 'username')}` : ''
+	let conjuge = uData.conjuge != null ? `\n<:girlfriend:799053368189911081> Casado com ${await bot.data.get(uData.conjuge + '.username')}` : ''
 	
 	let miniSituation = `Vadiando`
 	if (uData.emRoubo.tempo > currTime && uData.emRoubo.isAlvo)
-		miniSituation = `Sendo roubado por ${bot.data.get(uData.emRoubo.user, 'username')}`
+		miniSituation = `Sendo roubado por ${await bot.data.get(uData.emRoubo.user + '.username')}`
 	else if (uData.emRoubo.tempo > currTime && !uData.emRoubo.isAlvo)
-		miniSituation = `Roubando ${!isNaN(uData.emRoubo.user) ? bot.data.get(uData.emRoubo.user, 'username') : uData.emRoubo.user}`
+		miniSituation = `Roubando ${!isNaN(uData.emRoubo.user) ? await bot.data.get(uData.emRoubo.user + '.username') : uData.emRoubo.user}`
 	else if (uData.emEspancamento.tempo > currTime && uData.emEspancamento.isAlvo)
-		miniSituation = `Sendo espancado por ${bot.data.get(uData.emEspancamento.user, 'username')}`
+		miniSituation = `Sendo espancado por ${await bot.data.get(uData.emEspancamento.user + '.username')}`
 	else if (uData.emEspancamento.tempo > currTime && !uData.emEspancamento.isAlvo)
-		miniSituation = `Espancando ${bot.data.get(uData.emEspancamento.user, 'username')}`
+		miniSituation = `Espancando ${await bot.data.get(uData.emEspancamento.user + '.username')}`
 	else if (uData.fugindo > currTime)
 		miniSituation = `Fugindo`
 	else if (uData.morto > currTime)
@@ -76,12 +76,12 @@ exports.run = async (bot, message, args) => {
 		miniSituation += ` e procurado`
 	if (uData.jobTime < currTime && uData.job)
 		miniSituation += ` e pode receber salário`
-	if (bot.isPlayerViajando(uData))
+	if (await bot.isPlayerViajando(uData))
 		miniSituation = 'Viajando'
 
 	const embed = new Discord.MessageEmbed()
 		.setColor(uGang ? uGang.cor : bot.colors.darkGrey)
-		.setAuthor(`Informações de ${uData.username}`, uGang ? bot.gangs.get(uData.gangID, 'icone') : "")
+		.setAuthor(`Informações de ${uData.username}`, uGang ? await bot.gangs.get(uData.gangID + '.icone') : "")
 		.setThumbnail(uData.classe ? bot.classes[uData.classe].imagem : '')
 		.setDescription(`${badges}R$ ${uData.moni.toLocaleString().replace(/,/g, ".")} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}${uData.vipTime > currTime ? ` • ${bot.badges.vip} VIP restante: ${minToDays((uData.vipTime - currTime) / 1000 / 60)}` : ""}${conjuge}`)
 		.addField(`${emojiSituação} Situação󠀀󠀀`,

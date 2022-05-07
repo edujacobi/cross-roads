@@ -11,7 +11,7 @@ exports.run = async (bot, message, args) => {
 		.setTitle("Top Servidores")
 		.setColor('GREEN')
 		.setDescription("Coletando informações...")
-		.setFooter(`${bot.data.get(message.author.id, "username")} • Necessário 10 membros no servidor e 3 jogadores`, message.member.user.avatarURL())
+		.setFooter(`${await bot.data.get(message.author.id + ".username")} • Necessário 10 membros no servidor e 3 jogadores`, message.member.user.avatarURL())
 		.setTimestamp()
 
 	message.channel.send({

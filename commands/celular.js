@@ -40,10 +40,10 @@ exports.run = async (bot, message, args) => {
 		if (uData._celular < currTime)
 			return bot.createEmbed(message, `Você não possui um celular para comprar créditos ${bot.config.cellphone}`)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
             return
 
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 		if (quantidade == 'allin' || quantidade == 'all' || quantidade == 'tudo') {
@@ -66,7 +66,7 @@ exports.run = async (bot, message, args) => {
 
 		uData.lojaGastos += price
 
-		bot.banco.set('caixa', bot.banco.get('caixa') + price * bot.imposto)
+		await bot.banco.set('caixa', await bot.banco.get('caixa') + price * bot.imposto)
 
 		uData.celularCredito += (parseInt(quantidade))
 		bot.createEmbed(message, `Você comprou **${quantidade.toLocaleString().replace(/,/g, ".")} créditos** por R$ ${price.toLocaleString().replace(/,/g, ".")} ${bot.config.cellphone}`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`)

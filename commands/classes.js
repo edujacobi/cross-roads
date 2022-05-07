@@ -3,7 +3,7 @@ exports.run = async (bot, message, args) => {
 	let option = args[0] ? args[0].toString().toLowerCase() : null
 
 	if (option === 'alterar') {
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 		let currTime = new Date().getTime()
 		const custoBase = uData.vipTime > currTime ? 750000 : 1000000
 		// const custoBase = 1000
@@ -27,7 +27,7 @@ exports.run = async (bot, message, args) => {
 				}).then(reaction => {
 					if (msg) msg.reactions.removeAll().then(async () => {
 						if (reaction.first()._emoji.id === '572134588340633611') {
-							uData = bot.data.get(message.author.id)
+							uData = await bot.data.get(message.author.id)
 							if (uData.moni < 1)
 								return bot.msgSemDinheiro(message)
 
@@ -37,14 +37,14 @@ exports.run = async (bot, message, args) => {
 							if (uData.moni < custoPlayer)
 								return bot.msgDinheiroMenorQueAposta(message)
 
-							if (bot.isUserEmRouboOuEspancamento(message, uData))
+							if (await bot.isUserEmRouboOuEspancamento(message, uData))
 								return
 
 							uData.moni -= custoPlayer
 							uData.classeAlterada += 1
-							bot.data.set(message.author.id, uData)
+							await bot.data.set(message.author.id, uData)
 
-							bot.data.delete(message.author.id, 'classe')
+							await bot.data.delete(`${message.author.id}.classe`)
 
 							return msg.edit({
 								embeds: [new Discord.MessageEmbed()
@@ -86,46 +86,43 @@ exports.run = async (bot, message, args) => {
 		if (!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id) || bot.isAjudante(message.author.id)))
 			return
 
+		const embed = new Discord.MessageEmbed()
+			.setTitle("TOP Classes Escolhidas")
+			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
+			.setDescription('**Carregando...**')
+			.setColor('GREEN')
+			.setTimestamp()
+
+		let msg = await message.channel.send({embeds: [embed]})
+			.catch(() => console.log("Não consegui enviar mensagem `classes top`"))
+
 		let classesEscolhidas = {
-			ladrão: 0,
-			advogado: 0,
-			mafioso: 0,
-			empresário: 0,
-			assassino: 0,
-			mendigo: 0
+			ladrão: await bot.data.filter("classe", 'ladrao'),
+			advogado: await bot.data.filter("classe", 'advogado'),
+			mafioso: await bot.data.filter("classe", 'mafioso'),
+			empresário: await bot.data.filter("classe", 'empresario'),
+			assassino: await bot.data.filter("classe", 'assassino'),
+			mendigo: await bot.data.filter("classe", 'mendigo')
 		}
-		await bot.data.forEach(user => {
-			if (user.classe === 'ladrao')
-				classesEscolhidas.ladrão++
-			if (user.classe === 'advogado')
-				classesEscolhidas.advogado++
-			if (user.classe === 'mafioso')
-				classesEscolhidas.mafioso++
-			if (user.classe === 'empresario')
-				classesEscolhidas.empresário++
-			if (user.classe === 'assassino')
-				classesEscolhidas.assassino++
-			if (user.classe === 'mendigo')
-				classesEscolhidas.mendigo++
-		})
+
+		classesEscolhidas.ladrão = Object.entries(classesEscolhidas.ladrão).length
+		classesEscolhidas.advogado = Object.entries(classesEscolhidas.advogado).length
+		classesEscolhidas.mafioso = Object.entries(classesEscolhidas.mafioso).length
+		classesEscolhidas.empresário = Object.entries(classesEscolhidas.empresário).length
+		classesEscolhidas.assassino = Object.entries(classesEscolhidas.assassino).length
+		classesEscolhidas.mendigo = Object.entries(classesEscolhidas.mendigo).length
 
 		let total = classesEscolhidas.ladrão + classesEscolhidas.advogado + classesEscolhidas.mafioso +
 			classesEscolhidas.empresário + classesEscolhidas.assassino + classesEscolhidas.mendigo
 
-		const embed = new Discord.MessageEmbed()
-			.setTitle("TOP Classes Escolhidas")
-			.setFooter({
-				text: `${bot.user.username} • Total: ${total}`, iconURL: bot.user.avatarURL()
-			})
-			.setColor('GREEN')
-			.setTimestamp()
-		
+		embed.setFooter({text: `${bot.user.username} • Total: ${total}`, iconURL: bot.user.avatarURL()})
+			.setDescription("")
+
 		Object.values(bot.classes).forEach(classe => {
-			let emote = bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == classe.emote)
-			embed.addField(`${emote} ${classe.desc}`, `${classesEscolhidas[classe.desc.toLowerCase()]}`, true)
+			embed.addField(`${classe.emote} ${classe.desc}`, `${classesEscolhidas[classe.desc.toLowerCase()]}`, true)
 		})
 
-		return message.channel.send({embeds: [embed]})
+		return msg.edit({embeds: [embed]})
 			.catch(() => console.log("Não consegui enviar mensagem `classes top`"))
 
 	}
@@ -140,8 +137,7 @@ exports.run = async (bot, message, args) => {
 		let neg = '🔻'
 
 		Object.values(bot.classes).forEach(classe => {
-			let emote = bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == classe.emote)
-			embed.addField(`${emote} ${classe.desc}`, `${pos} **Positivo**\n${classe.buff}\n${neg} **Negativo**\n${classe.debuff}`, true)
+			embed.addField(`${classe.emote} ${classe.desc}`, `${pos} **Positivo**\n${classe.buff}\n${neg} **Negativo**\n${classe.debuff}`, true)
 		})
 		// embed.addField("\u200b", "\u200b", true)
 

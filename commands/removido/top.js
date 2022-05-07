@@ -43,14 +43,14 @@ exports.run = async (bot, message, args) => {
 	// 			.setStyle('SECONDARY')
 	// 			.setLabel(button.label)
 	// 			.setEmoji(button.emoji)
-	// 			.setCustomId(message.id + message.author.id + button.value))
+	// 			.setCustomId(button.value))
 	// 	}
 	// 	rows.push(row)
 	// }
 
 	const row = new Discord.MessageActionRow()
 		.addComponents(new Discord.MessageSelectMenu()
-			.setCustomId(message.id + message.author.id + 'select')
+			.setCustomId('select')
 			.setPlaceholder('Selecione o ranking')
 			.addOptions(buttons))
 
@@ -60,10 +60,10 @@ exports.run = async (bot, message, args) => {
 	// const filter = (button) => (button.customId.indexOf(message.id + message.author.id) > -1) && button.user.id === message.author.id
 
 	const filter = (select) => [
-		message.id + message.author.id + 'select',
+		'select',
 	].includes(select.customId) && select.user.id === message.author.id
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter,
 		time: 90000,
 	})

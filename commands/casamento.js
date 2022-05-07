@@ -8,20 +8,19 @@ exports.run = async (bot, message, args) => {
 	let {
 		uData,
 		alvo
-	} = bot.findUser(message, args)
+	} = await bot.findUser(message, args)
 
 	if (!uData) return
-	
-	
+
 
 	// if (!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id) || uData.vipTime > currTime))
 	// 	return
 
 	if (!uData.casamentoID)
 		return bot.createEmbed(message, `${emote} ${alvo === message.author.id ? "Você" : "Este jogador"} não é casado`, "Use ;casar para saber mais!", bot.colors.casamento)
-	
-	let uCasamento = bot.casais.get(uData.casamentoID)
-	
+
+	let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
+
 	const getStringNivelCasamento = (nivel) => {
 		const hp = {
 			lFull_g: '<:lFull_g:902350148036866099>',
@@ -39,7 +38,6 @@ exports.run = async (bot, message, args) => {
 			lFull_r: '<:lFull_r:902351150576185344>',
 			mFull_r: '<:mFull_r:902351150664273930>',
 			rFull_r: '<:rFull_r:902351150567788674>',
-
 
 			lEmpty: '<:lEmpty:902347180445159454>',
 			mEmpty: '<:mEmpty:902347180432556112>',
@@ -70,30 +68,35 @@ exports.run = async (bot, message, args) => {
 			esquema = hp.lEmpty + hp.mEmpty + hp.mEmpty + hp.mEmpty + hp.mEmpty + hp.mEmpty + hp.mEmpty + hp.mEmpty + hp.mEmpty + hp.rEmpty
 		return esquema
 	}
-	const getRow = (uData) => {
-		uCasamento = bot.casais.get(uData.casamentoID)
+	
+	const getRow = async (uData) => {
+		uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 		
+		console.log(uCasamento)
+
+		let isViajando = await bot.isPlayerViajando(uData)
+
 		let row = new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Escrever')
 				.setEmoji('💬')
-				.setCustomId(message.id + message.author.id + 'mural'))
+				.setCustomId('mural'))
 
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Entregar')
 				.setEmoji(bot.config.flor)
-				.setDisabled((uData._flor <= 0 || (currTime - uCasamento.ultimaFlor) < 7200000) || uCasamento.nivel >= 100 || bot.isPlayerViajando(uData) || uCasamento.anel === null)
-				.setCustomId(message.id + message.author.id + 'flor'))
+				.setDisabled((uData._flor <= 0 || (currTime - uCasamento.ultimaFlor) < 7200000) || uCasamento.nivel >= 100 || isViajando || uCasamento.anel === null)
+				.setCustomId('flor'))
 
 		if (uCasamento.nivel >= 90)
 			row.addComponents(new Discord.MessageButton()
 				.setStyle('SUCCESS')
 				.setLabel('Viajar')
 				.setEmoji(bot.config.aviao)
-				.setDisabled(uCasamento.nivel < 100 || bot.isPlayerViajando(uData) || uCasamento.anel === null)
-				.setCustomId(message.id + message.author.id + 'viajar'))
+				.setDisabled(uCasamento.nivel < 100 || isViajando || uCasamento.anel === null)
+				.setCustomId('viajar'))
 
 		if (uCasamento.nivel <= 20)
 			row.addComponents(new Discord.MessageButton()
@@ -101,21 +104,22 @@ exports.run = async (bot, message, args) => {
 				.setLabel('Divórcio')
 				.setDisabled(uCasamento.nivel >= 10)
 				.setEmoji('💔')
-				.setCustomId(message.id + message.author.id + 'divorcio'))
-		
+				.setCustomId('divorcio'))
+
 		if (uData.anel !== null)
 			row.addComponents(new Discord.MessageButton()
 				.setStyle('PRIMARY')
 				.setLabel('Melhorar anel')
 				.setDisabled(uCasamento.nivel <= 10 && uCasamento.anel != null)
 				.setEmoji(bot.aneis[uData.anel].emote)
-				.setCustomId(message.id + message.author.id + 'anel'))
+				.setCustomId('anel'))
 
 		return row
 	}
 
+
 	const embed = new Discord.MessageEmbed()
-		.setTitle(`${emote} ${alvo === message.author.id ? `Seu casamento com ${bot.data.get(uData.conjuge, 'username')}` : `Casamento de ${bot.data.get(uCasamento.conjuges._1, 'username')} e ${bot.data.get(uCasamento.conjuges._2, 'username')}`}`)
+		.setTitle(`${emote} ${alvo === message.author.id ? `Seu casamento com ${await bot.data.get(uData.conjuge.toString() + '.username')}` : `Casamento de ${await bot.data.get(uCasamento.conjuges._1 + '.username')} e ${await bot.data.get(uCasamento.conjuges._2 + '.username')}`}`)
 		.setThumbnail('https://media.discordapp.net/attachments/531174573463306240/862135638945824768/radar_girlfriend.png')
 		.setColor(bot.colors.casamento)
 		.addField("Mural", uCasamento.mural.length > 0 ? `"${uCasamento.mural}"` : `...`)
@@ -123,13 +127,13 @@ exports.run = async (bot, message, args) => {
 		.addField(`${bot.config.aviao} Viagens`, `${uCasamento.viagem > currTime ? `Viajando por mais ${bot.segToHour((uCasamento.viagem - currTime) / 1000)}` : 'Não estão viajando'}\n${uCasamento.ultimaViagem !== 0 ? `${bot.segToHour((currTime - uCasamento.ultimaViagem) / 1000)} desde a última` : "Não viajaram ainda"}`, true)
 		.addField(`${uCasamento.anel == null ? '' : bot.aneis[uCasamento.anel].emote} Anel`, `${uCasamento.anel == null ? 'Sem anel' : bot.aneis[uCasamento.anel].desc}`, true)
 		.addField("Nível", `${getStringNivelCasamento(uCasamento.nivel)} **${uCasamento.nivel}**`)
-		.setFooter(`${uData.username} e ${bot.data.get(uData.conjuge, 'username')} • Casados desde ${new Date(uCasamento.desde).toLocaleString("pt-BR").replace(/-/g, "/")}${bot.isAdmin(message.author.id) ? ` • ID: ${uData.casamentoID}`: ''}`, bot.user.avatarURL())
+		.setFooter(`${uData.username} e ${await bot.data.get(uData.conjuge.toString() + '.username')} • Casados desde ${new Date(uCasamento.desde).toLocaleString("pt-BR").replace(/-/g, "/")}${bot.isAdmin(message.author.id) ? ` • ID: ${uData.casamentoID}` : ''}`, bot.user.avatarURL())
 		.setTimestamp()
-	
-	if (currTime - uCasamento.ultimaViagem < 72 * 60 * 60 * 1000)
-		embed.addField(`Bônus de viagem ativo por mais ${bot.segToHour((uCasamento.ultimaViagem - currTime + 72 * 60 * 60 * 1000)/1000)}`, `${bot.aneis[uCasamento.anel].bonus * 1.5}%`)
 
-	const row = getRow(uData)
+	if (currTime - uCasamento.ultimaViagem < 72 * 60 * 60 * 1000)
+		embed.addField(`Bônus de viagem ativo por mais ${bot.segToHour((uCasamento.ultimaViagem - currTime + 72 * 60 * 60 * 1000) / 1000)}`, `${bot.aneis[uCasamento.anel].bonus * 1.5}%`)
+
+	const row = await getRow(uData)
 
 	let msg = await message.channel.send({
 		components: [uCasamento.conjuges._1, uCasamento.conjuges._2].includes(message.author.id) ? [row] : [],
@@ -137,14 +141,14 @@ exports.run = async (bot, message, args) => {
 	}).catch(() => console.log("Não consegui enviar mensagem `casamento`"))
 
 	const filter = (button) => [
-		message.id + message.author.id + 'mural',
-		message.id + message.author.id + 'flor',
-		message.id + message.author.id + 'viajar',
-		message.id + message.author.id + 'divorcio',
-		message.id + message.author.id + 'anel',
+		'mural',
+		'flor',
+		'viajar',
+		'divorcio',
+		'anel',
 	].includes(button.customId) && button.user.id === message.author.id
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter,
 		time: 90000,
 	})
@@ -162,7 +166,7 @@ exports.run = async (bot, message, args) => {
 			],
 		})
 
-		if (b.customId === message.id + message.author.id + 'mural') {
+		if (b.customId === 'mural') {
 			const embedMural = new Discord.MessageEmbed()
 				.setTitle(`💬 Escrever no mural`)
 				.setDescription(`Escreva sua mensagem para deixar anotado no mural do casamento!`)
@@ -180,14 +184,14 @@ exports.run = async (bot, message, args) => {
 				max: 1,
 			})
 
-			collectorMural.on('collect', m => {
+			collectorMural.on('collect', async m => {
 				if (m.author.id !== message.author.id) return
 				let {
 					uData,
 					alvo
-				} = bot.findUser(message, args)
+				} = await bot.findUser(message, args)
 
-				let uCasamento = bot.casais.get(uData.casamentoID)
+				let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 				let mensagem = m.content
 				mensagem.replace(/\s/g, " ")
@@ -200,7 +204,7 @@ exports.run = async (bot, message, args) => {
 
 				uCasamento.mural = mensagem
 
-				bot.casais.set(uData.casamentoID.toString(), uCasamento)
+				await bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
 				embed.fields[0].value = uCasamento.mural.length > 0 ? `"${uCasamento.mural}"` : `...`
 
@@ -208,22 +212,23 @@ exports.run = async (bot, message, args) => {
 					.catch(() => console.log("Não consegui editar mensagem `casamento mural`"))
 
 				return msgMural.edit({
-					components: [getRow(uData)],
+					components: [await getRow(uData)],
 					embeds: [embedMural.setTitle(`💬 Mural alterado!`).setDescription('')]
 				}).catch(() => console.log("Não consegui editar mensagem `casamento mural`"))
 			})
 
-		} else if (b.customId === message.id + message.author.id + 'flor') {
+		}
+		else if (b.customId === 'flor') {
 			let currTime = new Date().getTime()
 			const duasHoras = 7200000
 
 			// let {
 			// 	uData,
 			// 	alvo
-			// } = bot.findUser(message, args)
-			let uData = bot.data.get(message.author.id)
+			// } = await bot.findUser(message, args)
+			let uData = await bot.data.get(message.author.id)
 
-			let uCasamento = bot.casais.get(uData.casamentoID)
+			let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 			if (uData._flor <= 0)
 				return bot.createEmbed(message, `${bot.config.flor} Você não possui nenhuma flor para entregar`, `Encontre-as vasculhando`, bot.colors.casamento)
@@ -262,9 +267,9 @@ exports.run = async (bot, message, args) => {
 				})
 			}, duasHoras)
 
-			bot.data.set(message.author.id, uData)
+			await bot.data.set(message.author.id, uData)
 
-			bot.casais.set(uData.casamentoID.toString(), uCasamento)
+			await bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
 			embed.fields[1].value = `${uCasamento.flores.toString()} entregues\n${bot.segToHour((currTime - uCasamento.ultimaFlor) / 1000)} desde a última flor`
 			embed.fields[4].value = `${getStringNivelCasamento(uCasamento.nivel)} **${uCasamento.nivel}**`
@@ -279,17 +284,18 @@ exports.run = async (bot, message, args) => {
 			})
 
 			return msg.edit({
-				components: [getRow(uData)],
+				components: [await getRow(uData)],
 				embeds: [embed]
 			}).catch(() => console.log("Não consegui editar mensagem `casamento flor`"))
 
-		} else if (b.customId === message.id + message.author.id + 'viajar') {
+		}
+		else if (b.customId === 'viajar') {
 			let currTime = new Date().getTime()
 			const semana = 604800000
 
-			let uData = bot.data.get(message.author.id)
+			let uData = await bot.data.get(message.author.id)
 
-			let uCasamento = bot.casais.get(uData.casamentoID)
+			let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 			if ((currTime - uCasamento.ultimaViagem) < semana)
 				return bot.createEmbed(message, `${bot.config.aviao} Vocês só poderão viajar novamente em ${bot.segToHour((semana + uCasamento.ultimaViagem - currTime) / 1000)}`, null, bot.colors.casamento)
@@ -311,16 +317,16 @@ exports.run = async (bot, message, args) => {
 					.setStyle('SUCCESS')
 					.setLabel('Confirmar viagem 0/2')
 					.setEmoji(aviao)
-					.setCustomId(message.id + message.author.id + 'confirmarviagem'))
+					.setCustomId('confirmarviagem'))
 
 			let msgViagem = await message.channel.send({
 				embeds: [embedViagem],
 				components: [row]
 			}).catch(() => console.log("Não consegui enviar mensagem `casamento viajar"))
 
-			const filterViagem = (button) => message.id + message.author.id + 'confirmarviagem' === button.customId && (button.user.id === message.author.id || button.user.id === uData.conjuge)
+			const filterViagem = (button) => 'confirmarviagem' === button.customId && (button.user.id === message.author.id || button.user.id === uData.conjuge)
 
-			const collector = message.channel.createMessageComponentCollector({
+			const collector = msgViagem.createMessageComponentCollector({
 				filter: filterViagem,
 				time: 90000,
 			})
@@ -332,7 +338,7 @@ exports.run = async (bot, message, args) => {
 
 				currTime = new Date().getTime()
 
-				let uData = bot.data.get(c.user.id)
+				let uData = await bot.data.get(c.user.id)
 
 				if (uData.job != null)
 					return bot.msgTrabalhando(message, uData, uData.username)
@@ -340,12 +346,12 @@ exports.run = async (bot, message, args) => {
 					return bot.msgPreso(message, uData, uData.username)
 				if (uData.hospitalizado > currTime)
 					return bot.msgHospitalizado(message, uData, uData.username)
-				if (bot.isUserEmRouboOuEspancamento(message, uData))
+				if (await bot.isUserEmRouboOuEspancamento(message, uData))
 					return
-				if (bot.isGaloEmRinha(c.user.id))
+				if (await bot.isGaloEmRinha(c.user.id))
 					return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
-				uCasamento = bot.casais.get(uData.casamentoID)
+				uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 				if ((currTime - uCasamento.ultimaViagem) < semana)
 					return bot.createEmbed(message, `${bot.config.aviao} Vocês só poderão viajar novamente em ${bot.segToHour((semana + uCasamento.ultimaViagem - currTime) / 1000)}`, null, bot.colors.casamento)
@@ -362,7 +368,7 @@ exports.run = async (bot, message, args) => {
 							.setStyle('SUCCESS')
 							.setLabel(`Confirmar viagem ${confirmados.length}/2`)
 							.setEmoji(aviao)
-							.setCustomId(message.id + message.author.id + 'confirmarviagem'))
+							.setCustomId('confirmarviagem'))
 					]
 				})
 
@@ -380,7 +386,7 @@ exports.run = async (bot, message, args) => {
 					uCasamento.ultimaViagem = currTime
 					uCasamento.nivel = 75
 
-					bot.casais.set(uData.casamentoID.toString(), uCasamento)
+					await bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
 					setTimeout(() => {
 						let embedPV = new Discord.MessageEmbed()
@@ -416,14 +422,15 @@ exports.run = async (bot, message, args) => {
 					})
 				}
 			})
-			
-		} else if (b.customId === message.id + message.author.id + 'divorcio') {
+
+		}
+		else if (b.customId === 'divorcio') {
 			let currTime = new Date().getTime()
 			const semana = 604800000
 
-			let uData = bot.data.get(message.author.id)
+			let uData = await bot.data.get(message.author.id)
 
-			let uCasamento = bot.casais.get(uData.casamentoID)
+			let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 			if (uCasamento.nivel > 10)
 				return bot.createEmbed(message, `💔 Vocês não estão mal o suficiente para se divorciar!`, `Precisam estar abaixo do nível 10`, bot.colors.casamento)
@@ -439,16 +446,16 @@ exports.run = async (bot, message, args) => {
 					.setStyle('DANGER')
 					.setLabel('Confirmar divórcio 0/2')
 					.setEmoji('💔')
-					.setCustomId(message.id + message.author.id + 'confirmardivorcio'))
+					.setCustomId('confirmardivorcio'))
 
 			let msgDiv = await message.channel.send({
 				embeds: [embedDiv],
 				components: [row]
 			}).catch(() => console.log("Não consegui enviar mensagem `casamento divorcio"))
 
-			const filterDivorcio = (button) => message.id + message.author.id + 'confirmardivorcio' === button.customId && (button.user.id === message.author.id || button.user.id === uData.conjuge)
+			const filterDivorcio = (button) => 'confirmardivorcio' === button.customId && (button.user.id === message.author.id || button.user.id === uData.conjuge)
 
-			const collector = message.channel.createMessageComponentCollector({
+			const collector = msgDiv.createMessageComponentCollector({
 				filter: filterDivorcio,
 				time: 90000,
 			})
@@ -460,7 +467,7 @@ exports.run = async (bot, message, args) => {
 
 				currTime = new Date().getTime()
 
-				let uData = bot.data.get(c.user.id)
+				let uData = await bot.data.get(c.user.id)
 
 				if (uData.job != null)
 					return bot.msgTrabalhando(message, uData, uData.username)
@@ -468,12 +475,12 @@ exports.run = async (bot, message, args) => {
 					return bot.msgPreso(message, uData, uData.username)
 				if (uData.hospitalizado > currTime)
 					return bot.msgHospitalizado(message, uData, uData.username)
-				if (bot.isUserEmRouboOuEspancamento(message, uData))
+				if (await bot.isUserEmRouboOuEspancamento(message, uData))
 					return
-				if (bot.isGaloEmRinha(c.user.id))
+				if (await bot.isGaloEmRinha(c.user.id))
 					return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
-				uCasamento = bot.casais.get(uData.casamentoID)
+				uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 				if (uCasamento.nivel > 10)
 					return bot.createEmbed(message, `💔 Vocês não estão mal o suficiente para se divorciar!`, `Precisam estar abaixo do nível 10`, bot.colors.casamento)
@@ -489,7 +496,7 @@ exports.run = async (bot, message, args) => {
 							.setStyle('DANGER')
 							.setLabel(`Confirmar divórcio ${confirmados.length}/2`)
 							.setEmoji('💔')
-							.setCustomId(message.id + message.author.id + 'confirmardivorcio'))
+							.setCustomId('confirmardivorcio'))
 					]
 				})
 
@@ -501,16 +508,16 @@ exports.run = async (bot, message, args) => {
 					.setTimestamp()
 
 				if (confirmados.length === 2) {
-					let uData = bot.data.get(message.author.id)
+					let uData = await bot.data.get(message.author.id)
 					let conjugeID = uData.conjuge
-					let uConjuge = bot.data.get(conjugeID)
+					let uConjuge = await bot.data.get(conjugeID)
 
 					uConjuge.conjuge = null
 					uConjuge.casamentoID = null
 					uData.conjuge = null
 					uData.casamentoID = null
-					bot.data.set(conjugeID, uConjuge)
-					bot.data.set(message.author.id, uData)
+					await bot.data.set(conjugeID, uConjuge)
+					await bot.data.set(message.author.id, uData)
 
 					// bot.casais.set(uData.casamentoID, uCasamento)
 
@@ -520,12 +527,13 @@ exports.run = async (bot, message, args) => {
 					})
 				}
 			})
-			
-		} else if (b.customId === message.id + message.author.id + 'anel') {
-			let uData = bot.data.get(message.author.id)
-			let cData = bot.data.get(uData.conjuge)
+
+		}
+		else if (b.customId === 'anel') {
+			let uData = await bot.data.get(message.author.id)
+			let cData = await bot.data.get(uData.conjuge.toString())
 			let currTime = Date.now()
-			
+
 			if (uData.preso > currTime)
 				return bot.msgPreso(message, uData)
 			if (cData.preso > currTime)
@@ -534,17 +542,17 @@ exports.run = async (bot, message, args) => {
 				return bot.msgHospitalizado(message, uData)
 			if (cData.hospitalizado > currTime)
 				return bot.msgHospitalizado(message, cData, cData.username)
-			if (bot.isUserEmRouboOuEspancamento(message, uData))
+			if (await bot.isUserEmRouboOuEspancamento(message, uData))
 				return
-			if (bot.isAlvoEmRouboOuEspancamento(message, cData))
+			if (await bot.isAlvoEmRouboOuEspancamento(message, cData))
 				return
-			if (bot.isPlayerMorto(cData))
+			if (await bot.isPlayerMorto(cData))
 				return bot.msgPlayerMorto(message, cData.username)
-			if (bot.isPlayerViajando(cData))
+			if (await bot.isPlayerViajando(cData))
 				return bot.msgPlayerViajando(message, cData.username)
-			if (bot.isGaloEmRinha(message.author.id))
+			if (await bot.isGaloEmRinha(message.author.id))
 				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
-			if (bot.isGaloEmRinha(uData.conjuge))
+			if (await bot.isGaloEmRinha(uData.conjuge.toString()))
 				return bot.createEmbed(message, `O galo de **${cData.username}** está em uma rinha e ele não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 			if (uData.job != null)
 				return bot.msgTrabalhando(message, uData)
@@ -566,16 +574,16 @@ exports.run = async (bot, message, args) => {
 					.setStyle('PRIMARY')
 					.setLabel('Confirmar melhoria do anel 0/2')
 					.setEmoji(bot.aneis[uData.anel].emote)
-					.setCustomId(message.id + message.author.id + 'confirmaranel'))
+					.setCustomId('confirmaranel'))
 
 			let msgAnel = await message.channel.send({
 				embeds: [embedAnel],
 				components: [row]
 			}).catch(() => console.log("Não consegui enviar mensagem `casamento anel"))
 
-			const filterAnel = (button) => message.id + message.author.id + 'confirmaranel' === button.customId && (button.user.id === message.author.id || button.user.id === uData.conjuge)
+			const filterAnel = (button) => 'confirmaranel' === button.customId && (button.user.id === message.author.id || button.user.id === uData.conjuge)
 
-			const collector = message.channel.createMessageComponentCollector({
+			const collector = msgAnel.createMessageComponentCollector({
 				filter: filterAnel,
 				time: 90000,
 			})
@@ -585,8 +593,8 @@ exports.run = async (bot, message, args) => {
 			collector.on('collect', async c => {
 				await c.deferUpdate()
 
-				uData = bot.data.get(message.author.id)
-				cData = bot.data.get(c.user.id)
+				uData = await bot.data.get(message.author.id)
+				cData = await bot.data.get(c.user.id)
 				let currTime = Date.now()
 
 				if (uData.preso > currTime)
@@ -597,17 +605,17 @@ exports.run = async (bot, message, args) => {
 					return bot.msgHospitalizado(message, uData)
 				if (cData.hospitalizado > currTime)
 					return bot.msgHospitalizado(message, cData, cData.username)
-				if (bot.isUserEmRouboOuEspancamento(message, uData))
+				if (await bot.isUserEmRouboOuEspancamento(message, uData))
 					return
-				if (bot.isAlvoEmRouboOuEspancamento(message, cData))
+				if (await bot.isAlvoEmRouboOuEspancamento(message, cData))
 					return
-				if (bot.isPlayerMorto(cData))
+				if (await bot.isPlayerMorto(cData))
 					return bot.msgPlayerMorto(message, cData.username)
-				if (bot.isPlayerViajando(cData))
+				if (await bot.isPlayerViajando(cData))
 					return bot.msgPlayerViajando(message, cData.username)
-				if (bot.isGaloEmRinha(message.author.id))
+				if (await bot.isGaloEmRinha(message.author.id))
 					return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
-				if (bot.isGaloEmRinha(uData.conjuge))
+				if (await bot.isGaloEmRinha(uData.conjuge.toString()))
 					return bot.createEmbed(message, `O galo de **${cData.username}** está em uma rinha e ele não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 				if (uData.job != null)
 					return bot.msgTrabalhando(message, uData)
@@ -617,8 +625,8 @@ exports.run = async (bot, message, args) => {
 					return bot.createEmbed(message, `${emote} Você não possui um ${bot.aneis.prata.emote} Anel! Compre um para melhorar os benefícios do seu casamento!`, null, bot.colors.casamento)
 				if (cData.anel == null || cData.anel !== uData.anel)
 					return bot.createEmbed(message, `${emote} Seu parceiro não possui um ${bot.aneis.prata.emote} Anel igual ao seu! Vocês devem possui o mesmo tipo de anel`, null, bot.colors.casamento)
-				
-				uCasamento = bot.casais.get(uData.casamentoID)
+
+				uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 				if (uCasamento.nivel <= 10)
 					return bot.createEmbed(message, `💔 Vocês estão com nível de casamento muito baixo para melhorar o Anel!`, `Precisam estar acima do nível 10`, bot.colors.casamento)
@@ -634,7 +642,7 @@ exports.run = async (bot, message, args) => {
 							.setStyle('PRIMARY')
 							.setLabel(`Confirmar melhoria do anel ${confirmados.length}/2`)
 							.setEmoji(bot.aneis[uData.anel].emote)
-							.setCustomId(message.id + message.author.id + 'confirmaranel'))
+							.setCustomId('confirmaranel'))
 					]
 				})
 
@@ -645,22 +653,22 @@ exports.run = async (bot, message, args) => {
 					.setTimestamp()
 
 				if (confirmados.length === 2) {
-					uCasamento = bot.casais.get(uData.casamentoID)
-					uData = bot.data.get(message.author.id)
-					cData = bot.data.get(uData.conjuge)
-					
+					uCasamento = await bot.casais.get(uData.casamentoID?.toString())
+					uData = await bot.data.get(message.author.id)
+					cData = await bot.data.get(uData.conjuge.toString())
+
 					if (uCasamento.anel === null)
 						uCasamento.nivel = 75
-					
+
 					uCasamento.anel = uData.anel
-					
+
 					uData.anel = null
 					cData.anel = null
 
-					bot.data.set(uData.conjuge, cData)
-					bot.data.set(message.author.id, uData)
+					await bot.data.set(uData.conjuge.toString(), cData)
+					await bot.data.set(message.author.id, uData)
 
-					bot.casais.set(uData.casamentoID.toString(), uCasamento)
+					await bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
 					msgAnel.edit({
 						components: [],
@@ -672,9 +680,10 @@ exports.run = async (bot, message, args) => {
 	})
 
 	collector.on('end', async () => {
-		msg.edit({
-			components: []
-		}).catch(() => console.log("Não consegui editar mensagem `casamento`"))
+		if (msg)
+			msg.edit({
+				components: []
+			}).catch(() => console.log("Não consegui editar mensagem `casamento`"))
 	})
 }
 exports.config = {

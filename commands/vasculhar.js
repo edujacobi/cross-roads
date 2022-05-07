@@ -1,97 +1,102 @@
 const Discord = require('discord.js')
 exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
-	let multiplicador_evento = 0.75
+	let multiplicador_evento = 1
 	const hora = 3600000
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 
-	function vasculharLugar(lugar, uData) {
+	async function vasculharLugar(lugar, uData) {
 		let item = uData.classe === 'mendigo' ? bot.getRandom(0, 15) : bot.getRandom(0, 17) //normal: 15/17
 		let achou = ''
 		uData.vasculhar = currTime + hora * multiplicador_evento
 		// if (lugar == baile)
 		// 	uData.vasculhar = currTime + 600000
-		Object.entries(lugar).forEach(([key, value]) => {
+		for (const [key, value] of Object.entries(lugar)) {
 			if (item == key) {
-				if (value.item !== 'moni' && value.item !== 'ficha' && value.item !== 'granada' && value.item !== 'flor' && value.item !=='badge' && value.item !== 'ovo') {
-					Object.entries(uData.arma).forEach(([key_udata, arma]) => {
+				if (value.item !== 'moni' && value.item !== 'ficha' && value.item !== 'granada' && value.item !== 'flor' && value.item !== 'badge' && value.item !== 'ovo') {
+					for (const [key_udata, arma] of Object.entries(uData.arma)) {
 						if (key_udata == value.item) {
 							arma.tempo = arma.tempo > currTime ? arma.tempo + value.tempo * hora : currTime + value.tempo * hora
-							Object.values(bot.guns).forEach(gun => {
+							for (const gun of Object.values(bot.guns)) {
 								if (gun.data == value.item) {
 									let emote = gun.skins[arma.skinAtual].emote
 									achou = true
 									uData.vasculharAchou += 1
 									if (message.author.id !== bot.config.adminID)
-										bot.data.set(message.author.id, uData)
-									return bot.createEmbed(message, `Você encontrou ${emote} **${gun.desc}** com duração de ${value.tempo} ${value.tempo == 1 ? `hora` : `horas`} enquanto vasculhava ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
+										await bot.data.set(message.author.id, uData)
+									bot.createEmbed(message, `Você encontrou ${emote} **${gun.desc}** com duração de ${value.tempo} ${value.tempo == 1 ? `hora` : `horas`} enquanto vasculhava ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
 								}
-							})
+							}
 						}
-					})
-				} else if (value.item === 'moni') {
+					}
+				}
+				else if (value.item === 'moni') {
 					let money = bot.getRandom(value.min, value.max)
 					uData.moni += money
 					achou = true
 					uData.vasculharAchou += 1
 					if (message.author.id !== bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou **R$ ${money.toLocaleString().replace(/,/g, '.')}** enquanto vasculhava ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
+						await bot.data.set(message.author.id, uData)
+					bot.createEmbed(message, `Você encontrou **R$ ${money.toLocaleString().replace(/,/g, '.')}** enquanto vasculhava ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
 
-				} else if (value.item === 'ficha') {
+				}
+				else if (value.item === 'ficha') {
 					let ficha = bot.getRandom(value.min, value.max)
 					uData.ficha += ficha
 					achou = true
 					uData.vasculharAchou += 1
 					if (message.author.id !== bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.ficha} **${ficha.toLocaleString().replace(/,/g, '.')} ${ficha == 1 ? `Ficha` : `Fichas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-as no Cassino!`, bot.colors.vasculhar)
+						await bot.data.set(message.author.id, uData)
+					bot.createEmbed(message, `Você encontrou ${bot.config.ficha} **${ficha.toLocaleString().replace(/,/g, '.')} ${ficha == 1 ? `Ficha` : `Fichas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-as no Cassino!`, bot.colors.vasculhar)
 
-				} else if (value.item === 'granada') {
+				}
+				else if (value.item === 'granada') {
 					let quant = bot.getRandom(value.min, value.max)
 					uData.arma.granada.quant += quant
 					achou = true
 					uData.vasculharAchou += 1
 					if (message.author.id !== bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Granada` : `Granadas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Shaka laka boom!`, bot.colors.vasculhar)
+						await bot.data.set(message.author.id, uData)
+					bot.createEmbed(message, `Você encontrou ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Granada` : `Granadas`}** enquanto vasculhava ${bot.config.vasculhar}`, `Shaka laka boom!`, bot.colors.vasculhar)
 
-				} else if (value.item === 'flor') {
+				}
+				else if (value.item === 'flor') {
 					let quant = 1
 					uData._flor += quant
 					achou = true
 					uData.vasculharAchou += 1
 					if (message.author.id !== bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.flor} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Flor` : `Flores`}** enquanto vasculhava ${bot.config.vasculhar}`, `Você pode usá-las nos Casamentos! → ;casar`, bot.colors.vasculhar)
+						await bot.data.set(message.author.id, uData)
+					bot.createEmbed(message, `Você encontrou ${bot.config.flor} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Flor` : `Flores`}** enquanto vasculhava ${bot.config.vasculhar}`, `Você pode usá-las nos Casamentos! → ;casar`, bot.colors.vasculhar)
 
-				} else if (value.item === 'ovo') {
+				}
+				else if (value.item === 'ovo') {
 					let quant = bot.getRandom(value.min, value.max)
 					uData._ovo += quant
 					achou = true
 					uData.vasculharAchou += 1
 					if (message.author.id !== bot.config.adminID)
-						bot.data.set(message.author.id, uData)
-					return bot.createEmbed(message, `Você encontrou ${bot.config.ovo} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Presente` : `Presentes`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-os no Mercado do Natal! → ;natal`, 'YELLOW')
+						await bot.data.set(message.author.id, uData)
+					bot.createEmbed(message, `Você encontrou ${bot.config.ovo} **${quant.toLocaleString().replace(/,/g, '.')} ${quant == 1 ? `Presente` : `Presentes`}** enquanto vasculhava ${bot.config.vasculhar}`, `Use-os no Mercado do Natal! → ;natal`, 'YELLOW')
 				}
 				// else if (value.item == 'badge') {
 				// 	achou = true
 				// 	uData.vasculhar = currTime + 600000
 				// 	uData.badgeBaileMandrake = true
 				// 	if (message.author.id != bot.config.adminID)
-				// 		bot.data.set(message.author.id, uData)
+				// 		await bot.data.set(message.author.id, uData)
 				// 	return bot.createEmbed(message, `Você encontrou o ${bot.badges.mandrake} **Óculos Mandrake** enquanto vasculhava ${bot.config.vasculhar}`, `Ele ficará lindo no seu galo!`, bot.colors.vasculhar)
 				// }
 			}
-		})
+		}
 		if (!achou) {
 			if (message.author.id !== bot.config.adminID)
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 			return bot.createEmbed(message, `Você não encontrou nada enquanto vasculhava ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
 		}
 	}
 
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 
 	let lixao = {
 		1: {
@@ -499,9 +504,9 @@ Necessário: ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote}
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData)) return
+		if (await bot.isUserEmRouboOuEspancamento(message, uData)) return
 
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		if (uData.vasculhar > currTime) {
@@ -510,33 +515,33 @@ Necessário: ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote}
 		}
 
 		if (['lixao', 'lixão', 'l', '1'].includes(option)) {
-			vasculharLugar(lixao, uData)
+			await vasculharLugar(lixao, uData)
 			
 		} else if (['matagal', 'mata', 'm', '2'].includes(option)) {
-			vasculharLugar(matagal, uData)
+			await vasculharLugar(matagal, uData)
 			
 		} else if (['esgoto', 'e', '3'].includes(option)) {
-			vasculharLugar(esgoto, uData)
+			await vasculharLugar(esgoto, uData)
 			
 		} else if (['fabrica', 'fábrica', 'f', '4'].includes(option)) {
 			if (uData.arma.shotgun.tempo < currTime && uData.arma.mp5.tempo < currTime && uData.arma.ak47.tempo < currTime && uData.arma.m4.tempo < currTime && uData.arma.sniper.tempo < currTime && uData.arma.katana.tempo < currTime && uData.arma.rpg.tempo < currTime && uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
 				return bot.createEmbed(message, `É necessário possuir ${bot.guns.shotgun.skins[uData.arma['shotgun'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
-			vasculharLugar(fabrica, uData)
+			await vasculharLugar(fabrica, uData)
 			
 		} else if (['usina', 'u', '5'].includes(option)) {
 			if (uData.arma.ak47.tempo < currTime && uData.arma.m4.tempo < currTime && uData.arma.sniper.tempo < currTime && uData.arma.katana.tempo < currTime && uData.arma.rpg.tempo < currTime && uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
 				return bot.createEmbed(message, `É necessário possuir ${bot.guns.ak47.skins[uData.arma['ak47'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
-			vasculharLugar(usina, uData)
+			await vasculharLugar(usina, uData)
 			
 		} else if (['nave', 'n', '6'].includes(option)) {
 			if (uData.arma.rpg.tempo < currTime && uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
 				return bot.createEmbed(message, `É necessário possuir ${bot.guns.rpg.skins[uData.arma['rpg'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
-			vasculharLugar(nave, uData)
+			await vasculharLugar(nave, uData)
 			
 		} else if (['base', 'b', '7'].includes(option)) {
 			if (uData.arma.minigun.tempo < currTime && uData.arma.bazuca.tempo < currTime)
 				return bot.createEmbed(message, `É necessário possuir ${bot.guns.minigun.skins[uData.arma['minigun'].skinAtual].emote} ou melhor para vasculhar este lugar ${bot.config.vasculhar}`, null, bot.colors.vasculhar)
-			vasculharLugar(base, uData)
+			await vasculharLugar(base, uData)
 			
 		} 
 		// else if (['arvore', 'árvore', 'a', '8'].includes(option)) {
@@ -563,7 +568,7 @@ Necessário: ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote}
 		setTimeout(() => {
 			message.author.send({embeds: [embedPV]})
 					.catch(() => message.reply(`você já pode vasculhar novamente ${bot.config.vasculhar}`)
-						.catch(() => `Não consegui responder ${bot.data.get(message.author.id, 'username')} nem no PV nem no canal. \`Vasculhar\``))
+						.catch(() => `Não consegui responder ${uData.username} nem no PV nem no canal. \`Vasculhar\``))
 		}, hora)
 		
 	} else return bot.createEmbed(message, `Você deve escolher entre \`lixão\`, \`matagal\`, \`esgoto\`, \`fábrica\`, \`usina\`, \`nave\` e \`base\` ${bot.config.vasculhar}`, null, bot.colors.vasculhar)

@@ -14,7 +14,7 @@ exports.run = async (bot, interaction) => {
 	return await interaction.reply({embeds: [embed]})
 		.catch(() => console.log("Não consegui enviar mensagem `cars`"))
 
-	let uData = bot.data.get(interaction.user.id)
+	let uData = await bot.data.get(interaction.user.id)
 	const embed1 = new Discord.MessageEmbed()
 
 		.setTitle(`${bot.config.car} Concessionária [em breve]`)
@@ -30,7 +30,7 @@ exports.run = async (bot, interaction) => {
 		.addField("6: Bugatti Veyron", `R$ 25.000.000\nRedução: 30%`, true)
 
 		.setFooter({
-			text: `${bot.data.get(interaction.user.id, "username")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+			text: `${await bot.data.get(interaction.user.id + ".username")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
 			iconURL: interaction.user.user.avatarURL()
 		})
 		.setTimestamp()

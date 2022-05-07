@@ -44,7 +44,7 @@ exports.run = async (bot, message, args) => {
 	//if (!(message.author.id == bot.config.adminID) && !(message.author.id == '405930523622375424')) return message.channel.send('Comando em manutenção')
 	if (option === 'criar') {
 		// return bot.createEmbed(message, `A criação de gangues está bloqueada na primeira semana da temporada ${bot.config.gang}`, null, bot.colors.darkGrey)
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 
 		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
@@ -69,26 +69,19 @@ exports.run = async (bot, message, args) => {
 		if (['criar', 'info', 'descricao', 'nome', 'cor', 'imagem', 'sair', 'transferir', 'convidar', 'base', 'comunicar', 'vice', 'importar', 'exportar', 'golpe', 'tag', 'icone', 'boneco'].includes(args[1]))
 			return bot.createEmbed(message, `Defina outro nome. ${bot.config.gang}`, null, bot.colors.darkGrey)
 
-		let achou = false
-		bot.gangs.forEach(gang => {
-			if (gang !== '') {
-				if (nome.toLowerCase() === " " + gang.nome.toLowerCase())
-					achou = true
-			}
 
-		})
-		if (achou) return bot.createEmbed(message, `Este nome de gangue já está em uso. ${bot.config.gang}`, null, bot.colors.darkGrey)
+		if (await bot.gangs.find("nome", nome) || await bot.gangs.find(gang => gang.nome?.toLowerCase() === nome.toLowerCase()))
+			return bot.createEmbed(message, `Este nome de gangue já está em uso. ${bot.config.gang}`, null, bot.colors.darkGrey)
 
 		let regex = /^[a-zA-Z0-9 !$.,%^&()+=/\\]{4,20}$/ugm
 		if (!regex.test(nome))
 			return bot.createEmbed(message, 'Escolha outro nome', `Este nome é inválido`, null)
 
+		await bot.gangs.ensure((await bot.gangs.size).toString(), bot.defautGang)
 
-		bot.gangs.ensure((bot.gangs.size).toString(), bot.defautGang)
+		uData.gangID = await bot.gangs.size - 1
 
-		uData.gangID = bot.gangs.size - 1
-
-		let uGang = bot.gangs.get(uData.gangID)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		uGang.membros.push({
 			id: message.author.id,
@@ -99,16 +92,16 @@ exports.run = async (bot, message, args) => {
 		uGang.nome = nome.substring(1, nome.length)
 		uGang.cor = (Math.random() * 0xFFFFFF << 0).toString(16)
 		uData.moni -= 2500000
-		bot.data.set(message.author.id, uData)
-		bot.gangs.set(uData.gangID.toString(), uGang)
-		bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(2500000 * bot.imposto))
+		await bot.data.set(message.author.id, uData)
+		await bot.gangs.set(uData.gangID?.toString(), uGang)
+		await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(2500000 * bot.imposto))
 
 		return bot.createEmbed(message, `Você criou a gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 	}
 	else if (option === 'descricao') { //lider
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -129,15 +122,15 @@ exports.run = async (bot, message, args) => {
 		if (desc.length > 255)
 			return bot.createEmbed(message, `Defina uma descrição menor. Limite de caracteres: 255. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Descrição da gangue **${uGang.nome}** alterada! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 
 	}
 	else if (option === 'nome') { //lider
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -157,14 +150,8 @@ exports.run = async (bot, message, args) => {
 		if (['criar', 'info', 'descricao', 'nome', 'cor', 'imagem', 'sair', 'transferir', 'convidar', 'base', 'comunicar', 'vice', 'importar', 'exportar', 'golpe', 'tag', 'icone', 'boneco'].includes(args[1]))
 			return bot.createEmbed(message, `Defina outro nome ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		let achou = false
-		bot.gangs.forEach(gang => {
-			if (gang !== '') {
-				if (nome.toLowerCase() === " " + gang.nome.toLowerCase())
-					achou = true
-			}
-		})
-		if (achou) return bot.createEmbed(message, `Este nome de gangue já está em uso. ${getIcone(uGang.boneco)}`, null, uGang.cor)
+		if (await bot.gangs.find("nome", nome) || await bot.gangs.find(gang => gang.nome?.toLowerCase() === nome.toLowerCase()))
+			return bot.createEmbed(message, `Este nome de gangue já está em uso. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		let regex = /^[a-zA-Z0-9 !$.,%^&()+=/\\]{4,20}$/ugm
 		if (!regex.test(nome))
@@ -179,14 +166,14 @@ exports.run = async (bot, message, args) => {
 		if (nome.length > 20)
 			return bot.createEmbed(message, `Defina um nome menor. Limite de caracteres: 20 ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `A gangue **${old_nome}** agora é **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 	}
 	else if (option === 'cor') { //lider
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -205,14 +192,14 @@ exports.run = async (bot, message, args) => {
 
 		uGang.cor = '0x' + args[1]
 
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Cor da gangue **${uGang.nome}** alterada! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 	}
 	else if (option === 'imagem') { //lider
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -229,14 +216,14 @@ exports.run = async (bot, message, args) => {
 
 		uGang.icone = args[1]
 
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Imagem da gangue **${uGang.nome}** alterada! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 	}
 	else if (option === 'convidar') { //lider e vice
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 		let custo_base = 100000
 
 		if (!uGang)
@@ -255,7 +242,7 @@ exports.run = async (bot, message, args) => {
 
 		if (target.id === message.author.id) return bot.createEmbed(message, `Você já faz parte desta gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		let tData = bot.data.get(target.id)
+		let tData = await bot.data.get(target.id)
 		if (!tData) return bot.createEmbed(message, "Este usuário não possui um inventário", null, uGang.cor)
 
 		if (tData.gangID != null) return bot.createEmbed(message, `Este jogador já está em uma gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -286,17 +273,17 @@ Aceitar convite?`)
 
 					confirm.on('collect', () => {
 						if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `gang`"))
-							.then(() => {
-								tData = bot.data.get(target.id)
-								uGang = bot.gangs.get(uData.gangID)
+							.then(async () => {
+								tData = await bot.data.get(target.id)
+								uGang = await bot.gangs.get(uData.gangID?.toString())
 								if (tData.gangID != null) return bot.createEmbed(message, `Este jogador já está em uma gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 								if (tData.moni < custo_base + (50000 * uGang.baseLevel))
 									return bot.createEmbed(message, `**${tData.username}** não tem dinheiro suficiente para entrar na gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
-								if (bot.isGaloEmRinha(target.id))
+								if (await bot.isGaloEmRinha(target.id))
 									return bot.createEmbed(message, `O galo de **${tData.username}** está em uma rinha e ele não pode fazer isto ${getIcone(uGang.boneco)}`, null, bot.colors.white)
 
 								let currTime = new Date().getTime()
-								tData.gangID = uData.gangID // Coloca ID da gangue no usuário
+								tData.gangID = uData.gangID.toString() // Coloca ID da gangue no usuário
 								tData.moni -= custo_base + (50000 * uGang.baseLevel)
 								uGang.caixa += custo_base + (50000 * uGang.baseLevel)
 								let tempo_deposito = 6 * 60 * 60 * 1000
@@ -307,8 +294,8 @@ Aceitar convite?`)
 									cargo: 'membro',
 									depositado: 0
 								})
-								bot.gangs.set(uData.gangID.toString(), uGang) // Salva gangue
-								bot.data.set(target.id, tData) // Salva user
+								await bot.gangs.set(uData.gangID?.toString(), uGang) // Salva gangue
+								await bot.data.set(target.id, tData) // Salva user
 								// Manda mensagem
 								return msg.edit({
 									embeds: [new Discord.MessageEmbed()
@@ -340,8 +327,8 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'sair') { // membro
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (uData.gangID == null)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -357,17 +344,17 @@ Aceitar convite?`)
 
 					uGang.membros.splice(getMembroIdx(uGang, message.author.id), 1)
 					uGang.membros[newLider].cargo = 'lider'
-					bot.gangs.set(uData.gangID.toString(), uGang)
+					await bot.gangs.set(uData.gangID.toString(), uGang)
 					uData.gangID = null
-					bot.data.set(message.author.id, uData)
+					await bot.data.set(message.author.id, uData)
 
 					uGang.membros.forEach(membro => {
 						if (membro.id !== message.author.id)
-							bot.users.fetch(membro.id).then(user => user.send(`**${uData.username}** saiu da gangue **${uGang.nome}**. **${bot.data.get(vice.id, "username")}** foi definido como novo líder ${getIcone(uGang.boneco)}`)
+							bot.users.fetch(membro.id).then(async user => user.send(`**${uData.username}** saiu da gangue **${uGang.nome}**. **${await bot.data.get(vice.id + ".username")}** foi definido como novo líder ${getIcone(uGang.boneco)}`)
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${membro.id})`)))
 					})
 
-					return bot.createEmbed(message, `Você saiu da gangue **${uGang.nome}**. **${bot.data.get(id, "username")}** foi definido como novo líder. ${getIcone(uGang.boneco)}`, null, uGang.cor)
+					return bot.createEmbed(message, `Você saiu da gangue **${uGang.nome}**. **${await bot.data.get(id + ".username")}** foi definido como novo líder. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 				}
 
 				uGang.membros.splice(getMembroIdx(uGang, message.author.id), 1)
@@ -377,21 +364,21 @@ Aceitar convite?`)
 
 				// uGang.membros.set(newLider, 'lider', 'cargo')
 				uGang.membros[0].cargo = 'lider'
-				bot.gangs.set(uData.gangID.toString(), uGang)
+				await bot.gangs.set(uData.gangID.toString(), uGang)
 				uData.gangID = null
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 
 				bot.users.fetch(newLider).then(user => user.send(`**${uData.username}** saiu da gangue **${uGang.nome}**. Você foi definido como novo líder ${getIcone(uGang.boneco)}`)
 					.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${newLider})`)))
 
-				return bot.createEmbed(message, `Você saiu da gangue **${uGang.nome}**. **${bot.data.get(newLider, "username")}** foi definido como novo líder. ${getIcone(uGang.boneco)}`, null, uGang.cor)
+				return bot.createEmbed(message, `Você saiu da gangue **${uGang.nome}**. **${await bot.data.get(newLider + ".username")}** foi definido como novo líder. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 			}
 			else {
-				bot.gangs.set(uData.gangID.toString(), '')
-				//bot.gangs.delete(uData.gangID)
+				await bot.gangs.set(uData.gangID.toString(), '')
+				//await bot.gangs.delete(uData.gangID)
 				uData.gangID = null
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 				return bot.createEmbed(message, `Você saiu da gangue **${uGang.nome}**. Você era o último membro e ela foi encerrada. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 			}
 
@@ -399,10 +386,10 @@ Aceitar convite?`)
 		else {
 			uGang.membros.splice(getMembroIdx(uGang, message.author.id), 1)
 
-			bot.gangs.set(uData.gangID.toString(), uGang)
+			await bot.gangs.set(uData.gangID.toString(), uGang)
 
 			uData.gangID = null
-			bot.data.set(message.author.id, uData)
+			await bot.data.set(message.author.id, uData)
 
 			uGang.membros.forEach(membro => {
 				if (membro.id !== message.author.id)
@@ -417,8 +404,8 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'expulsar') { //lider e vice
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (uData.gangID == null)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -441,12 +428,12 @@ Aceitar convite?`)
 		if (target.id === message.author.id)
 			return bot.createEmbed(message, `Você não pode expulsar você mesmo. Use \`;gangue sair\` para sair da gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		let tData = bot.data.get(target.id)
+		let tData = await bot.data.get(target.id)
 
 		if (!tData)
 			return bot.createEmbed(message, "O jogador não existe")
 
-		if (tData.gangID !== uData.gangID)
+		if (tData.gangID.toString() !== uData.gangID.toString())
 			return bot.createEmbed(message, `**${tData.username}** não faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		if (isLider(uGang, target.id))
@@ -458,10 +445,10 @@ Aceitar convite?`)
 		// if (membro_remover > -1)
 		// 	uGang.membros.splice(membro_remover, 1)
 		uGang.membros.splice(getMembroIdx(uGang, target.id), 1)
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		tData.gangID = null
-		bot.data.set(target.id, tData)
+		await bot.data.set(target.id, tData)
 
 		bot.users.fetch(target.id).then(user => {
 			user.send(`**${uData.username}** lhe expulsou da gangue **${uGang.nome}** ${motivo !== `` ? `| Motivo: ${motivo} ` : ""}${getIcone(uGang.boneco)}`)
@@ -473,12 +460,12 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'transferir') { //lider
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 
 		if (uData.gangID == null)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null)
 
-		let uGang = bot.gangs.get(uData.gangID)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!isLider(uGang, message.author.id))
 			return bot.createEmbed(message, `Somente o líder pode transferir a posse da gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -486,13 +473,13 @@ Aceitar convite?`)
 		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
 
 		if (!target)
 			return bot.createEmbed(message, `Insira um usuário para transferir a posse ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		let tData = bot.data.get(target.id)
+		let tData = await bot.data.get(target.id)
 
 		if (!tData)
 			return bot.createEmbed(message, `Este usuário não possui um inventário ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -500,13 +487,13 @@ Aceitar convite?`)
 		if (target.id === message.author.id)
 			return bot.createEmbed(message, `Você já é o líder ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		if (tData.gangID !== uData.gangID)
+		if (tData.gangID.toString() !== uData.gangID.toString())
 			return bot.createEmbed(message, `**${tData.username}** não faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		if (tData.preso > currTime)
 			return bot.msgPreso(message, tData, tData.username)
 
-		if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+		if (await bot.isAlvoEmRouboOuEspancamento(message, tData))
 			return
 
 		//return bot.createEmbed(message, `Você transferiu a posse da gangue **${uGang.nome}** para **${tData.username}**! ${bot.config.gang}`)
@@ -524,29 +511,29 @@ Aceitar convite?`)
 
 					confirm.on('collect', () => {
 						if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `gang`"))
-							.then(() => {
-								let uData = bot.data.get(message.author.id)
-								let uGang = bot.gangs.get(uData.gangID)
-								let tData = bot.data.get(target.id)
+							.then(async () => {
+								let uData = await bot.data.get(message.author.id)
+								let uGang = await bot.gangs.get(uData.gangID?.toString())
+								let tData = await bot.data.get(target.id)
 								if (uData.preso > currTime)
 									return bot.msgPreso(message, uData)
 
-								if (bot.isUserEmRouboOuEspancamento(message, uData))
+								if (await bot.isUserEmRouboOuEspancamento(message, uData))
 									return
 
 								if (tData.preso > currTime)
 									return bot.msgPreso(message, tData)
 
-								if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+								if (await bot.isAlvoEmRouboOuEspancamento(message, tData))
 									return
 
-								if (tData.gangID !== uData.gangID)
+								if (tData.gangID.toString() !== uData.gangID.toString())
 									return bot.createEmbed(message, `**${tData.username}** não faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`)
 
 								uGang.membros[getMembroIdx(uGang, target.id)].cargo = 'lider'
 								uGang.membros[getMembroIdx(uGang, message.author.id)].cargo = 'membro'
 
-								bot.gangs.set(uData.gangID.toString(), uGang)
+								await bot.gangs.set(uData.gangID.toString(), uGang)
 
 								uGang.membros.forEach(membro => {
 									if (membro.id !== message.author.id)
@@ -571,12 +558,12 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'vice') { //lider
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 
 		if (uData.gangID == null)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
 
-		let uGang = bot.gangs.get(uData.gangID)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!isLider(uGang, message.author.id))
 			return bot.createEmbed(message, `Somente o líder pode definir o vice-líder da gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -589,8 +576,8 @@ Aceitar convite?`)
 
 			if (vice) {
 				vice.cargo = 'membro'
-				bot.gangs.set(uData.gangID.toString(), uGang)
-				return bot.createEmbed(message, `**${bot.data.get(vice.id, "username")}** foi destituído do cargo de vice-líder da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, uGang.cor)
+				await bot.gangs.set(uData.gangID.toString(), uGang)
+				return bot.createEmbed(message, `**${await bot.data.get(vice.id + ".username")}** foi destituído do cargo de vice-líder da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, uGang.cor)
 			}
 
 			return bot.createEmbed(message, `**${uGang.nome}** não possui um vice-líder para ser removido ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -605,12 +592,12 @@ Aceitar convite?`)
 		if (isVice(uGang, target.id))
 			return bot.createEmbed(message, `Este usuário já é o vice-líder da gangue ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		let tData = bot.data.get(target.id)
+		let tData = await bot.data.get(target.id)
 
 		if (tData.preso > currTime)
 			return bot.msgPreso(message, tData, tData.username)
 
-		if (uData.gangID !== tData.gangID)
+		if (uData.gangID.toString() !== tData.gangID.toString())
 			return bot.createEmbed(message, `**${tData.username}** não faz parte da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		// for (let i = 0; i < uGang.membros.length; i++) {
@@ -624,14 +611,14 @@ Aceitar convite?`)
 		let newVice = getMembro(uGang, target.id)
 		newVice.cargo = 'vice'
 
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Você definiu **${tData.username}** como vice-líder da gangue **${uGang.nome}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 
 	}
 	else if (option === 'depositar' || option === 'd' || option === 'dep') { //membro
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 		let currTime = new Date().getTime()
 		let valor = args[1]
 
@@ -644,15 +631,15 @@ Aceitar convite?`)
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		let uGang = bot.gangs.get(uData.gangID)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (uData.depositoGang > currTime)
 			return bot.createEmbed(message, `Você poderá depositar novamente em ${bot.segToHour((uData.depositoGang - currTime) / 1000)} ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
 
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${getIcone(uGang.boneco)}`, null, bot.colors.white)
 
 		if (!args[1])
@@ -692,9 +679,9 @@ Aceitar convite?`)
 
 					confirm.on('collect', () => {
 						if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `gang`"))
-							.then(() => {
-								let uData = bot.data.get(message.author.id)
-								let uGang = bot.gangs.get(uData.gangID)
+							.then(async () => {
+								let uData = await bot.data.get(message.author.id)
+								let uGang = await bot.gangs.get(uData.gangID?.toString())
 								let currTime = new Date().getTime()
 								if (uData.depositoGang > currTime)
 									return bot.createEmbed(message, `Você poderá depositar novamente em ${bot.segToHour((uData.depositoGang - currTime) / 1000)} ${getIcone(uGang.boneco)}`, null, uGang.cor)
@@ -702,25 +689,25 @@ Aceitar convite?`)
 									return bot.msgSemDinheiro(message)
 								if (uData.moni < parseInt(valor))
 									return bot.msgDinheiroMenorQueAposta(message)
-								if (bot.isUserEmRouboOuEspancamento(message, uData))
+								if (await bot.isUserEmRouboOuEspancamento(message, uData))
 									return
-								if (bot.isGaloEmRinha(message.author.id))
+								if (await bot.isGaloEmRinha(message.author.id))
 									return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 								let tempo_deposito = (22 - 1 * uGang.baseLevel) * 60 * 60 * 1000
 								uData.depositoGang = currTime + tempo_deposito
 								uData.moni -= parseInt(valor)
 								uGang.caixa += parseInt(valor)
-								bot.data.set(message.author.id, uData)
+								await bot.data.set(message.author.id, uData)
 
 								// uGang.membros.set(message.author.id, uGang.membros.get(message.author.id, 'depositado') + parseInt(valor), 'depositado')
 								uGang.membros[getMembroIdx(uGang, message.author.id)].depositado += parseInt(valor)
-								bot.gangs.set(uData.gangID.toString(), uGang)
+								await bot.gangs.set(uData.gangID.toString(), uGang)
 								setTimeout(() => {
 									bot.users.fetch(message.author.id).then(user =>
 										user.send(`Você pode depositar novamente na sua gangue ${getIcone(uGang.boneco)}`)
 											.catch(() => message.reply(`você pode depositar novamente na sua gangue ${getIcone(uGang.boneco)}`)
-												.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Gang\``))
+												.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Gang\``))
 									)
 								}, tempo_deposito)
 
@@ -747,32 +734,32 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'base' || option === 'b') { // comprar e upgrade: lider e vice // resto: membro
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 		let uGang
 		let uID
 
 		if (!args[1] || args[1] === 'info' || args[1] === 'comprar' || args[1] === 'upgrade')
-			uGang = bot.gangs.get(uData.gangID)
+			uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (args[1] && args[1] !== 'info' && args[1] !== 'comprar' && args[1] !== 'upgrade') {
 			if (target) {
-				let targetD = bot.data.get(target.id)
+				let targetD = await bot.data.get(target.id)
 				if (!targetD)
 					return bot.createEmbed(message, `Este usuário não possui um inventário ${bot.config.gang}`, null, bot.colors.darkGrey)
 
 				if (!targetD.gangID)
 					return bot.createEmbed(message, `Este usuário não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
 
-				uGang = bot.gangs.get(targetD.gangID)
+				uGang = await bot.gangs.get(targetD.gangID.toString())
 
 			}
 			else {
 				let name = args.join(" ").replace(option, "")
 				name = name.substring(1, name.length)
-				bot.gangs.forEach((gang, id) => {
+				await bot.gangs.filter(async (gang, id) => {
 					if (gang !== '') {
 						if (name.toLowerCase() === gang.nome.toLowerCase() || name.toLowerCase() === gang.tag.toLowerCase()) {
-							uGang = bot.gangs.get(id)
+							uGang = await bot.gangs.get(id)
 							uID = id
 						}
 					}
@@ -887,25 +874,25 @@ Aceitar convite?`)
 					.setLabel('Importar')
 					.setEmoji(bot.config.carregamento)
 					.setDisabled(uGang.estoque === 5)
-					.setCustomId(message.id + message.author.id + 'importar')
+					.setCustomId('importar')
 
 				let btnExportar = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Exportar')
 					.setEmoji(bot.config.carregamento)
 					.setDisabled(uGang.estoque === 0)
-					.setCustomId(message.id + message.author.id + 'exportar')
+					.setCustomId('exportar')
 
 				let btnUpgrade = new Discord.MessageButton()
 					.setStyle('SUCCESS')
 					.setLabel('Upgrade')
 					.setDisabled(uGang.baseLevel >= 10)
-					.setCustomId(message.id + message.author.id + 'upgrade')
+					.setCustomId('upgrade')
 
 				let btnMembros = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Membros')
-					.setCustomId(message.id + message.author.id + 'membros')
+					.setCustomId('membros')
 
 				let row = new Discord.MessageActionRow()
 
@@ -922,26 +909,26 @@ Aceitar convite?`)
 				.catch(() => console.log("Não consegui enviar mensagem `gg base`"))
 
 			const filter = (button) => [
-				message.id + message.author.id + 'importar',
-				message.id + message.author.id + 'exportar',
-				message.id + message.author.id + 'upgrade',
-				message.id + message.author.id + 'membros',
+				'importar',
+				'exportar',
+				'upgrade',
+				'membros',
 			].includes(button.customId) && button.user.id === message.author.id
 
-			const collector = message.channel.createMessageComponentCollector({
+			const collector = msg.createMessageComponentCollector({
 				filter,
 				time: 90000,
 			})
 
 			collector.on('collect', async b => {
 				await b.deferUpdate()
-				if (b.customId === message.id + message.author.id + 'importar')
+				if (b.customId === 'importar')
 					bot.commands.get('gang').run(bot, message, ['importar'])
-				else if (b.customId === message.id + message.author.id + 'exportar')
+				else if (b.customId === 'exportar')
 					bot.commands.get('gang').run(bot, message, ['exportar'])
-				else if (b.customId === message.id + message.author.id + 'upgrade')
+				else if (b.customId === 'upgrade')
 					bot.commands.get('gang').run(bot, message, ['base', 'upgrade'])
-				else if (b.customId === message.id + message.author.id + 'membros')
+				else if (b.customId === 'membros')
 					bot.commands.get('gang').run(bot, message, [uGang.nome])
 			})
 
@@ -980,7 +967,7 @@ Aceitar convite?`)
 				// uGang.tempoCarregamento = 24
 				// uGang.chanceCarregamento = 35
 				uGang.caixa -= 2000000
-				bot.gangs.set(uData.gangID.toString(), uGang)
+				await bot.gangs.set(uData.gangID.toString(), uGang)
 
 				return bot.createEmbed(message, `Você comprou a base **${bot.bases[uGang.base].desc}** para a gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
@@ -1025,8 +1012,8 @@ Aceitar convite?`)
 
 							confirm.on('collect', () => {
 								if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `gang`"))
-									.then(() => {
-										uGang = bot.gangs.get(uData.gangID)
+									.then(async () => {
+										uGang = await bot.gangs.get(uData.gangID?.toString())
 										if (uGang.carregamentoAtivo)
 											return bot.createEmbed(message, `Você não pode dar upgrade na base enquanto um carregamento está ativo ${getIcone(uGang.boneco)}`, null, uGang.cor)
 										if (uGang.baseLevel === 10)
@@ -1041,7 +1028,7 @@ Aceitar convite?`)
 										// uGang.baseDEF += 5
 										// uGang.tempoCarregamento -= 1
 										// uGang.chanceCarregamento += 1
-										bot.gangs.set(uData.gangID.toString(), uGang)
+										await bot.gangs.set(uData.gangID.toString(), uGang)
 										msg.edit({
 											embeds: [new Discord.MessageEmbed()
 												.setDescription(`A base **${bot.bases[uGang.base].desc}** de **${uGang.nome}** foi melhorada! ${getIcone(uGang.boneco)}\n${prox_beneficios}`)
@@ -1059,8 +1046,8 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'comunicar') { //lider e vice
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -1095,8 +1082,8 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'importar' || option === 'i' || option === 'imp') { //lider e vice
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 		let currTime = new Date().getTime()
 
 		if (!uGang)
@@ -1118,7 +1105,7 @@ Aceitar convite?`)
 			uGang.carregamento = currTime
 			uGang.carregamentoAtivo = false
 
-			bot.gangs.set(uData.gangID.toString(), uGang)
+			await bot.gangs.set(uData.gangID.toString(), uGang)
 
 			return bot.createEmbed(message, `Você parou o carregamento da gangue **${uGang.nome}**. R$ ${(Math.floor(custo / 3 * 2)).toLocaleString().replace(/,/g, ".")} foram devolvidos ao caixa da gangue. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 		}
@@ -1142,7 +1129,7 @@ Aceitar convite?`)
 			if (chance < chanceCarregamento) {
 				uGang.estoque += 1
 				uGang.carregamentoAtivo = false
-				bot.gangs.set(uData.gangID.toString(), uGang)
+				await bot.gangs.set(uData.gangID.toString(), uGang)
 
 				uGang.membros.forEach(membro => {
 					bot.users.fetch(membro.id).then(user => {
@@ -1156,7 +1143,7 @@ Aceitar convite?`)
 			}
 			else {
 				uGang.carregamentoAtivo = false
-				bot.gangs.set(uData.gangID.toString(), uGang)
+				await bot.gangs.set(uData.gangID.toString(), uGang)
 
 				let textos = [
 					'Seu carregamento foi roubado!',
@@ -1203,8 +1190,8 @@ Aceitar convite?`)
 
 					confirm.on('collect', () => {
 						if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `gang`"))
-							.then(() => {
-								uGang = bot.gangs.get(uData.gangID)
+							.then(async () => {
+								uGang = await bot.gangs.get(uData.gangID?.toString())
 								if (uData.preso > currTime)
 									return bot.msgPreso(message, uData)
 								if (uData.hospitalizado > currTime)
@@ -1219,7 +1206,7 @@ Aceitar convite?`)
 								uGang.carregamento = currTime + (((uGang.base === 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2) * 60 * 60 * 1000 * multiplicadorEventoCarregamento) //currTime + (((uGang.base == 'aeroporto' ? 23 : 26) - uGang.baseLevel * 2) * 60 * 60 * 1000)
 								uGang.carregamentoAtivo = true
 
-								bot.gangs.set(uData.gangID.toString(), uGang)
+								await bot.gangs.set(uData.gangID?.toString(), uGang)
 
 								setTimeout(() => {
 									bot.users.fetch(message.author.id).then(user =>
@@ -1243,8 +1230,8 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'exportar' || option === 'e' || option === 'exp') { //lider e vice
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -1274,10 +1261,10 @@ Aceitar convite?`)
 
 		let parte = Math.floor(venda / (uGang.membros.length + adicionalCaixa))
 
-		uGang.membros.forEach(membro => {
-			let userD = bot.data.get(membro.id)
+		uGang.membros.filter(async membro => {
+			let userD = await bot.data.get(membro.id)
 			userD.moni += parte
-			bot.data.set(membro.id, userD)
+			await bot.data.set(membro.id, userD)
 			bot.users.fetch(membro.id).then(user => {
 				user.send(`Sua gangue **${uGang.nome}** exportou um carregamento no valor de R$ ${venda.toLocaleString().replace(/,/g, ".")}.\nCada membro recebeu R$ ${parte.toLocaleString().replace(/,/g, ".")}. Foram depositados R$ ${parte.toLocaleString().replace(/,/g, ".")} no caixa da gangue. ${getIcone(uGang.boneco)}`)
 					.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${membro.id})`))
@@ -1285,14 +1272,14 @@ Aceitar convite?`)
 		})
 
 		uGang.caixa += parte
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `Sua gangue **${uGang.nome}** exportou um carregamento no valor de R$ ${venda.toLocaleString().replace(/,/g, ".")}.\nCada membro recebeu R$ ${parte.toLocaleString().replace(/,/g, ".")}. Foram depositados R$ ${parte.toLocaleString().replace(/,/g, ".")} no caixa da gangue. ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 	}
 	else if (option === 'golpe') { //lider e vice
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 		let currTime = new Date().getTime()
 		let day = new Date().getDay()
 
@@ -1347,10 +1334,10 @@ Aceitar convite?`)
 						errors: ['time'],
 					})
 
-					collector.on('collect', r => {
+					collector.on('collect', async r => {
 						if (msg) msg.reactions.removeAll().catch(() => console.log("Não consegui remover as reações mensagem `gang`"))
-						uData = bot.data.get(message.author.id)
-						uGang = bot.gangs.get(uData.gangID)
+						uData = await bot.data.get(message.author.id)
+						uGang = await bot.gangs.get(uData.gangID?.toString())
 						currTime = new Date().getTime()
 
 						if (uData.preso > currTime)
@@ -1362,10 +1349,10 @@ Aceitar convite?`)
 						if (uData.roubo > currTime)
 							return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((uData.roubo - currTime) / 1000))} ${bot.config.police}`, null, bot.colors.policia)
 
-						if (bot.isUserEmRouboOuEspancamento(message, uData))
+						if (await bot.isUserEmRouboOuEspancamento(message, uData))
 							return
 
-						if (bot.isGaloEmRinha(message.author.id))
+						if (await bot.isGaloEmRinha(message.author.id))
 							return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 						if (uData.job != null)
@@ -1393,7 +1380,7 @@ Aceitar convite?`)
 								isAlvo: false
 							}
 
-							bot.data.set(message.author.id, uData)
+							await bot.data.set(message.author.id, uData)
 							//let players_negados = []
 							players.push(message.author.id)
 
@@ -1418,9 +1405,9 @@ Aceitar convite?`)
 										errors: ['time']
 									})
 
-									collector.on('collect', r => {
+									collector.on('collect', async r => {
 										let newplayer = r.users.cache.last()
-										let jogador = bot.data.get(newplayer.id)
+										let jogador = await bot.data.get(newplayer.id)
 										currTime = new Date().getTime()
 
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) { // !players_negados.includes(newplayer.id)
@@ -1428,17 +1415,17 @@ Aceitar convite?`)
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 											else if (jogador.hospitalizado > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-											else if (jogador.gangID !== uData.gangID)
+											else if (jogador.gangID.toString() !== uData.gangID.toString())
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, bot.colors.background)
 											else if (jogador.roubo > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 											else if (jogador.job != null)
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.trabalhando}`, bot.jobs[jogador.job].desc, bot.colors.background)
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
-												bot.isUserEmRouboOuEspancamento(message, jogador)
-											else if (bot.isPlayerViajando(jogador))
+												await bot.isUserEmRouboOuEspancamento(message, jogador)
+											else if (await bot.isPlayerViajando(jogador))
 												bot.msgPlayerViajando(message, jogador, jogador.username)
-											else if (bot.isGaloEmRinha(newplayer.id))
+											else if (await bot.isGaloEmRinha(newplayer.id))
 												bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 											else {
 												jogador.emRoubo = {
@@ -1446,7 +1433,7 @@ Aceitar convite?`)
 													user: '📁 Planta do Banco',
 													isAlvo: false
 												}
-												bot.data.set(newplayer.id, jogador)
+												await bot.data.set(newplayer.id, jogador)
 												players.push(newplayer.id)
 												if (players.length === uGang.espacoMembro)
 													collector.stop()
@@ -1483,12 +1470,12 @@ Aceitar convite?`)
 											.setColor(uGang.cor)
 
 										message.channel.send({embeds: [embed_robb_inicio]}).then(message_robb => {
-											setTimeout(() => {
+											setTimeout(async () => {
 												if (robbing < chance) {
 													uGang.golpeMissao1.concluido = true
 													uGang.golpeMissao1.time = currTime + 21600000 // 6h
-													players.forEach(membro => {
-														let userD = bot.data.get(membro)
+													for (const membro of players) {
+														let userD = await bot.data.get(membro)
 														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.15 * 2700000) : (userD.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 														userD.roubosW++
 														userD.emRoubo.tempo = 0
@@ -1496,12 +1483,12 @@ Aceitar convite?`)
 															bot.users.fetch(membro).then(user => {
 																user.send(`Você já pode roubar novamente! ${bot.config.roubar}`)
 																	.catch(() => message.reply(`você já pode roubar novamente! ${bot.config.roubar}`)
-																		.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																		.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															})
 														}, 2700000)
-														bot.data.set(membro, userD)
-													})
-													bot.gangs.set(uData.gangID.toString(), uGang)
+														await bot.data.set(membro, userD)
+													}
+													await bot.gangs.set(uData.gangID.toString(), uGang)
 													const embed_robb_final = new Discord.MessageEmbed()
 														.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082883578495087/file-folder_1f4c1.png`)
 														.setDescription(`Sua gangue **${uGang.nome}** conseguiu com sucesso 📁 **Roubar a Planta do Banco**! ${getIcone(uGang.boneco)}`)
@@ -1516,17 +1503,17 @@ Aceitar convite?`)
 													let tempo_preso = bot.getRandom(14400000, 18000000) //4h a 5h
 													uGang.golpeMissao1.concluido = false
 													uGang.golpeMissao1.time = currTime + 21600000 // 6h
-													players.forEach(membro => {
-														let userD = bot.data.get(membro)
+													for (const membro of players) {
+														let userD = await bot.data.get(membro)
 														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.15) : tempo_preso)
 														userD.roubosL++
 														userD.emRoubo.tempo = 0
-														bot.data.set(membro, userD)
+														await bot.data.set(membro, userD)
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user => {
 																user.send(`Você está livre! ${bot.config.police}`)
 																	.catch(() => message.reply(`você está livre! ${bot.config.police}`)
-																		.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																		.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															})
 														}, tempo_preso)
 
@@ -1534,11 +1521,11 @@ Aceitar convite?`)
 															bot.users.fetch(membro).then(user => {
 																user.send(`Sua gangue **${uGang.nome}** já pode tentar 📁 **Roubar a Planta do Banco** novamente! ${bot.config.police}`)
 																	.catch(() => message.reply(`sua gangue **${uGang.nome}** já pode tentar 📁 **Roubar a Planta do Banco** novamente! ${bot.config.police}`)
-																		.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																		.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															})
 														}, 21600000)
-													})
-													bot.gangs.set(uData.gangID.toString(), uGang)
+													}
+													await bot.gangs.set(uData.gangID.toString(), uGang)
 													const embed_robb_final = new Discord.MessageEmbed()
 														.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082883578495087/file-folder_1f4c1.png`)
 														.setDescription(`Deu ruim! Vocês foram pegos enquanto tentavam escapar!\nSua gangue **${uGang.nome}** falhou em 📁 **Roubar a Planta do Banco**, e todos os membros presentes ficarão presos por ${bot.segToHour(tempo_preso / 1000)} ${bot.config.police}`)
@@ -1566,7 +1553,7 @@ Aceitar convite?`)
 							uGang.golpeMissao2.concluido = true
 							uGang.golpeMissao2.time = currTime + 21600000 // 6h
 
-							bot.gangs.set(uData.gangID.toString(), uGang)
+							await bot.gangs.set(uData.gangID.toString(), uGang)
 							return bot.createEmbed(message, `Sua gangue comprou 🚗 **Carros de Fuga** para o golpe! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 						}
@@ -1584,7 +1571,7 @@ Aceitar convite?`)
 								user: '💻 Sistema de Câmeras',
 								isAlvo: false
 							}
-							bot.data.set(message.author.id, uData)
+							await bot.data.set(message.author.id, uData)
 							//let players_negados = []
 							players.push(message.author.id)
 
@@ -1609,9 +1596,9 @@ Aceitar convite?`)
 										errors: ['time']
 									})
 
-									collector.on('collect', r => {
+									collector.on('collect', async r => {
 										let newplayer = r.users.cache.last()
-										let jogador = bot.data.get(newplayer.id)
+										let jogador = await bot.data.get(newplayer.id)
 										currTime = new Date().getTime()
 
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) {
@@ -1619,17 +1606,17 @@ Aceitar convite?`)
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 											else if (jogador.hospitalizado > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-											else if (jogador.gangID !== uData.gangID)
+											else if (jogador.gangID.toString() !== uData.gangID.toString())
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${bot.config.gang}`, null, bot.colors.background)
 											else if (jogador.roubo > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 											else if (jogador.job != null)
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.trabalhando}`, bot.jobs[jogador.job].desc, bot.colors.background)
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
-												bot.isUserEmRouboOuEspancamento(message, jogador)
-											else if (bot.isPlayerViajando(jogador))
+												await bot.isUserEmRouboOuEspancamento(message, jogador)
+											else if (await bot.isPlayerViajando(jogador))
 												bot.msgPlayerViajando(message, jogador, jogador.username)
-											else if (bot.isGaloEmRinha(newplayer.id))
+											else if (await bot.isGaloEmRinha(newplayer.id))
 												bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 											else {
 												jogador.emRoubo = {
@@ -1637,7 +1624,7 @@ Aceitar convite?`)
 													user: '💻 Sistema de Câmeras',
 													isAlvo: false
 												}
-												bot.data.set(newplayer.id, jogador)
+												await bot.data.set(newplayer.id, jogador)
 												players.push(newplayer.id)
 												if (players.length === uGang.espacoMembro)
 													collector.stop()
@@ -1676,31 +1663,31 @@ Aceitar convite?`)
 										message.channel.send({
 											embeds: [embed_hack_inicio]
 										}).then(message_hack => {
-											setTimeout(() => {
+											setTimeout(async () => {
 												if (hacking < chance) {
 													uGang.golpeMissao3.concluido = true
 													uGang.golpeMissao3.time = currTime + 21600000 // 6h
-													players.forEach(membro => {
-														let userD = bot.data.get(membro)
+													for (const membro of players) {
+														let userD = await bot.data.get(membro)
 														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.15 * 2700000) : (userD.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 														userD.emRoubo.tempo = 0
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user =>
 																user.send(`Você já pode roubar novamente! ${bot.config.roubar}`)
 																	.catch(() => message.reply(`você já pode roubar novamente! ${bot.config.roubar}`)
-																		.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																		.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															)
 														}, 2700000)
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user =>
 																user.send(`Sua gangue **${uGang.nome}** já pode tentar 💻 **Hackear o Sistema de Câmeras** novamente! ${getIcone(uGang.boneco)}`)
 																	.catch(() => message.reply(`sua gangue **${uGang.nome}** já pode tentar 💻 **Hackear o Sistema de Câmeras** novamente! ${getIcone(uGang.boneco)}`)
-																		.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																		.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															)
 														}, 21600000)
-														bot.data.set(membro, userD)
-													})
-													bot.gangs.set(uData.gangID.toString(), uGang)
+														await bot.data.set(membro, userD)
+													}
+													await bot.gangs.set(uData.gangID.toString(), uGang)
 													const embed_hack_final = new Discord.MessageEmbed()
 														.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082999072587846/laptop_1f4bb.png`)
 														.setDescription(`Sua gangue **${uGang.nome}** conseguiu com sucesso 💻 **Hackear o Sistema de Câmeras**! ${getIcone(uGang.boneco)}`)
@@ -1715,22 +1702,22 @@ Aceitar convite?`)
 													let tempo_preso = bot.getRandom(14400000, 18000000) //4h a 5h
 													uGang.golpeMissao3.concluido = false
 													uGang.golpeMissao3.time = currTime + 21600000 // 6h
-													players.forEach(membro => {
-														let userD = bot.data.get(membro)
+													for (const membro of players) {
+														let userD = await bot.data.get(membro)
 														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.15) : tempo_preso)
 														userD.roubosW++
 														userD.emRoubo.tempo = 0
-														bot.data.set(membro, userD)
+														await bot.data.set(membro, userD)
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user => {
 																user.send(`Você está livre! ${bot.config.police}`)
 																	.catch(() => message.reply(`você está livre! ${bot.config.police}`)
-																		.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																		.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															})
 														}, tempo_preso)
-													})
+													}
 
-													bot.gangs.set(uData.gangID.toString(), uGang)
+													await bot.gangs.set(uData.gangID.toString(), uGang)
 													const embed_hack_final = new Discord.MessageEmbed()
 														.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770082999072587846/laptop_1f4bb.png`)
 														.setDescription(`Deu merda! A Polícia Federal rastreou o seu IP!\nSua gangue **${uGang.nome}** falhou em 💻 **Hackear o Sistema de Câmeras**, e todos os membros presentes ficarão presos por ${bot.segToHour(tempo_preso / 1000)} ${bot.config.police}`)
@@ -1777,7 +1764,7 @@ Aceitar convite?`)
 								user: `${bot.config.cash} BANCO`,
 								isAlvo: false
 							}
-							bot.data.set(message.author.id, uData)
+							await bot.data.set(message.author.id, uData)
 							//let players_negados = []
 							players.push(message.author.id)
 
@@ -1802,9 +1789,9 @@ Aceitar convite?`)
 										errors: ['time']
 									})
 
-									collector.on('collect', r => {
+									collector.on('collect', async r => {
 										let newplayer = r.users.cache.last()
-										let jogador = bot.data.get(newplayer.id)
+										let jogador = await bot.data.get(newplayer.id)
 										currTime = new Date().getTime()
 
 										if (players.length <= uGang.espacoMembro && !players.includes(newplayer.id)) {
@@ -1812,17 +1799,17 @@ Aceitar convite?`)
 												bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour(Math.floor((jogador.preso - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 											else if (jogador.hospitalizado > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour(Math.floor((jogador.hospitalizado - currTime) / 1000))} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-											else if (jogador.gangID !== uData.gangID)
+											else if (jogador.gangID.toString() !== uData.gangID.toString())
 												bot.createEmbed(message, `**${jogador.username}**, você não faz parte da gangue **${uGang.nome}** ${getIcone(uGang.boneco)}`, null, bot.colors.background)
 											else if (jogador.roubo > currTime)
 												bot.createEmbed(message, `**${jogador.username}**, você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((jogador.roubo - currTime) / 1000))} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 											else if (jogador.job != null)
 												bot.createEmbed(message, `**${jogador.username}**, você está trabalhando e não pode fazer isto ${bot.config.trabalhando}`, bot.jobs[jogador.job].desc, bot.colors.background)
 											else if (jogador.emRoubo.tempo > currTime || jogador.emEspancamento.tempo > currTime)
-												bot.isUserEmRouboOuEspancamento(message, jogador)
-											else if (bot.isPlayerViajando(jogador))
+												await bot.isUserEmRouboOuEspancamento(message, jogador)
+											else if (await bot.isPlayerViajando(jogador))
 												bot.msgPlayerViajando(message, jogador, jogador.username)
-											else if (bot.isGaloEmRinha(newplayer.id))
+											else if (await bot.isGaloEmRinha(newplayer.id))
 												bot.createEmbed(message, `**${jogador.username}**, seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.background)
 											else {
 												jogador.emRoubo = {
@@ -1830,7 +1817,7 @@ Aceitar convite?`)
 													user: `${bot.config.cash} BANCO`,
 													isAlvo: false
 												}
-												bot.data.set(newplayer.id, jogador)
+												await bot.data.set(newplayer.id, jogador)
 												players.push(newplayer.id)
 												if (players.length === uGang.espacoMembro)
 													collector.stop()
@@ -1883,37 +1870,37 @@ Aceitar convite?`)
 											.setColor(uGang.cor)
 
 										message.channel.send({embeds: [embed_bank_inicio]}).then(message_bank => {
-											setTimeout(() => {
+											setTimeout(async () => {
 												if (golpe < chance) {
 													let porcentagem_roubada = uGang.base === "motoclube" ? bot.getRandom(10 + uGang.baseLevel, 20 + uGang.baseLevel) : bot.getRandom(10, 20)
-													let valor_roubado = Math.floor(bot.banco.get('caixa') * porcentagem_roubada / 100)
+													let valor_roubado = Math.floor(await bot.banco.get('caixa') * porcentagem_roubada / 100)
 													let adicional = 1 // caixa ganha 1
 													let parte = Math.floor(valor_roubado / (players.length + adicional))
 
-													players.forEach(membro => {
-														let userD = bot.data.get(membro)
+													for (const membro of players) {
+														let userD = await bot.data.get(membro)
 														userD.roubo = currTime + ((userD.classe === 'ladrao' ? Math.round(1.15 * 2700000) : (userD.classe === 'advogado' ? Math.round(0.85 * 2700000) : 2700000))) //+45m
 														userD.moni += userD.classe === 'ladrao' ? Math.floor(parte * 1.1) : parte
 														userD.emRoubo.tempo = 0
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user => user.send(`Você já pode roubar novamente! ${bot.config.roubar}`)
 																.catch(() => message.reply(`você já pode roubar novamente! ${bot.config.roubar}`)
-																	.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																	.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															)
 														}, 2700000)
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user => user.send(`Sua gangue **${uGang.nome}** já pode tentar roubar o ${bot.config.cash} **Banco** novamente! ${getIcone(uGang.boneco)}`)
 																.catch(() => message.reply(`sua gangue **${uGang.nome}** já pode tentar roubar o ${bot.config.cash} **Banco** novamente! ${getIcone(uGang.boneco)}`)
-																	.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																	.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															)
 														}, 86400000)
-														bot.data.set(membro, userD)
-													})
-													bot.banco.set('caixa', bot.banco.get('caixa') - valor_roubado)
+														await bot.data.set(membro, userD)
+													}
+													await bot.banco.set('caixa', await bot.banco.get('caixa') - valor_roubado)
 													uGang.valorRoubadoBanco += valor_roubado
 													uGang.caixa += parte
 													uGang.golpeW++
-													bot.gangs.set(uData.gangID.toString(), uGang)
+													await bot.gangs.set(uData.gangID.toString(), uGang)
 
 													const embed_bank_final = new Discord.MessageEmbed()
 														//.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770078593975320596/radar_cash.png`)
@@ -1927,21 +1914,21 @@ Aceitar convite?`)
 												}
 												else {
 													let tempo_preso = bot.getRandom(28800000, 36000000) //8h a 10h
-													players.forEach(membro => {
-														let userD = bot.data.get(membro)
+													for (const membro of players) {
+														let userD = await bot.data.get(membro)
 														userD.preso = currTime + (userD.classe === 'ladrao' ? Math.floor(tempo_preso * 1.15) : tempo_preso)
 														userD.roubosL++
 														userD.emRoubo.tempo = 0
-														bot.data.set(membro, userD)
+														await bot.data.set(membro, userD)
 														setTimeout(() => {
 															bot.users.fetch(membro).then(user => user.send(`Você está livre! ${bot.config.police}`)
 																.catch(() => message.reply(`você está livre! ${bot.config.police}`)
-																	.catch(() => `Não consegui responder ${bot.data.get(membro, "username")} nem no PV nem no canal. \`Gang\``))
+																	.catch(async () => `Não consegui responder ${await bot.data.get(membro + ".username")} nem no PV nem no canal. \`Gang\``))
 															)
 														}, tempo_preso)
-													})
+													}
 													uGang.golpeL++
-													bot.gangs.set(uData.gangID.toString(), uGang)
+													await bot.gangs.set(uData.gangID.toString(), uGang)
 
 													const embed_bank_final = new Discord.MessageEmbed()
 														//.setThumbnail(`https://media.discordapp.net/attachments/531174573463306240/770078593975320596/radar_cash.png`)
@@ -1964,8 +1951,8 @@ Aceitar convite?`)
 
 	}
 	else if (option === 'tag') { //lider
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -1988,30 +1975,23 @@ Aceitar convite?`)
 		let regex = /^[a-zA-Z0-9 !$.,%^&()+=/\\]{2,32}$/ugm
 		if (!regex.test(tag))
 			return bot.createEmbed(message, `Defina outra TAG ${getIcone(uGang.boneco)}`, `Esta TAG é inválida`, uGang.cor)
-
-		let achou = false
-		bot.gangs.forEach(gang => {
-			if (gang !== '') {
-				if (tag.toLowerCase() === gang.tag.toLowerCase())
-					achou = true
-			}
-
-		})
-		if (achou) return bot.createEmbed(message, `Esta TAG de gangue já está em uso ${getIcone(uGang.boneco)}`, null, uGang.cor)
+		
+		if (await bot.gangs.find("tag", tag) || await bot.gangs.find(gang => gang.tag?.toLowerCase() === tag.toLowerCase()))
+			return bot.createEmbed(message, `Esta TAG de gangue já está em uso ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 		uGang.tag = tag.substring(0, tag.length)
 
 		if (tag.length < 2 || tag.length > 3)
 			return bot.createEmbed(message, `A TAG deve ter 2 ou 3 caracteres ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
-		bot.gangs.set(uData.gangID.toString(), uGang)
+		await bot.gangs.set(uData.gangID.toString(), uGang)
 
 		return bot.createEmbed(message, `A TAG da gangue gangue **${uGang.nome}** foi definida como **${uGang.tag}**! ${getIcone(uGang.boneco)}`, null, uGang.cor)
 
 	}
 	else if (option === 'boneco' || option === 'icone') { //lider 
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if (!uGang)
 			return bot.createEmbed(message, `Você não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
@@ -2050,7 +2030,7 @@ Aceitar convite?`)
 					if (bonecos.includes(reaction.emoji.id))
 						uGang.boneco = bonecos.indexOf(reaction.emoji.id)
 
-					bot.gangs.set(uData.gangID.toString(), uGang)
+					await bot.gangs.set(uData.gangID?.toString(), uGang)
 
 					const embedEd = new Discord.MessageEmbed()
 						.setTitle(`${getIcone(uGang.boneco)} Ícone`)
@@ -2072,8 +2052,8 @@ Aceitar convite?`)
 
 	}
 	else {
-		let uData = bot.data.get(message.author.id)
-		let uGang = bot.gangs.get(uData.gangID)
+		let uData = await bot.data.get(message.author.id)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 
 		if ((uData.gangID == null && !option) || option === 'info') {
 			const embed = new Discord.MessageEmbed()
@@ -2126,29 +2106,30 @@ Aceitar convite?`)
 			let uID
 
 			if (!option)
-				uGang = bot.gangs.get(uData.gangID)
+				uGang = await bot.gangs.get(uData.gangID?.toString())
 
-			uID = uData.gangID
+			uID = uData.gangID?.toString()
 
 			if (option) {
 				if (target) {
-					let targetD = bot.data.get(target.id)
+					let targetD = await bot.data.get(target.id)
 					if (!targetD)
 						return bot.createEmbed(message, `Este usuário não possui um inventário ${bot.config.gang}`, null, bot.colors.darkGrey)
 
 					if (targetD.gangID == null)
 						return bot.createEmbed(message, `Este usuário não está em uma gangue ${bot.config.gang}`, null, bot.colors.darkGrey)
 
-					uGang = bot.gangs.get(targetD.gangID)
-					uID = targetD.gangID
+					uGang = await bot.gangs.get(targetD.gangID?.toString())
+					uID = targetD.gangID?.toString()
 
 				}
 				else {
 					let name = args.join(" ").toLowerCase()
-					bot.gangs.forEach((gang, id) => {
+
+					await bot.gangs.map(async (gang, id) => {
 						if (gang !== '') {
 							if (name === gang.nome.toLowerCase() || name === gang.tag.toLowerCase()) {
-								uGang = bot.gangs.get(id)
+								uGang = await bot.gangs.get(id)
 								uID = id
 							}
 						}
@@ -2163,7 +2144,7 @@ Aceitar convite?`)
 			// let topDeposito = []
 			// uGang.membros.forEach((user, id) => {
 			// 	top.push({
-			// 		nick: bot.data.get(id, 'username'),
+			// 		nick: await bot.data.get(id, 'username'),
 			// 		id: id,
 			// 		deposito: user.depositado
 			// 	})
@@ -2191,23 +2172,23 @@ Aceitar convite?`)
 					})
 			})
 
-			let lista_membros = `♦️ **${bot.data.get(lider.id, "username")}**\n`
+			let lista_membros = `♦️ **${await bot.data.get(lider.id + ".username")}**\n`
 			let lista_membros_ID = `♦️ **${lider.id}**\n`
-			let lista_membros_deposits = `♦️ **${bot.data.get(lider.id, "username")}** R$ ${lider.depositado.toLocaleString().replace(/,/g, ".")}\n`
+			let lista_membros_deposits = `♦️ **${await bot.data.get(lider.id + ".username")}** R$ ${lider.depositado.toLocaleString().replace(/,/g, ".")}\n`
 			let lista_membros_deposits2 = ''
 
 			for (let vice of vices) {
-				lista_membros += `:small_orange_diamond: ${bot.data.get(vice.id, "username")}\n`
+				lista_membros += `:small_orange_diamond: ${await bot.data.get(vice.id + ".username")}\n`
 				lista_membros_ID += `:small_orange_diamond: ${vice.id}\n`
-				lista_membros_deposits += `:small_orange_diamond: **${bot.data.get(vice.id, "username")}** R$ ${vice.depositado.toLocaleString().replace(/,/g, ".")}\n`
+				lista_membros_deposits += `:small_orange_diamond: **${await bot.data.get(vice.id + ".username")}** R$ ${vice.depositado.toLocaleString().replace(/,/g, ".")}\n`
 			}
 			for (let membro of membros) {
-				lista_membros += `:white_small_square: ${bot.data.get(membro.id, "username")}\n`
+				lista_membros += `:white_small_square: ${await bot.data.get(membro.id + ".username")}\n`
 				lista_membros_ID += `:white_small_square: ${membro.id}\n`
 				if (lista_membros_deposits.length < 512)
-					lista_membros_deposits += `:white_small_square: **${bot.data.get(membro.id, "username")}** R$ ${membro.depositado.toLocaleString().replace(/,/g, ".")}\n`
+					lista_membros_deposits += `:white_small_square: **${await bot.data.get(membro.id + ".username")}** R$ ${membro.depositado.toLocaleString().replace(/,/g, ".")}\n`
 				else
-					lista_membros_deposits2 += `:white_small_square: **${bot.data.get(membro.id, "username")}** R$ ${membro.depositado.toLocaleString().replace(/,/g, ".")}\n`
+					lista_membros_deposits2 += `:white_small_square: **${await bot.data.get(membro.id + ".username")}** R$ ${membro.depositado.toLocaleString().replace(/,/g, ".")}\n`
 			}
 
 			let nome_base = uGang.base == null ? "Não possui" : bot.bases[uGang.base].desc
@@ -2246,51 +2227,52 @@ Aceitar convite?`)
 			if (lista_membros_deposits2 !== '')
 				embedWithDeposits.addField(`Depósito dos Membros`, lista_membros_deposits2, true)
 
-			function getRow({type = 'nomes'}) {
+			async function getRow({type = 'nomes'}) {
 
-				let gang = bot.gangs.get(uID)
+				let gang = await bot.gangs.get(uID)
+
 				let btnIDs = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Ver IDs')
 					.setEmoji('🆔')
-					.setCustomId(message.id + message.author.id + 'ids')
+					.setCustomId('ids')
 
 				let btnDeps = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Depósitos')
 					.setEmoji('539572031436619777')
-					.setCustomId(message.id + message.author.id + 'deps')
+					.setCustomId('deps')
 
 				let btnNomes = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Ver nomes')
 					.setEmoji('🔡')
-					.setCustomId(message.id + message.author.id + 'nomes')
+					.setCustomId('nomes')
 
 				let btnBase = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Base')
 					.setDisabled(gang.base == null)
-					.setCustomId(message.id + message.author.id + 'base')
+					.setCustomId('base')
 
 				let row = new Discord.MessageActionRow()
 
 				if (type === 'nomes') {
-					if (uData.gangID === uID)
+					if (uData.gangID?.toString() === uID)
 						row.addComponents(btnIDs).addComponents(btnDeps).addComponents(btnBase)
 					else
 						row.addComponents(btnIDs).addComponents(btnBase)
 
 				}
 				else if (type === 'ids') {
-					if (uData.gangID === uID)
+					if (uData.gangID?.toString() === uID)
 						row.addComponents(btnNomes).addComponents(btnDeps).addComponents(btnBase)
 					else
 						row.addComponents(btnNomes).addComponents(btnBase)
 
 				}
 				else if (type === 'deps') {
-					if (uData.gangID === uID)
+					if (uData.gangID?.toString() === uID)
 						row.addComponents(btnNomes).addComponents(btnIDs).addComponents(btnBase)
 					else
 						row.addComponents(btnNomes).addComponents(btnIDs)
@@ -2301,17 +2283,17 @@ Aceitar convite?`)
 
 			let msg = await message.channel.send({
 				embeds: [embedWithoutID],
-				components: [getRow({type: 'nomes'})]
+				components: [await getRow({type: 'nomes'})]
 			})
 
 			const filter = (button) => [
-				message.id + message.author.id + 'ids',
-				message.id + message.author.id + 'deps',
-				message.id + message.author.id + 'nomes',
-				message.id + message.author.id + 'base',
+				'ids',
+				'deps',
+				'nomes',
+				'base',
 			].includes(button.customId) && button.user.id === message.author.id
 
-			const collector = message.channel.createMessageComponentCollector({
+			const collector = msg.createMessageComponentCollector({
 				filter,
 				time: 90000,
 			})
@@ -2319,28 +2301,28 @@ Aceitar convite?`)
 			collector.on('collect', async b => {
 				await b.deferUpdate()
 
-				if (b.customId === message.id + message.author.id + 'nomes') {
+				if (b.customId === 'nomes') {
 					msg.edit({
 						embeds: [embedWithoutID],
-						components: [getRow({type: 'nomes'})]
+						components: [await getRow({type: 'nomes'})]
 					}).catch(() => console.log("Não consegui editar mensagem `gang`"))
 
 				}
-				else if (b.customId === message.id + message.author.id + 'ids') {
+				else if (b.customId === 'ids') {
 					msg.edit({
 						embeds: [embedWithID],
-						components: [getRow({type: 'ids'})]
+						components: [await getRow({type: 'ids'})]
 					}).catch(() => console.log("Não consegui editar mensagem `gang`"))
 
 				}
-				else if (b.customId === message.id + message.author.id + 'deps') {
+				else if (b.customId === 'deps') {
 					msg.edit({
 						embeds: [embedWithDeposits],
-						components: [getRow({type: 'deps'})]
+						components: [await getRow({type: 'deps'})]
 					}).catch(() => console.log("Não consegui editar mensagem `gang`"))
 
 				}
-				else if (b.customId === message.id + message.author.id + 'base')
+				else if (b.customId === 'base')
 					bot.commands.get('gang').run(bot, message, ['base', uGang.nome])
 
 			})

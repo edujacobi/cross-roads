@@ -3,7 +3,7 @@ const wait = require('util').promisify(setTimeout)
 exports.run = async (bot, message, args) => {
 	let target = message.mentions.members.first()
 	let option = args ? args[0] : null
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let currTime = new Date().getTime()
 
 	let emote = bot.config.namoro
@@ -14,12 +14,12 @@ exports.run = async (bot, message, args) => {
 				.setStyle('SECONDARY')
 				.setLabel('Comprar anel')
 				.setEmoji(bot.aneis.prata.emote)
-				.setCustomId(message.id + message.author.id + 'anel'))
+				.setCustomId('anel'))
 			
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Mais informações')
-				.setCustomId(message.id + message.author.id + 'info'))
+				.setCustomId('info'))
 
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${emote} Casamento`)
@@ -39,14 +39,14 @@ exports.run = async (bot, message, args) => {
 		}).catch(() => console.log("Não consegui enviar mensagem `casar`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'anel',
-			message.id + message.author.id + 'info',
-			message.id + message.author.id + 'prata',
-			message.id + message.author.id + 'ouro',
-			message.id + message.author.id + 'diamante',
+			'anel',
+			'info',
+			'prata',
+			'ouro',
+			'diamante',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			idle: 90000
 		})
@@ -54,7 +54,7 @@ exports.run = async (bot, message, args) => {
 		collector.on('collect', async b => {
 			await b.deferUpdate()
 
-			if (b.customId === message.id + message.author.id + 'info') {
+			if (b.customId === 'info') {
 				const embed = new Discord.MessageEmbed()
 					.setTitle(`${emote} Mais informações do Casamento`)
 					.setColor(bot.colors.casamento)
@@ -71,7 +71,7 @@ exports.run = async (bot, message, args) => {
 				}).catch(() => console.log("Não consegui enviar mensagem `casar info`"))
 			}
 
-			uData = bot.data.get(message.author.id)
+			uData = await bot.data.get(message.author.id)
 
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.aneis.prata.emote} Anéis`)
@@ -83,7 +83,7 @@ exports.run = async (bot, message, args) => {
 			
 			if (uData.casamentoID != null){
 				embed.description += "\nVocê já é casado"
-				if (bot.casais.get(uData.casamentoID, 'anel') === 'diamante')
+				if (bot.casais.get(uData.casamentoID + '.anel') === 'diamante')
 					embed.description += " e já possui o melhor anel disponível em seu casamento."
 				else
 					embed.description += ", mas pode comprar outro anel para aumentar os benefícios!"
@@ -99,19 +99,19 @@ exports.run = async (bot, message, args) => {
 
 			const rowAneis = new Discord.MessageActionRow()
 			
-			let uCasamento = bot.casais.get(uData.casamentoID)
+			let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
-			Object.values(bot.aneis).forEach(anel => {
+			for (const anel of Object.values(bot.aneis)) {
 				rowAneis.addComponents(new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel(anel.desc)
 					.setEmoji(anel.emote)
-					.setDisabled(uData.casamentoID != null && uCasamento?.anel != null ? anel.id <= bot.aneis[bot.casais.get(uData.casamentoID, 'anel')].id : false)
-					.setCustomId(message.id + message.author.id + anel.desc.toLowerCase())
+					.setDisabled(uData.casamentoID != null && uCasamento?.anel != null ? anel.id <= bot.aneis[await bot.casais.get(`${uData.casamentoID}.anel`)].id : false)
+					.setCustomId(anel.desc.toLowerCase())
 				)
-			})
+			}
 
-			if (b.customId === message.id + message.author.id + 'anel') {
+			if (b.customId === 'anel') {
 				msg.edit({
 					components: uData.anel == null ? [rowAneis] : [],
 					embeds: [embed]
@@ -130,10 +130,10 @@ exports.run = async (bot, message, args) => {
 					return bot.msgPreso(message, uData)
 				if (uData.hospitalizado > currTime)
 					return bot.msgHospitalizado(message, uData)
-				if (bot.isPlayerMorto(uData)) return
-				if (bot.isUserEmRouboOuEspancamento(message, uData))
+				if (await bot.isPlayerMorto(uData)) return
+				if (await bot.isUserEmRouboOuEspancamento(message, uData))
 					return
-				if (bot.isGaloEmRinha(message.author.id))
+				if (await bot.isGaloEmRinha(message.author.id))
 					return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 				if (uData.job != null)
 					return bot.msgTrabalhando(message, uData)
@@ -166,19 +166,19 @@ exports.run = async (bot, message, args) => {
 				// if (!(bot.isAdmin(message.author.id) || bot.isMod(message.author.id) || uData.vipTime > currTime))
 				// 	return bot.createEmbed(message, `${emote} Casamentos em breve!`, "Mas sabe-se lá quando", bot.colors.casamento)
 
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 
 			}
 		})
 	}
 
 	if (target) {
-		let tData = bot.data.get(target.id)
+		let tData = await bot.data.get(target.id)
 		if (!tData) return bot.createEmbed(message, "Este usuário não possui um inventário", null, bot.colors.casamento)
 		if (uData.conjuge != null)
-			return bot.createEmbed(message, `${emote} Você já é casado com ${bot.data.get(uData.conjuge, 'username')}!`, null, bot.colors.casamento)
+			return bot.createEmbed(message, `${emote} Você já é casado com ${await bot.data.get(`${uData.conjuge}.username`)}!`, null, bot.colors.casamento)
 		if (tData.conjuge != null)
-			return bot.createEmbed(message, `${emote} ${tData.username} já é casado com ${bot.data.get(tData.conjuge, 'username')}!`, null, bot.colors.casamento)
+			return bot.createEmbed(message, `${emote} ${tData.username} já é casado com ${await bot.data.get(`${tData.conjuge}.username`)}!`, null, bot.colors.casamento)
 		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
 		if (tData.preso > currTime)
@@ -187,17 +187,17 @@ exports.run = async (bot, message, args) => {
 			return bot.msgHospitalizado(message, uData)
 		if (tData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, tData, tData.username)
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-		if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+		if (await bot.isAlvoEmRouboOuEspancamento(message, tData))
 			return
-		if (bot.isPlayerMorto(tData))
+		if (await bot.isPlayerMorto(tData))
 			return bot.msgPlayerMorto(message, tData.username)
-		if (bot.isPlayerViajando(tData))
+		if (await bot.isPlayerViajando(tData))
 			return bot.msgPlayerViajando(message, tData.username)
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
-		if (bot.isGaloEmRinha(target.id))
+		if (await bot.isGaloEmRinha(target.id))
 			return bot.createEmbed(message, `O galo de **${tData.username}** está em uma rinha e ele não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 		if (uData.job != null)
 			return bot.msgTrabalhando(message, uData)
@@ -234,12 +234,12 @@ exports.run = async (bot, message, args) => {
 		const buttonSim = new Discord.MessageButton()
 			.setStyle('SUCCESS')
 			.setLabel('SIM!')
-			.setCustomId(message.id + message.author.id + 'sim')
+			.setCustomId('sim')
 
 		const buttonNao = new Discord.MessageButton()
 			.setStyle('DANGER')
 			.setLabel('Não...')
-			.setCustomId(message.id + message.author.id + 'nao')
+			.setCustomId('nao')
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(buttonSim)
@@ -251,11 +251,11 @@ exports.run = async (bot, message, args) => {
 		}).catch(() => console.log("Não consegui editar mensagem `casar`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'sim',
-			message.id + message.author.id + 'nao'
+			'sim',
+			'nao'
 		].includes(button.customId) && button.user.id === target.id
 
-		const collectorAceito = message.channel.createMessageComponentCollector({
+		const collectorAceito = msg.createMessageComponentCollector({
 			filter,
 			time: 90000,
 			max: 1
@@ -266,11 +266,11 @@ exports.run = async (bot, message, args) => {
 		collectorAceito.on('collect', async b => {
 			await b.deferUpdate()
 
-			if (b.customId === message.id + message.author.id + 'sim') {
+			if (b.customId === 'sim') {
 				if (uData.conjuge != null)
-					return bot.createEmbed(message, `Você já é casado com ${bot.data.get(uData.conjuge, 'username')}!`, null, bot.colors.casamento)
+					return bot.createEmbed(message, `Você já é casado com ${await bot.data.get(`${uData.conjuge}.username`)}!`, null, bot.colors.casamento)
 				if (tData.conjuge != null)
-					return bot.createEmbed(message, `${tData.username} já é casado com ${bot.data.get(tData.conjuge, 'username')}!`, null, bot.colors.casamento)
+					return bot.createEmbed(message, `${tData.username} já é casado com ${await bot.data.get(`${tData.conjuge}.username`)}!`, null, bot.colors.casamento)
 				if (uData.anel == null)
 					return bot.createEmbed(message, `Você não possui um ${bot.aneis.prata.emote} Anel! Compre um para fazer um pedido de casamento`, null, bot.colors.casamento)
 				if (tData.anel == null || tData.anel !== uData.anel)
@@ -280,8 +280,8 @@ exports.run = async (bot, message, args) => {
 				let anelLog = uData.anel
 				uData.anel = null
 				tData.anel = null
-				uData.conjuge = target.id
-				tData.conjuge = message.author.id
+				uData.conjuge = target.id.toString()
+				tData.conjuge = message.author.id.toString()
 				uData.casamentoID = bot.casais.size
 				tData.casamentoID = bot.casais.size
 
@@ -301,10 +301,10 @@ exports.run = async (bot, message, args) => {
 					ultimoDecrescimo: 0,
 				}
 
-				bot.casais.ensure((bot.casais.size).toString(), casamento)
+				await bot.casais.ensure((await bot.casais.size).toString(), casamento)
 
-				bot.data.set(message.author.id, uData)
-				bot.data.set(target.id, tData)
+				await bot.data.set(message.author.id, uData)
+				await bot.data.set(target.id, tData)
 
 				embed.setThumbnail('https://media.discordapp.net/attachments/531174573463306240/862135638945824768/radar_girlfriend.png')
 					.setTitle(`${emote} Eu vos declaro Casados!`)

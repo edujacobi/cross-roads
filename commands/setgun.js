@@ -17,15 +17,15 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `${bot.config.emmetGun} \`;setgun <horas> <id> <arma>\``)
 
 	if (horas % 1 != 0)
-		return bot.createEmbed(message, `PQP, ${bot.data.get(message.author.id, "username")}, as horas são inválidas`)
+		return bot.createEmbed(message, `PQP, ${await bot.data.get(message.author.id + ".username")}, as horas são inválidas`)
 
 	if (id <= 0 || (id % 1 != 0) || id.toString().length != 18)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}i, o ID é inválido`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}i, o ID é inválido`)
 
 	if (!arma)
-		return bot.createEmbed(message, `Pelo amor de deus, ${bot.data.get(message.author.id, "username")}, escolha uma arma`)
+		return bot.createEmbed(message, `Pelo amor de deus, ${await bot.data.get(message.author.id + ".username")}, escolha uma arma`)
 
-	let uData = bot.data.get(id)
+	let uData = await bot.data.get(id)
 
 	if (!uData || uData.username == undefined) return bot.createEmbed(message, `Este usuário não possui um inventário`)
 
@@ -36,20 +36,20 @@ exports.run = async (bot, message, args) => {
 		}
 	})
 	if (achou == false)
-		return bot.createEmbed(message, `Puta merda, ${bot.data.get(message.author.id, "username")}, essa arma não existe`)
+		return bot.createEmbed(message, `Puta merda, ${await bot.data.get(message.author.id + ".username")}, essa arma não existe`)
 
 	let gun = bot.guns[achou]
-	let emoji = gun.skins.default.emote 
+	let emoji = gun.skins.default.emote
 
 	bot.createEmbed(message, `${bot.config.emmetGun} ${uData.username} recebeu ${horas} horas de ${emoji} ${gun.desc}`)
 
 	const armaRecebida = new Discord.MessageEmbed()
 		.setColor(bot.colors.darkGrey)
-		.setDescription(`**${bot.data.get(message.author.id, "username")}** te deu ${horas} horas de ${emoji} ${gun.desc} ${bot.config.emmetGun}`)
+		.setDescription(`**${await bot.data.get(message.author.id + ".username")}** te deu ${horas} horas de ${emoji} ${gun.desc} ${bot.config.emmetGun}`)
 
-	bot.users.fetch(id).then(user => user.send({
-		embeds: [armaRecebida]
-	}).catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
+	bot.users.fetch(id).then(user =>
+		user.send({embeds: [armaRecebida]})
+			.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
 
 	Object.entries(uData.arma).forEach(([key, arma]) => {
 		if (key == dataBase) {
@@ -60,9 +60,9 @@ exports.run = async (bot, message, args) => {
 		}
 	})
 
-	bot.data.set(id, uData)
+	await bot.data.set(id, uData)
 	return bot.log(message, new Discord.MessageEmbed()
-		.setDescription(`**${uData.username} recebeu ${horas} horas de ${emoji} de ${bot.data.get(message.author.id, "username")}**`)
+		.setDescription(`**${uData.username} recebeu ${horas} horas de ${emoji} de ${await bot.data.get(message.author.id + ".username")}**`)
 		.setColor(bot.colors.admin))
 
 }

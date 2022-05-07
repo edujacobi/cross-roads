@@ -42,7 +42,7 @@ exports.run = async (bot, interaction) => {
 		.setColor(0xffd700)
 		.addField("Vantagens", beneficios())
 		.addField("Como adquirir", "Mande uma DM pro Jacobi#5109. Caso não consiga, entre no servidor do Cross Roads. Valores: R$ 10,00 = 1 mês. R$ 25,00 = 3 meses.")
-		.setFooter({text: bot.data.get(interaction.user.id, "username"), iconURL: interaction.member.user.avatarURL()})
+		.setFooter({text: await bot.data.get(interaction.user.id + ".username"), iconURL: interaction.member.user.avatarURL()})
 		.setTimestamp()
 
 	let row = new Discord.MessageActionRow()
@@ -69,8 +69,8 @@ exports.run = async (bot, interaction) => {
 	let vipsTotal = []
 	let vips = []
 	let currTime = new Date().getTime()
-
-	bot.data.forEach(user => {
+	
+	await bot.data.filter(user => {
 		if (user.vipTime > currTime) {
 			vipsTotal.push({
 				nick: user.username,

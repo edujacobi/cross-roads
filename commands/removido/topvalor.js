@@ -38,7 +38,7 @@ exports.run = async (bot, message, args) => {
 			topGlobal.forEach((user, i) => {
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
 				let mod = user.id == message.author.id ? "__" : ""
-				let viagem = bot.isPlayerViajando(bot.data.get(user.id)) ? `${bot.config.aviao} ` : ''
+				let viagem = await bot.isPlayerViajando(bot.data.get(user.id)) ? `${bot.config.aviao} ` : ''
 				topGlobalString += `\`${i + start + 1}.\` ${viagem}${emote} ${mod}**${user.nick}**${mod} R$ ${user.money.toLocaleString().replace(/,/g, ".")}\n`;
 				topGlobalStringID += `\`${i + start + 1}.\`${viagem}${emote} ${mod}**${user.nick}**${mod} ${user.id}\n`;
 			});
@@ -46,7 +46,7 @@ exports.run = async (bot, message, args) => {
 			if (userComando) {
 				let user = bot.data.get(userComando.id)
 				const i = top.indexOf(userComando)
-				let viagem = bot.isPlayerViajando(user) ? `${bot.config.aviao} ` : ''
+				let viagem = await bot.isPlayerViajando(user) ? `${bot.config.aviao} ` : ''
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
 				topGlobalString += `\`${i + 1}.\` ${viagem}${emote} __**${user.username}**__ R$ ${(user.moni + user.ficha * 80).toLocaleString().replace(/,/g, ".")}\n`;
 			}

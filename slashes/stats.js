@@ -25,6 +25,8 @@ exports.run = async (bot, interaction) => {
     })
 
     let online = '<:online:763539013574459402>'
+    
+    let players = await bot.data.size
 
     const embed = new Discord.MessageEmbed()
         .setTitle(`📊 Estatísticas`)
@@ -33,7 +35,7 @@ exports.run = async (bot, interaction) => {
         .addField("Tempo online", bot.segToHour(Math.floor(bot.uptime / 1000)), true)
         .addField("Temporada 7", minToMonths((new Date() - new Date(2022, 0, 31)) / 1000 / 60), true)
         //.addField("Usuários", bot.users.cache.size, true)
-        .addField("Jogadores", bot.data.indexes.length.toString(), true)
+        .addField("Jogadores", players.toString(), true)
         //.addField("Servidores", bot.guilds.cache.size, true)
         //.addField("Canais", bot.channels.cache.size, true)
         .addField("Discord.js", ` v${Discord.version}`, true)

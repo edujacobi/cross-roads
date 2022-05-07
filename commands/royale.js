@@ -16,8 +16,8 @@ exports.run = async (bot, message, args) => {
 	players.push(message.author.id)
 
 	let time = new Date().getTime()
-	let uData = bot.data.get(message.author.id)
-	let uGalo = bot.galos.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
+	let uGalo = await bot.galos.get(message.author.id)
 
 	if (!args[0]) {
 		const embed = new Discord.MessageEmbed()
@@ -66,7 +66,7 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 	// 	return bot.createEmbed(message, `O valor máximo de aposta no Battle Royale é R$ ${apostaMAX.toLocaleString().replace(/,/g, ".")} ${bot.config.galo}`, null, bot.colors.white)
 	else if (uData.preso > time)
 		return bot.msgPreso(message, uData)
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 	if (uData.hospitalizado > time)
 		return bot.msgHospitalizado(message, uData)
@@ -97,24 +97,24 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			.setStyle('SECONDARY')
 			.setLabel('Participar')
 			.setEmoji(participar)
-			.setCustomId(message.id + message.author.id + 'participar'))
+			.setCustomId('participar'))
 		.addComponents(new Discord.MessageButton()
 			.setStyle('DANGER')
 			.setLabel('Cancelar')
 			.setEmoji(cancelar)
-			.setCustomId(message.id + message.author.id + 'cancelar'))
+			.setCustomId('cancelar'))
 
 	let msg = await message.channel.send({embeds: [embed], components: [row]})
 		.catch(() => console.log("Não consegui enviar mensagem `royale`"))
 
-	// bot.galos.set(message.author.id, true, 'emRinha')
+	// await bot.galos.set(message.author.id, true, 'emRinha')
 
 	const filter = (button) => [
-		message.id + message.author.id + 'participar',
-		message.id + message.author.id + 'cancelar',
+		'participar',
+		'cancelar',
 	].includes(button.customId)
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter,
 		time: 90000,
 	})
@@ -124,13 +124,13 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 
 	collector.on('collect', async b => {
 		await b.deferUpdate()
-		if (b.customId === message.id + message.author.id + 'participar') {
+		if (b.customId === 'participar') {
 			if (players.includes(b.user.id))
 				return
 
 			let newplayer = b.user
-			let jogador = bot.data.get(newplayer.id)
-			let galo = bot.galos.get(newplayer.id)
+			let jogador = await bot.data.get(newplayer.id)
+			let galo = await bot.galos.get(newplayer.id)
 			time = new Date().getTime()
 
 			//verificador
@@ -152,25 +152,25 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 					bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour((jogador.preso - time) / 1000)} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 				else if (jogador.hospitalizado > time)
 					bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour((jogador.hospitalizado - time) / 1000)} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-				else if (bot.isPlayerMorto(jogador))
+				else if (await bot.isPlayerMorto(jogador))
 					bot.msgPlayerMorto(message, jogador.username)
-				else if (bot.isPlayerViajando(jogador))
+				else if (await bot.isPlayerViajando(jogador))
 					bot.msgPlayerViajando(message, jogador, jogador.username)
 				else if (jogador.moni < 1)
 					bot.createEmbed(message, `**${jogador.username}** não tem dinheiro suficiente para fazer isto`, null, bot.colors.background)
 				else if (jogador.emRoubo.tempo > time || jogador.emEspancamento.tempo > time)
-					bot.isUserEmRouboOuEspancamento(message, jogador, jogador.username)
+					await bot.isUserEmRouboOuEspancamento(message, jogador, jogador.username)
 				else if (jogador.moni < aposta)
 					bot.createEmbed(message, `**${jogador.username}** não tem esta quantidade de dinheiro para fazer isto`, null, bot.colors.background)
 				else if (galo.power < LVL_MIN)
 					bot.createEmbed(message, `**${jogador.username}**, seu galo precisa estar nível ${LVL_MIN} para poder participar do Battle Royale ${bot.config.galo}`, null, bot.colors.background)
 				else if (galo.emRinha)
 					bot.createEmbed(message, `**${jogador.username}**, seu galo já está em uma rinha ${bot.config.galo}`, null, bot.colors.background)
-				else if (bot.isPlayerViajando(jogador))
+				else if (await bot.isPlayerViajando(jogador))
 					bot.msgPlayerViajando(message, jogador, jogador.username)
 
 				else if (players.indexOf(newplayer.id < 0)) {
-					// bot.galos.set(newplayer.id, true, 'emRinha')
+					// await bot.galos.set(newplayer.id, true, 'emRinha')
 					players.push(newplayer.id)
 
 					// copia o campo do embed pra um novo objeto
@@ -192,7 +192,7 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			}
 
 		}
-		else if (b.customId === message.id + message.author.id + 'cancelar') {
+		else if (b.customId === 'cancelar') {
 			if (b.user.id !== message.author.id)
 				return
 			if (canCancel) {
@@ -225,9 +225,9 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			return
 		}
 
-		players.forEach(id => {
-			let jogador = bot.data.get(id)
-			let galo = bot.galos.get(id)
+		for (const id of players) {
+			let jogador = await bot.data.get(id)
+			let galo = await bot.galos.get(id)
 
 			if (galo.descansar > time)
 				return bot.createEmbed(message, `**${jogador.username}**, seu galo está descansando. Ele poderá lutar em ${bot.segToHour((galo.descansar - time) / 1000)} ${bot.config.galo}`, null, bot.colors.background)
@@ -239,40 +239,40 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 				return bot.createEmbed(message, `**${jogador.username}**, você está preso por mais ${bot.segToHour((jogador.preso - time) / 1000)} e não pode fazer isto ${bot.config.police}`, null, bot.colors.background)
 			else if (jogador.hospitalizado > time)
 				return bot.createEmbed(message, `**${jogador.username}**, você está hospitalizado por mais ${bot.segToHour((jogador.hospitalizado - time) / 1000)} e não pode fazer isto ${bot.config.hospital}`, null, bot.colors.background)
-			else if (bot.isPlayerMorto(jogador))
+			else if (await bot.isPlayerMorto(jogador))
 				return bot.msgPlayerMorto(message, jogador, jogador.username)
-			else if (bot.isPlayerViajando(jogador))
+			else if (await bot.isPlayerViajando(jogador))
 				return bot.msgPlayerViajando(message, jogador, jogador.username)
 			else if (jogador.moni < 1)
 				return bot.createEmbed(message, `**${jogador.username}** não tem dinheiro suficiente para fazer isto`, null, bot.colors.background)
 			else if (jogador.emRoubo.tempo > time || jogador.emEspancamento.tempo > time)
-				return bot.isUserEmRouboOuEspancamento(message, jogador, jogador.username)
+				return await bot.isUserEmRouboOuEspancamento(message, jogador, jogador.username)
 			else if (jogador.moni < aposta)
 				return bot.createEmbed(message, `**${jogador.username}** não tem esta quantidade de dinheiro para fazer isto`, null, bot.colors.background)
 			else if (galo.power < LVL_MIN)
 				return bot.createEmbed(message, `**${jogador.username}**, seu galo precisa estar nível ${LVL_MIN} para poder participar do Battle Royale ${bot.config.galo}`, null, bot.colors.background)
 			else if (galo.emRinha)
 				return bot.createEmbed(message, `**${jogador.username}**, seu galo já está em uma rinha ${bot.config.galo}`, null, bot.colors.background)
-			else if (bot.isPlayerViajando(jogador))
+			else if (await bot.isPlayerViajando(jogador))
 				return bot.msgPlayerViajando(message, jogador, jogador.username)
-		})
+		}
 
-		players.forEach(player => {
-			bot.galos.set(player, true, 'emRinha')
-		})
-		bot.galos.set(message.author.id, true, 'emRinha')
+		for (const player of players)
+			await bot.galos.set(player + '.emRinha', true)
+		
+		await bot.galos.set(message.author.id + '.emRinha', true)
 
 		canCancel = false
 		//return bot.createEmbed(message, "Obrigado por testar. O Battle Royale estará disponível em breve")
 		let participantes = []
-		players.forEach(player => {
+		for (const player of players)
 			participantes.push({
 				id: player,
-				data: bot.data.get(player),
-				galo: bot.galos.get(player),
-				chance: bot.galos.get(player, 'power') * bot.getRandom(1, 100)
+				data: await bot.data.get(player),
+				galo: await bot.galos.get(player),
+				chance: await bot.galos.get(player + '.power') * bot.getRandom(1, 100)
 			})
-		})
+		
 
 		participantes = participantes.sort((a, b) => {
 			return a.chance - b.chance
@@ -407,10 +407,10 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			mensagemLevelUp = `**${vencedor.galo.nome}** subiu para o nível ${vencedor.galo.power - 30}!\n`
 		}
 
-		bot.data.set(vencedor.id, vencedor.data)
-		bot.galos.set(vencedor.id, vencedor.galo)
+		await bot.data.set(vencedor.id, vencedor.data)
+		await bot.galos.set(vencedor.id, vencedor.galo)
 
-		console.log(`Win: ${vencedor.data.username} R$ ${bot.data.get(vencedor.id, 'moni')}`)
+		console.log(`Win: ${vencedor.data.username} R$ ${await bot.data.get(vencedor.id, 'moni')}`)
 
 		await wait(500)
 
@@ -424,9 +424,9 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 		if (mensagemLevelUp)
 			fimRinha.addField(`<:small_green_triangle:801611850491363410> ${mensagemLevelUp}`, '\u200b')
 
-		perdedores.forEach(player => {
-			let userData = bot.data.get(player.id)
-			let userGalo = bot.galos.get(player.id)
+		for (const player of perdedores){
+			let userData = await bot.data.get(player.id)
+			let userGalo = await bot.galos.get(player.id)
 
 			if (userGalo.power >= 60) {
 				userGalo.power -= 1
@@ -437,11 +437,11 @@ Independente de sua classe, o Battle Royale sempre terá imposto.`)
 			userGalo.emRinha = false
 			userGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
 
-			bot.data.set(player.id, userData)
-			bot.galos.set(player.id, userGalo)
+			await bot.data.set(player.id, userData)
+			await bot.galos.set(player.id, userGalo)
 
-			console.log(`Lost: ${userData.username} R$ ${bot.data.get(player.id, 'moni')}`)
-		})
+			console.log(`Lost: ${userData.username} R$ ${await bot.data.get(player.id, 'moni')}`)
+		}
 
 		message.channel.send({embeds: [fimRinha]})
 			.catch(() => console.log("Não consegui enviar mensagem `royale fim`"))

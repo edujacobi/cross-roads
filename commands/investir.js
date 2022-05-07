@@ -4,7 +4,7 @@ exports.run = async (bot, message, args) => {
 	// if (!bot.isAdmin(message.author.id) && !bot.isMod(message.author.id))
 	// 	return bot.createEmbed(message, `${bot.config.propertyG} Comando em manutenção.`)
 
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 
 	const semana = 604800000 // 7 dias
 	const hora = 3600000 // 1h
@@ -42,7 +42,7 @@ exports.run = async (bot, message, args) => {
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageSelectMenu()
-				.setCustomId(message.id + message.author.id + 'select')
+				.setCustomId('select')
 				.setPlaceholder('Selecione o investimento')
 				.addOptions(investimentos))
 
@@ -50,10 +50,10 @@ exports.run = async (bot, message, args) => {
 			.catch(() => console.log("Não consegui enviar mensagem `investimentos`"))
 
 		const filter = (select) => [
-			message.id + message.author.id + 'select',
+			'select',
 		].includes(select.customId) && select.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			time: 90000,
 		})
@@ -61,7 +61,7 @@ exports.run = async (bot, message, args) => {
 		collector.on('collect', async s => {
 			await s.deferUpdate()
 
-			uData = bot.data.get(message.author.id)
+			uData = await bot.data.get(message.author.id)
 
 			if (uData.invest != null) return
 
@@ -91,14 +91,14 @@ exports.run = async (bot, message, args) => {
 					.setStyle('SUCCESS')
 					.setLabel('Comprar')
 					// .setEmoji(bot.config.propertyR)
-					.setCustomId(message.id + message.author.id + 'comprar'))
+					.setCustomId('comprar'))
 
 			let msgComprar = await message.channel.send({embeds: [embedComprar], components: [rowComprar]})
 				.catch(() => console.log("Não consegui enviar mensagem `investir comprar"))
 
-			const filterComprar = (button) => message.id + message.author.id + 'comprar' === button.customId && button.user.id === message.author.id
+			const filterComprar = (button) => 'comprar' === button.customId && button.user.id === message.author.id
 
-			const collectorComprar = message.channel.createMessageComponentCollector({
+			const collectorComprar = msgComprar.createMessageComponentCollector({
 				filter: filterComprar,
 				time: 90000,
 				max: 1
@@ -107,17 +107,17 @@ exports.run = async (bot, message, args) => {
 			collectorComprar.on('collect', async c => {
 				await c.deferUpdate()
 
-				uData = bot.data.get(message.author.id)
+				uData = await bot.data.get(message.author.id)
 
 				if (uData.preso > currTime)
 					return bot.msgPreso(message, uData)
 				if (uData.hospitalizado > currTime)
 					return bot.msgHospitalizado(message, uData)
-				if (bot.isUserEmRouboOuEspancamento(message, uData))
+				if (await bot.isUserEmRouboOuEspancamento(message, uData))
 					return
-				if (bot.isPlayerViajando(uData))
+				if (await bot.isPlayerViajando(uData))
 					return bot.msgPlayerViajando(message, uData)
-				if (bot.isGaloEmRinha(message.author.id))
+				if (await bot.isGaloEmRinha(message.author.id))
 					return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 				if (uData.invest != null)
 					return bot.createEmbed(message, `Você só pode ter um investimento por vez ${bot.config.propertyG}`, null, 'GREEN')
@@ -134,7 +134,7 @@ exports.run = async (bot, message, args) => {
 					uData.moni -= investimentoSelecionado.valorPago * desconto
 
 					if (uData.classe !== 'mafioso')
-						bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(investimentoSelecionado.preço * bot.imposto))
+						await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(investimentoSelecionado.preço * bot.imposto))
 
 					const embed = new Discord.MessageEmbed()
 						.setDescription(`${bot.config.propertyG} Você adquiriu o investimento **${investimentoSelecionado.desc}!**`)
@@ -143,7 +143,7 @@ exports.run = async (bot, message, args) => {
 						.setFooter(`${uData.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 						.setTimestamp()
 
-					bot.data.set(message.author.id, uData)
+					await bot.data.set(message.author.id, uData)
 
 					msgComprar.edit({embeds: [embed], components: []})
 						.catch(() => console.log("Não consegui editar mensagem `investir`"))
@@ -192,26 +192,26 @@ exports.run = async (bot, message, args) => {
 					.setStyle('SECONDARY')
 					.setLabel(uData.investNotification ? 'Desativar notificações' : 'Ativar notificações')
 					.setEmoji(uData.investNotification ? '🔕' : '🔔')
-					.setCustomId(message.id + message.author.id + 'notificar'))
+					.setCustomId('notificar'))
 
 				.addComponents(new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Ver outros')
 					.setEmoji(bot.config.propertyG)
-					.setCustomId(message.id + message.author.id + 'outros'))
+					.setCustomId('outros'))
 
 				.addComponents(new Discord.MessageButton()
 					.setStyle('DANGER')
 					.setLabel('Parar')
 					// .setEmoji(bot.config.propertyR)
-					.setCustomId(message.id + message.author.id + 'parar'))
+					.setCustomId('parar'))
 
 				.addComponents(new Discord.MessageButton()
 					.setStyle('SUCCESS')
 					.setLabel('Reinvestir')
 					// .setEmoji(bot.config.propertyR)
 					.setDisabled(preco + praSacar > uData.moni)
-					.setCustomId(message.id + message.author.id + 'reinvestir'))
+					.setCustomId('reinvestir'))
 		}
 
 		const embed = new Discord.MessageEmbed()
@@ -235,7 +235,7 @@ exports.run = async (bot, message, args) => {
 		}
 		// if (bot.isPlayerMorto(uData))
 		// 	embed.setDescription(`🪦 Você está morto por mais ${bot.segToHour((currTime - uData.morto)/1000)} e não receberá lucros`)
-		// if (bot.isPlayerViajando(uData))
+		// if (await bot.isPlayerViajando(uData))
 		// 	embed.setDescription(`${bot.config.aviao} Você está viajando e só receberá lucros quando retornar`)
 
 		if ((uData.investTime + semana) < currTime) {
@@ -247,13 +247,13 @@ exports.run = async (bot, message, args) => {
 			.catch(() => console.log("Não consegui enviar mensagem `investir`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'notificar',
-			message.id + message.author.id + 'parar',
-			message.id + message.author.id + 'reinvestir',
-			message.id + message.author.id + 'outros',
+			'notificar',
+			'parar',
+			'reinvestir',
+			'outros',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			time: 90000,
 		})
@@ -261,20 +261,20 @@ exports.run = async (bot, message, args) => {
 		collector.on('collect', async b => {
 			await b.deferUpdate()
 
-			if (b.customId === message.id + message.author.id + 'notificar') {
+			if (b.customId === 'notificar') {
 				if (uData.invest == null)
 					return bot.createEmbed(message, `Você não possui um investimento para receber notificações ${bot.config.propertyG}`, null, 'GREEN')
 
 				uData.investNotification = !uData.investNotification
 
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 
 				// bot.createEmbed(message, `Você ${uData.investNotification ? `receberá` : `não receberá mais`} notificações do investimento ${bot.config.propertyG}`, null, 'GREEN')
 				return msg.edit({embeds: [embed], components: [getRow(uData)]})
 
 			}
-			else if (b.customId === message.id + message.author.id + 'parar') {
-				uData = bot.data.get(message.author.id)
+			else if (b.customId === 'parar') {
+				uData = await bot.data.get(message.author.id)
 				let horas = (uData.investTime + semana) > currTime ? currTime - uData.investLast : uData.investTime + semana - uData.investLast
 				let praSacar = Math.round(((horas / 3600000) * bot.investimentos[uData.invest].lucro))
 
@@ -288,14 +288,14 @@ exports.run = async (bot, message, args) => {
 						.setStyle('DANGER')
 						.setLabel('Parar')
 						// .setEmoji(bot.config.propertyR)
-						.setCustomId(message.id + message.author.id + 'confirmarparar'))
+						.setCustomId('confirmarparar'))
 
 				let msg2 = await message.channel.send({embeds: [embed2], components: [row2]})
 					.catch(() => console.log("Não consegui enviar mensagem `investir parar"))
 
-				const filterParar = (button) => message.id + message.author.id + 'confirmarparar' === button.customId && button.user.id === message.author.id
+				const filterParar = (button) => 'confirmarparar' === button.customId && button.user.id === message.author.id
 
-				const collector2 = message.channel.createMessageComponentCollector({
+				const collector2 = msg2.createMessageComponentCollector({
 					filter: filterParar,
 					time: 90000,
 				})
@@ -303,20 +303,20 @@ exports.run = async (bot, message, args) => {
 				collector2.on('collect', async c => {
 					await c.deferUpdate()
 
-					uData = bot.data.get(message.author.id)
+					uData = await bot.data.get(message.author.id)
 					currTime = Date.now()
 
 					if (uData.preso > currTime)
 						return bot.msgPreso(message, uData)
 					if (uData.hospitalizado > currTime)
 						return bot.msgHospitalizado(message, uData)
-					if (bot.isUserEmRouboOuEspancamento(message, uData))
+					if (await bot.isUserEmRouboOuEspancamento(message, uData))
 						return
-					if (bot.isGaloEmRinha(message.author.id))
+					if (await bot.isGaloEmRinha(message.author.id))
 						return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 					if (uData.invest == null)
 						return bot.createEmbed(message, `Você não pode parar um investimento se você não possui um ${bot.config.propertyG}`, null, 'GREEN')
-					if (bot.isPlayerViajando(uData))
+					if (await bot.isPlayerViajando(uData))
 						return bot.msgPlayerViajando(message, uData)
 
 					let horas = (uData.investTime + semana) > currTime ? currTime - uData.investLast : uData.investTime + semana - uData.investLast
@@ -339,7 +339,7 @@ exports.run = async (bot, message, args) => {
 					msg2.edit({components: []})
 						.catch(() => console.log("Não consegui editar mensagem `investir`"))
 
-					return bot.data.set(message.author.id, uData)
+					return await bot.data.set(message.author.id, uData)
 				})
 
 				collector2.on('end', () => {
@@ -348,8 +348,8 @@ exports.run = async (bot, message, args) => {
 					}).catch(() => console.log("Não consegui editar mensagem `investir`"))
 				})
 			}
-			else if (b.customId === message.id + message.author.id + 'reinvestir') {
-				uData = bot.data.get(message.author.id)
+			else if (b.customId === 'reinvestir') {
+				uData = await bot.data.get(message.author.id)
 				let horas = (uData.investTime + semana) > currTime ? currTime - uData.investLast : uData.investTime + semana - uData.investLast
 				let praSacar = Math.round(((horas / 3600000) * bot.investimentos[uData.invest].lucro))
 				let preco = uData.classe === 'mafioso' ? bot.investimentos[uData.invest].preço : (bot.investimentos[uData.invest].preço + bot.investimentos[uData.invest].preço * bot.imposto)
@@ -365,14 +365,14 @@ exports.run = async (bot, message, args) => {
 						.setStyle('SUCCESS')
 						.setLabel('Reinvestir')
 						// .setEmoji(bot.config.propertyR)
-						.setCustomId(message.id + message.author.id + 'confirmarreinvestir'))
+						.setCustomId('confirmarreinvestir'))
 
 				let msg3 = await message.channel.send({embeds: [embed3], components: [row3]})
 					.catch(() => console.log("Não consegui enviar mensagem `investir reinvestir"))
 
-				const filterReinvestir = (button) => message.id + message.author.id + 'confirmarreinvestir' === button.customId && button.user.id === message.author.id
+				const filterReinvestir = (button) => 'confirmarreinvestir' === button.customId && button.user.id === message.author.id
 
-				const collector3 = message.channel.createMessageComponentCollector({
+				const collector3 = msg3.createMessageComponentCollector({
 					filter: filterReinvestir,
 					time: 90000,
 				})
@@ -380,20 +380,20 @@ exports.run = async (bot, message, args) => {
 				collector3.on('collect', async c => {
 					await c.deferUpdate()
 
-					uData = bot.data.get(message.author.id)
+					uData = await bot.data.get(message.author.id)
 					currTime = Date.now()
 
 					if (uData.preso > currTime)
 						return bot.msgPreso(message, uData)
 					if (uData.hospitalizado > currTime)
 						return bot.msgHospitalizado(message, uData)
-					if (bot.isUserEmRouboOuEspancamento(message, uData))
+					if (await bot.isUserEmRouboOuEspancamento(message, uData))
 						return
-					if (bot.isGaloEmRinha(message.author.id))
+					if (await bot.isGaloEmRinha(message.author.id))
 						return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 					if (uData.invest == null)
 						return bot.createEmbed(message, `Você não pode parar um investimento se você não possui um ${bot.config.propertyG}`, null, 'GREEN')
-					if (bot.isPlayerViajando(uData))
+					if (await bot.isPlayerViajando(uData))
 						return bot.msgPlayerViajando(message, uData)
 
 					let horas = (uData.investTime + semana) > currTime ? currTime - uData.investLast : uData.investTime + semana - uData.investLast
@@ -411,7 +411,7 @@ exports.run = async (bot, message, args) => {
 					uData.moni -= preco * desconto
 
 					if (uData.classe !== 'mafioso')
-						bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(bot.investimentos[uData.invest].preço * bot.imposto))
+						await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(bot.investimentos[uData.invest].preço * bot.imposto))
 
 					const embed = new Discord.MessageEmbed()
 						.setDescription(`${bot.config.propertyG} Você readquiriu o investimento **${bot.investimentos[uData.invest].desc}!**`)
@@ -420,7 +420,7 @@ exports.run = async (bot, message, args) => {
 						.setFooter(`${uData.username} • R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, message.member.user.avatarURL())
 						.setTimestamp()
 
-					bot.data.set(message.author.id, uData)
+					await bot.data.set(message.author.id, uData)
 
 					msg.edit({components: []})
 						.catch(() => console.log("Não consegui editar mensagem `investir`"))
@@ -437,7 +437,7 @@ exports.run = async (bot, message, args) => {
 						.catch(() => console.log("Não consegui editar mensagem `investir`"))
 				})
 			}
-			else if (b.customId === message.id + message.author.id + 'outros') {
+			else if (b.customId === 'outros') {
 				msg.edit({components: []})
 					.catch(() => console.log("Não consegui enviar mensagem `investir outros`"))
 

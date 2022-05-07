@@ -5,6 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
+    "@joshdb/core": "^1.2.7",
+    "@joshdb/sqlite": "^1.1.9",
     "better-sqlite3": "^7.4.3",
     "bufferutil": "^4.0.1",
     "canvas": "^2.8.0",

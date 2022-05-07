@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 
 exports.run = async (bot, message, args) => {
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let currTime = new Date().getTime()
 
 	// const semana = 604800000 // 7 dias
@@ -13,10 +13,10 @@ exports.run = async (bot, message, args) => {
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
 
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Você não pode receber enquanto seu galo está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
 
 	let linhaTrabalho = ''
@@ -54,7 +54,7 @@ exports.run = async (bot, message, args) => {
 
 	}
 
-	bot.data.set(message.author.id, uData)
+	await bot.data.set(message.author.id, uData)
 	
 	return bot.createEmbed(message, `${linhaTrabalho}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'YELLOW')
 }

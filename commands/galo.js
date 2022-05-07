@@ -24,8 +24,8 @@ exports.run = async (bot, message, args) => {
 	}
 
 	let showGalo = async ({message, id, isAuthor}) => {
-		let galo = bot.galos.get(id)
-		let user = bot.data.get(id)
+		let galo = await bot.galos.get(id)
+		let user = await bot.data.get(id)
 		let currTime = new Date().getTime()
 		if (!galo)
 			return bot.createEmbed(message, `Este usuário não possui um inventário ${bot.config.galo}`, null, bot.colors.white)
@@ -47,7 +47,7 @@ exports.run = async (bot, message, args) => {
 		let nacionalidade = 'Desconhecido'
 
 		if ((!isAuthor && galo.nacionalidade) || isAuthor)
-			nacionalidade = getRarity(galo)
+			nacionalidade = await getRarity(galo)
 
 		if (!nacionalidade)
 			return
@@ -89,12 +89,12 @@ exports.run = async (bot, message, args) => {
 		const buttonOpen = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('+')
-			.setCustomId(message.id + message.author.id + 'open')
+			.setCustomId('open')
 
 		const buttonClose = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('-')
-			.setCustomId(message.id + message.author.id + 'close')
+			.setCustomId('close')
 
 		const rowClosed = new Discord.MessageActionRow()
 			.addComponents(buttonOpen)
@@ -106,13 +106,13 @@ exports.run = async (bot, message, args) => {
 			.setStyle('SECONDARY')
 			.setLabel('Whey Protein')
 			.setEmoji(bot.config.whey)
-			.setCustomId(message.id + message.author.id + 'whey')
+			.setCustomId('whey')
 
 		const buttonTreinar = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel(galo.train ? 'Parar' : 'Treinar')
 			.setEmoji('💪')
-			.setCustomId(message.id + message.author.id + 'treinar')
+			.setCustomId('treinar')
 
 		const desconto = user.classe === 'mafioso' ? 0.95 : 1 // 1 = 0%, 0.7 = 30%
 		let preco_whey = Math.floor((((galo.power - 29) * 5) ** 2.7) * desconto)
@@ -134,7 +134,7 @@ exports.run = async (bot, message, args) => {
 			const buttonEditar = new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Editar')
-				.setCustomId(message.id + message.author.id + 'editar')
+				.setCustomId('editar')
 
 			rowClosed
 				.addComponents(buttonWhey)
@@ -152,7 +152,7 @@ exports.run = async (bot, message, args) => {
 			// 	.setLabel('Super Whey')
 			// 	.setEmoji(bot.config.superWhey)
 			// 	.setDisabled(true)
-			// 	.setCustomId(message.id + message.author.id + 'superwhey')
+			// 	.setCustomId('superwhey')
 			//
 			// let precoSuperWhey = uData.classe === 'mafioso' ? 5000000 : (5000000 * (1 + bot.imposto))
 			//
@@ -168,23 +168,23 @@ exports.run = async (bot, message, args) => {
 			rowClosed.addComponents(buttonEditar)
 
 		}
-		
+
 		let msg = await message.channel.send({
 			embeds: [embedClosed],
 			components: [rowClosed]
 		}).catch(() => console.log("Não consegui enviar mensagem `galo view`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'open',
-			message.id + message.author.id + 'close',
-			message.id + message.author.id + 'whey',
-			message.id + message.author.id + 'treinar',
-			message.id + message.author.id + 'editar',
-			message.id + message.author.id + 'confirmar',
-			// message.id + message.author.id + 'superwhey',
+			'open',
+			'close',
+			'whey',
+			'treinar',
+			'editar',
+			'confirmar',
+			// 'superwhey',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			time: 60000,
 		})
@@ -193,7 +193,7 @@ exports.run = async (bot, message, args) => {
 		collector.on('collect', async b => {
 			await b.deferUpdate()
 
-			if (b.customId === message.id + message.author.id + 'open') {
+			if (b.customId === 'open') {
 				isAberto = true
 				if (msg) {
 					msg.edit({
@@ -202,7 +202,7 @@ exports.run = async (bot, message, args) => {
 					}).catch(() => console.log("Não consegui editar mensagem `galo abrir`"))
 				}
 			}
-			else if (b.customId === message.id + message.author.id + 'close') {
+			else if (b.customId === 'close') {
 				isAberto = false
 				if (msg) {
 					msg.edit({
@@ -212,7 +212,7 @@ exports.run = async (bot, message, args) => {
 				}
 			}
 
-			else if (b.customId === message.id + message.author.id + 'whey') {
+			else if (b.customId === 'whey') {
 				buttonWhey.setDisabled(true)
 
 				if (msg) {
@@ -221,8 +221,8 @@ exports.run = async (bot, message, args) => {
 					}).catch(() => console.log("Não consegui editar mensagem `galo whey`"))
 				}
 
-				user = bot.data.get(message.author.id)
-				galo = bot.galos.get(message.author.id)
+				user = await bot.data.get(message.author.id)
+				galo = await bot.galos.get(message.author.id)
 				preco_whey = Math.floor((((galo.power - 29) * 5) ** 2.7) * desconto)
 
 				if (galo.power >= 60) {
@@ -246,18 +246,18 @@ exports.run = async (bot, message, args) => {
 						.setStyle('SUCCESS')
 						.setLabel(`Comprar Whey Protein por R$ ${preco_whey.toLocaleString().replace(/,/g, ".")}`)
 						.setEmoji(bot.config.whey)
-						.setCustomId(message.id + message.author.id + 'confirmar'))
+						.setCustomId('confirmar'))
 
 				msg.edit({components: [rowConfirmar]})
 					.catch(() => console.log("Não consegui enviar mensagem `galo whey`"))
 
 			}
-			else if (b.customId === message.id + message.author.id + 'confirmar') {
+			else if (b.customId === 'confirmar') {
 				if (b.user.id !== message.author.id)
 					return
 
-				user = bot.data.get(message.author.id)
-				galo = bot.galos.get(message.author.id)
+				user = await bot.data.get(message.author.id)
+				galo = await bot.galos.get(message.author.id)
 				preco_whey = Math.floor(((galo.power - 29) * 5) ** 2.7)
 				if (galo.train)
 					return galo.trainTime > currTime ?
@@ -268,7 +268,7 @@ exports.run = async (bot, message, args) => {
 					return bot.createEmbed(message, `Seu galo já está muito forte e só subirá de nível ganhando rinhas ${bot.config.galo}`, null, bot.colors.white)
 				if (user.moni < preco_whey)
 					return bot.msgSemDinheiro(message)
-				if (bot.isUserEmRouboOuEspancamento(message, user))
+				if (await bot.isUserEmRouboOuEspancamento(message, user))
 					return
 
 				const comprarWheyConfirm = new Discord.MessageEmbed()
@@ -313,28 +313,28 @@ exports.run = async (bot, message, args) => {
 					}).catch(() => console.log("Não consegui editar mensagem `galo whey comprado`"))
 				}
 
-				bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preco_whey * bot.imposto))
+				await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(preco_whey * bot.imposto))
 
-				bot.data.set(message.author.id, user)
-				bot.galos.set(message.author.id, galo)
+				await bot.data.set(message.author.id, user)
+				await bot.galos.set(message.author.id, galo)
 
 
 			}
-			else if (b.customId === message.id + message.author.id + 'treinar') {
-				if (bot.isUserEmRouboOuEspancamento(message, uData)) 
-					return				
+			else if (b.customId === 'treinar') {
+				if (await bot.isUserEmRouboOuEspancamento(message, uData))
+					return
 
-				let uGalo = bot.galos.get(message.author.id)
+				let uGalo = await bot.galos.get(message.author.id)
 
 				if (buttonTreinar.label === 'Parar') {
-					if (!uGalo.train) 
+					if (!uGalo.train)
 						return bot.createEmbed(message, `Você não pode parar o que nem começou ${bot.config.galo}`, null, bot.colors.white)
 
 					uGalo.train = 0
 					uGalo.trainTime = 0
 					uGalo.trainNotification = false
 
-					bot.galos.set(message.author.id, uGalo)
+					await bot.galos.set(message.author.id, uGalo)
 
 					embedOpen.fields[5].value = `**${getSituation(uGalo)}**`
 					embedClosed.fields[1].value = `**${getSituation(uGalo)}**`
@@ -371,11 +371,11 @@ exports.run = async (bot, message, args) => {
 					uGalo.trainTime = 0
 					uGalo.power += 1
 					uGalo.descansar = currTime + 600000 + ((uGalo.power - 30) * 60000) // 10 min + 1min por level
-					bot.galos.set(message.author.id, uGalo)
+					await bot.galos.set(message.author.id, uGalo)
 					setTimeout(() => {
 						message.author.send(`Seu galo descansou! Ele já pode treinar ou rinhar novamente! ${bot.config.galo}`)
 							.catch(() => message.reply(`seu galo descansou! Ele já pode treinar ou rinhar novamente! ${bot.config.galo}`)
-								.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+								.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Galo\``))
 					}, uGalo.descansar - currTime)
 
 					embedOpen.fields[5].value = `**${getSituation(uGalo)}**`
@@ -407,11 +407,11 @@ exports.run = async (bot, message, args) => {
 					bot.users.fetch(message.author.id).then(user => {
 						user.send(`Seu galo encerrou o treinamento! ${bot.config.galo}`)
 							.catch(() => message.reply(`seu galo encerrou o treinamento! ${bot.config.galo}${aviso}`)
-								.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+								.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Galo\``))
 					})
 				}, trainTime - currTime)
 
-				bot.galos.set(message.author.id, uGalo)
+				await bot.galos.set(message.author.id, uGalo)
 
 				embedOpen.fields[5].value = `**${getSituation(uGalo)}**`
 				embedClosed.fields[1].value = `**${getSituation(uGalo)}**`
@@ -430,19 +430,19 @@ exports.run = async (bot, message, args) => {
 				return
 
 			}
-			else if (b.customId === message.id + message.author.id + 'editar') {
+			else if (b.customId === 'editar') {
 				let btnNome = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel(`Nome`)
-					.setCustomId(message.id + message.author.id + 'nome')
+					.setCustomId('nome')
 				let btnTitulo = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel(`Titulo`)
-					.setCustomId(message.id + message.author.id + 'titulo')
+					.setCustomId('titulo')
 				let btnAvatar = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel(`Avatar`)
-					.setCustomId(message.id + message.author.id + 'avatar')
+					.setCustomId('avatar')
 
 				let row = new Discord.MessageActionRow()
 					.addComponents(btnNome).addComponents(btnTitulo).addComponents(btnAvatar)
@@ -455,19 +455,19 @@ exports.run = async (bot, message, args) => {
 				}
 
 				const filterEditar = (button) => [
-					message.id + message.author.id + 'nome',
-					message.id + message.author.id + 'titulo',
-					message.id + message.author.id + 'avatar',
+					'nome',
+					'titulo',
+					'avatar',
 				].includes(button.customId) && button.user.id === message.author.id
 
-				const collectorEditar = message.channel.createMessageComponentCollector({
+				const collectorEditar = msg.createMessageComponentCollector({
 					filter: filterEditar,
 					time: 90000,
 				})
 
 				collectorEditar.on('collect', async b => {
 					await b.deferUpdate()
-					if (b.customId === message.id + message.author.id + 'nome') {
+					if (b.customId === 'nome') {
 						btnNome.setDisabled(true)
 
 						msg.edit({
@@ -477,7 +477,7 @@ exports.run = async (bot, message, args) => {
 						bot.commands.get('galo').run(bot, message, ['nome'])
 
 					}
-					else if (b.customId === message.id + message.author.id + 'titulo') {
+					else if (b.customId === 'titulo') {
 						btnTitulo.setDisabled(true)
 
 						msg.edit({
@@ -487,7 +487,7 @@ exports.run = async (bot, message, args) => {
 						bot.commands.get('galo').run(bot, message, ['titulo'])
 
 					}
-					else if (b.customId === message.id + message.author.id + 'avatar') {
+					else if (b.customId === 'avatar') {
 						btnAvatar.setDisabled(true)
 
 						msg.edit({
@@ -506,7 +506,7 @@ exports.run = async (bot, message, args) => {
 					}
 				})
 			}
-			// else if (b.customId === message.id + message.author.id + 'superwhey') {
+			// else if (b.customId === 'superwhey') {
 			// 	msg.edit({components: []})
 			// 		.catch(() => console.log("Não consegui enviar mensagem `galo superwhey`"))
 			//
@@ -521,7 +521,7 @@ exports.run = async (bot, message, args) => {
 				}).catch(() => console.log("Não consegui editar mensagem `galo view`"))
 			}
 		})
-		
+
 	}
 
 	let nacionalidades = [
@@ -670,9 +670,9 @@ exports.run = async (bot, message, args) => {
 		'lendario': '<:Lendario:894353110296838144>'
 	}
 
-	const getRarity = (uGalo) => {
+	const getRarity = async (uGalo) => {
 		if (uGalo.raridade == undefined) {
-			let rarity = generateRarity(uGalo)
+			let rarity = await generateRarity(uGalo)
 			bot.createEmbed(message, `Você descobriu a raça e nacionalidade do seu galo!\n\n**${emojis[rarity.raridade]} ${rarity.raça} ${rarity.nacionalidade.gentilico} ${rarity.nacionalidade.flag}**`, null, bot.colors.white)
 			return false
 		}
@@ -680,7 +680,7 @@ exports.run = async (bot, message, args) => {
 		return `${emojis[uGalo.raridade]} ${uGalo.raça} ${uGalo.nacionalidade.gentilico} ${uGalo.nacionalidade.flag}`
 	}
 
-	const generateRarity = (uGalo) => {
+	const generateRarity = async (uGalo) => {
 		// let chance = bot.getRandom(0, 100)
 
 		let raridade = 'comum'
@@ -696,7 +696,7 @@ exports.run = async (bot, message, args) => {
 		uGalo.raça = raça
 		uGalo.nacionalidade = nacionalidade
 		uGalo.raridade = raridade
-		bot.galos.set(message.author.id, uGalo)
+		await bot.galos.set(message.author.id, uGalo)
 		return uGalo
 	}
 
@@ -705,50 +705,19 @@ exports.run = async (bot, message, args) => {
 	// }
 
 	let targetMention = message.mentions.members.first()
-	let targetNoMention = []
 	let currTime = new Date().getTime()
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 	let aposta = args[1]
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 
 	if (!targetMention && !["nome", "titulo", 'título', "info", "treinar", "avatar", "boss"].includes(option)) {
 
-		if (!targetNoMention[0] && args[0] && !targetMention) {
+		let {
+			uData,
+			alvo
+		} = await bot.findUser(message, args)
 
-			let name = args.join(" ").toLowerCase()
-
-			bot.data.forEach((item, id) => {
-				if (bot.data.has(id, "username") && item.username.toLowerCase() == name) // verifica se o usuário é um jogador
-				{
-					targetNoMention.push(id)
-				}
-				else if (id.toString() == name) {
-					targetNoMention.push(id)
-				}
-			})
-
-			if (!targetNoMention[0]) {
-				return bot.createEmbed(message, "Usuário não encontrado", null, bot.colors.white)
-			}
-
-		}
-
-		let alvo
-
-		if (targetNoMention.length > 0) {
-			alvo = targetNoMention[0]
-		}
-		else {
-			alvo = targetMention ? targetMention.id : message.author.id
-		}
-
-
-		let tData = bot.data.get(alvo)
-		if (!tData) return bot.createEmbed(message, "Este usuário não possui um inventário", null, bot.colors.white)
-
-		bot.users.fetch(alvo).then(user => {
-			alvo = user.id
-		})
+		if (!uData) return
 
 		return showGalo({
 			message: message,
@@ -763,7 +732,7 @@ exports.run = async (bot, message, args) => {
 			return bot.createEmbed(message, `Insira um nome para seu galo ${bot.config.galo}`, ";galo nome <novo-nome>", bot.colors.white)
 		}
 
-		let uGalo = bot.galos.get(message.author.id)
+		let uGalo = await bot.galos.get(message.author.id)
 
 		option = args[0]
 		let nome = args.join(" ").replace(option, "")
@@ -782,7 +751,7 @@ exports.run = async (bot, message, args) => {
 		}
 
 		uGalo.nome = nome
-		bot.galos.set(message.author.id, uGalo)
+		await bot.galos.set(message.author.id, uGalo)
 
 		return bot.createEmbed(message, `Você nomeou seu galo como **${uGalo.nome}** ${bot.config.galo}`, null, bot.colors.white)
 
@@ -793,7 +762,7 @@ exports.run = async (bot, message, args) => {
 			return bot.createEmbed(message, `Insira um título para seu galo ${bot.config.galo}`, ";galo titulo <novo-titulo>", bot.colors.white)
 		}
 
-		let uGalo = bot.galos.get(message.author.id)
+		let uGalo = await bot.galos.get(message.author.id)
 
 		// let titulo = args.join(" ").replace(option, "")
 		// titulo = titulo.substring(1, titulo.length)
@@ -812,16 +781,16 @@ exports.run = async (bot, message, args) => {
 		}
 
 		uGalo.titulo = titulo
-		bot.galos.set(message.author.id, uGalo)
+		await bot.galos.set(message.author.id, uGalo)
 		return bot.createEmbed(message, `Você deu o título **${uGalo.titulo}** para seu galo ${bot.config.galo}`, null, bot.colors.white)
 
 	}
 	else if (option === "treinar") { // treinar galo para aumentar level
-		if (bot.isUserEmRouboOuEspancamento(message, uData)) {
+		if (await bot.isUserEmRouboOuEspancamento(message, uData)) {
 			return
 		}
 
-		let uGalo = bot.galos.get(message.author.id)
+		let uGalo = await bot.galos.get(message.author.id)
 
 		if (aposta === "parar") {
 			if (!uGalo.train) {
@@ -832,7 +801,7 @@ exports.run = async (bot, message, args) => {
 			uGalo.trainTime = 0
 			uGalo.trainNotification = false
 
-			bot.galos.set(message.author.id, uGalo)
+			await bot.galos.set(message.author.id, uGalo)
 
 			return bot.createEmbed(message, `**${uGalo.nome}** parou de treinar. Ele não subiu de nível ${bot.config.galo}`, null, bot.colors.white)
 		}
@@ -867,12 +836,12 @@ exports.run = async (bot, message, args) => {
 			uGalo.trainTime = 0
 			uGalo.power += 1
 			uGalo.descansar = currTime + 600000 + ((uGalo.power - 30) * 60000) // 10 min + 1min por level
-			bot.galos.set(message.author.id, uGalo)
+			await bot.galos.set(message.author.id, uGalo)
 			setTimeout(() => {
 				bot.users.fetch(message.author.id).then(user => {
 					user.send(`Seu galo descansou! Ele já pode treinar ou rinhar novamente! ${bot.config.galo}`)
 						.catch(() => message.reply(`seu galo descansou! Ele já pode treinar ou rinhar novamente! ${bot.config.galo}`)
-							.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+							.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Galo\``))
 				})
 			}, uGalo.descansar - currTime)
 			return bot.createEmbed(message, `**${uGalo.nome}** encerrou o treinamento. Ele subiu para o nível ${uGalo.power - 30} ${bot.config.galo}`, "Ele descansará por " + bot.segToHour((uGalo.descansar - currTime) / 1000), bot.colors.white)
@@ -892,11 +861,11 @@ exports.run = async (bot, message, args) => {
 			bot.users.fetch(message.author.id).then(user => {
 				user.send(`Seu galo encerrou o treinamento! ${bot.config.galo}`)
 					.catch(() => message.reply(`seu galo encerrou o treinamento! ${bot.config.galo}${aviso}`)
-						.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+						.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Galo\``))
 			})
 		}, trainTime - currTime)
 
-		bot.galos.set(message.author.id, uGalo)
+		await bot.galos.set(message.author.id, uGalo)
 		return bot.createEmbed(message, `**${uGalo.nome}** treinará por ${bot.segToHour((trainTime - currTime) / 1000)} ${bot.config.galo}`, null, bot.colors.white)
 
 	}
@@ -939,11 +908,10 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 		if (!targetMention)
 			return bot.createEmbed(message, `Você precisa escolher um jogador para rinhar ${bot.config.galo}`, ";galo rinha <valor> <@jogador>", bot.colors.white)
 
-
 		let alvo = targetMention.user
-		let uGalo = bot.galos.get(message.author.id)
-		let tGalo = bot.galos.get(alvo.id)
-		let tData = bot.data.get(alvo.id)
+		let uGalo = await bot.galos.get(message.author.id)
+		let tGalo = await bot.galos.get(alvo.id)
+		let tData = await bot.data.get(alvo.id)
 
 		if (!tGalo)
 			return bot.createEmbed(message, `Este usuário não é um jogador ${bot.config.galo}`, null, bot.colors.white)
@@ -971,7 +939,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 			return bot.msgSemDinheiro(message, tData.username)
 		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
 		if (tData.preso > currTime)
 			return bot.msgPreso(message, tData, tData.username)
@@ -979,11 +947,11 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 			return bot.msgHospitalizado(message, uData)
 		if (tData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, tData, tData.username)
-		if (bot.isPlayerViajando(tData))
+		if (await bot.isPlayerViajando(tData))
 			return bot.msgPlayerViajando(message, tData, tData.username)
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-		if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+		if (await bot.isAlvoEmRouboOuEspancamento(message, tData))
 			return
 		if (aposta <= 0 || (aposta % 1 != 0))
 			return bot.msgValorInvalido(message)
@@ -1012,8 +980,8 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 		let respondeu = false
 
-		// bot.galos.set(message.author.id, true, 'emRinha')
-		// bot.galos.set(alvo.id, true, 'emRinha')
+		// await bot.galos.set(message.author.id, true, 'emRinha')
+		// await bot.galos.set(alvo.id, true, 'emRinha')
 
 		// let avatarUGalo = await Canvas.loadImage(uGalo.avatar)
 		// let avatarTGalo = await Canvas.loadImage(tGalo.avatar)
@@ -1046,21 +1014,21 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 			.addComponents(new Discord.MessageButton()
 				.setStyle('SUCCESS')
 				.setLabel('Aceitar')
-				.setCustomId(message.id + message.author.id + 'aceitar'))
+				.setCustomId('aceitar'))
 			.addComponents(new Discord.MessageButton()
 				.setStyle('DANGER')
 				.setLabel('Recusar')
-				.setCustomId(message.id + message.author.id + 'recusar'))
+				.setCustomId('recusar'))
 
 		let msg = await message.channel.send({embeds: [embed], components: [row]})
 			.catch(() => console.log("Não consegui enviar mensagem `galo rinha`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'aceitar',
-			message.id + message.author.id + 'recusar',
+			'aceitar',
+			'recusar',
 		].includes(button.customId) && button.user.id === alvo.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			time: 60000,
 			max: 1,
@@ -1083,14 +1051,14 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 				msg.edit({components: []})
 					.catch(() => console.log("Não consegui enviar mensagem `galo rinha`"))
 
-				if (b.customId === message.id + message.author.id + 'aceitar') {
-					uData = bot.data.get(message.author.id)
-					tData = bot.data.get(alvo.id)
-					uGalo = bot.galos.get(message.author.id)
-					tGalo = bot.galos.get(alvo.id)
+				if (b.customId === 'aceitar') {
+					uData = await bot.data.get(message.author.id)
+					tData = await bot.data.get(alvo.id)
+					uGalo = await bot.galos.get(message.author.id)
+					tGalo = await bot.galos.get(alvo.id)
 
-					// bot.galos.set(message.author.id, false, 'emRinha')
-					// bot.galos.set(alvo.id, false, 'emRinha')
+					// await bot.galos.set(message.author.id, false, 'emRinha')
+					// await bot.galos.set(alvo.id, false, 'emRinha')
 
 					if (uData.moni < 1)
 						return bot.msgSemDinheiro(message)
@@ -1104,17 +1072,17 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 						return bot.msgHospitalizado(message, uData)
 					if (tData.hospitalizado > currTime)
 						return bot.msgHospitalizado(message, tData, tData.username)
-					if (bot.isPlayerMorto(tData))
+					if (await bot.isPlayerMorto(tData))
 						return bot.msgPlayerMorto(message, tData.username)
-					if (bot.isPlayerViajando(tData))
+					if (await bot.isPlayerViajando(tData))
 						return bot.msgPlayerViajando(message, tData, tData.username)
 					if (parseFloat(uData.moni) < aposta)
 						return bot.msgDinheiroMenorQueAposta(message)
 					if (parseFloat(tData.moni) < aposta)
 						return bot.msgDinheiroMenorQueAposta(message, tData.username)
-					if (bot.isUserEmRouboOuEspancamento(message, uData))
+					if (await bot.isUserEmRouboOuEspancamento(message, uData))
 						return
-					if (bot.isAlvoEmRouboOuEspancamento(message, tData))
+					if (await bot.isAlvoEmRouboOuEspancamento(message, tData))
 						return
 					if (uGalo.descansar > currTime)
 						return bot.msgGaloDescansando(message, uGalo)
@@ -1133,8 +1101,8 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 					if (tGalo.emRinha)
 						return bot.createEmbed(message, `O galo de ${tData.username} já está em uma rinha ${bot.config.galo}`, null, bot.colors.white)
 
-					bot.galos.set(message.author.id, true, 'emRinha')
-					bot.galos.set(alvo.id, true, 'emRinha')
+					await bot.galos.set(message.author.id + '.emRinha', true)
+					await bot.galos.set(alvo.id + '.emRinha', true)
 
 					const inicioRinha = new Discord.MessageEmbed()
 						.setAuthor({
@@ -1295,10 +1263,10 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 					await wait(1000)
 
 					currTime = new Date().getTime()
-					uData = bot.data.get(message.author.id)
-					tData = bot.data.get(alvo.id)
-					uGalo = bot.galos.get(message.author.id)
-					tGalo = bot.galos.get(alvo.id)
+					uData = await bot.data.get(message.author.id)
+					tData = await bot.data.get(alvo.id)
+					uGalo = await bot.galos.get(message.author.id)
+					tGalo = await bot.galos.get(alvo.id)
 
 					let vencedor
 					let perdedor
@@ -1370,10 +1338,10 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 					uGalo.emRinha = false
 					tGalo.descansar = currTime + (1800000 * multiplicador_tempo_rinha)
 					tGalo.emRinha = false
-					bot.data.set(message.author.id, uData)
-					bot.data.set(targetMention.id, tData)
-					bot.galos.set(message.author.id, uGalo)
-					bot.galos.set(targetMention.id, tGalo)
+					await bot.data.set(message.author.id, uData)
+					await bot.data.set(targetMention.id, tData)
+					await bot.galos.set(message.author.id, uGalo)
+					await bot.galos.set(targetMention.id, tGalo)
 
 					const embedPV = new Discord.MessageEmbed()
 						.setTitle(`${bot.config.galo} Seu galo está pronto para outra batalha!`)
@@ -1383,7 +1351,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 						bot.users.fetch(message.author.id).then(user => {
 							user.send({embeds: [embedPV]})
 								.catch(() => message.reply(`seu galo está pronto para outra batalha! ${bot.config.galo}`)
-									.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+									.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Galo\``))
 						})
 					}, uGalo.descansar - currTime)
 
@@ -1443,9 +1411,9 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 
 				}
-				if (b.customId === message.id + message.author.id + 'recusar') {
-					bot.galos.set(message.author.id, false, 'emRinha')
-					bot.galos.set(alvo.id, false, 'emRinha')
+				if (b.customId === 'recusar') {
+					await bot.galos.set(message.author.id + '.emRinha', false)
+					await bot.galos.set(alvo.id + '.emRinha', false)
 
 					bot.log(message, new Discord.MessageEmbed()
 						.setDescription(`${bot.config.galo} **${tData.username} recusou a rinha de ${tData.username}**`)
@@ -1473,8 +1441,8 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 
 		collector.on('end', async () => {
 			// if (msg) msg.reactions.removeAll()
-			// bot.galos.set(message.author.id, false, 'emRinha')
-			// bot.galos.set(alvo.id, false, 'emRinha')
+			// await bot.galos.set(message.author.id, false, 'emRinha')
+			// await bot.galos.set(alvo.id, false, 'emRinha')
 
 			bot.log(message, new Discord.MessageEmbed()
 				.setDescription(`${bot.config.galo} **${tData.username} não respondeu o desafio de ${tData.username}**`)
@@ -1503,7 +1471,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 	}
 	else if (option === "avatar") { // trocar avatar do galo
 
-		let uGalo = bot.galos.get(message.author.id)
+		let uGalo = await bot.galos.get(message.author.id)
 
 		let galosImagens = {
 			1: 'https://media.discordapp.net/attachments/531174573463306240/754444939739398154/galo1.png',
@@ -1638,7 +1606,7 @@ Após cada rinha, seu galo precisará descansar por 25 minutos até se recuperar
 			}
 
 			uGalo.avatar = galosImagens[aposta]
-			bot.galos.set(message.author.id, uGalo)
+			await bot.galos.set(message.author.id, uGalo)
 
 			let textos = ["Olha que coisinha linda!", "Poderoso e imponente", "Que bunitinhu!!", "Winner winner, chicken dinner", "O barbeiro disse \"Corto cabelo e pinto\""]
 			bot.shuffle(textos)
@@ -1680,13 +1648,13 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				.setStyle('SECONDARY')
 				.setLabel('Ver Caramuru')
 				.setEmoji(bot.config.caramuru)
-				.setCustomId(message.id + message.author.id + 'ver')
+				.setCustomId('ver')
 
 			const btnDesafiar = new Discord.MessageButton()
 				.setStyle('SECONDARY')
 				.setLabel('Desafiar')
 				.setEmoji(bot.config.galo)
-				.setCustomId(message.id + message.author.id + 'desafiar')
+				.setCustomId('desafiar')
 
 			const row = new Discord.MessageActionRow()
 				.addComponents(btnVer)
@@ -1696,22 +1664,22 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				.catch(() => console.log("Não consegui enviar mensagem `galo boss`"))
 
 			const filter = (button) => [
-				message.id + message.author.id + 'ver',
-				message.id + message.author.id + 'desafiar',
+				'ver',
+				'desafiar',
 			].includes(button.customId) && button.user.id === message.author.id
 
-			const collector = message.channel.createMessageComponentCollector({
+			const collector = msg.createMessageComponentCollector({
 				filter,
 				time: 90000,
 			})
 
 			collector.on('collect', async b => {
 				await b.deferUpdate()
-				if (b.customId === message.id + message.author.id + 'ver') {
+				if (b.customId === 'ver') {
 					btnVer.setDisabled(true)
 					bot.commands.get('galo').run(bot, message, ['526203502318321665'])
 				}
-				else if (b.customId === message.id + message.author.id + 'desafiar') {
+				else if (b.customId === 'desafiar') {
 					btnDesafiar.setDisabled(true)
 					bot.commands.get('galo').run(bot, message, ['boss', 'desafiar'])
 				}
@@ -1734,17 +1702,17 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 			let dia = new Date().getDay()
 			let hora = new Date().getHours()
 
-			if (dia !== 0 && dia !== 6 && !(dia === 5 && hora >= 20)) 
+			if (dia !== 0 && dia !== 6 && !(dia === 5 && hora >= 20))
 				return bot.createEmbed(message, `**Caramuru** só pode ser desafiado aos finais de semana ${bot.config.caramuru}`, null, bot.colors.white)
 
 			//return bot.createEmbed(message, `**Caramuru** está de folga durante a primeira semana da temporada ${bot.config.caramuru}`, null, bot.colors.white)
-			if (bot.isUserEmRouboOuEspancamento(message, uData)) 
+			if (await bot.isUserEmRouboOuEspancamento(message, uData))
 				return
-			
-			let uGalo = bot.galos.get(message.author.id)
-			let caramuru = bot.galos.get('526203502318321665')
 
-			if (uGalo.descansar > currTime) 
+			let uGalo = await bot.galos.get(message.author.id)
+			let caramuru = await bot.galos.get('526203502318321665')
+
+			if (uGalo.descansar > currTime)
 				return bot.msgGaloDescansando(message, uGalo)
 			if (uGalo.train)
 				return uGalo.trainTime > currTime ?
@@ -1766,7 +1734,7 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 			if (uGalo.nome == '' || uGalo.nome == 'Galo')
 				uGalo.nome = `Galo de ${uData.username}`
 
-			bot.galos.set(message.author.id, true, 'emRinha')
+			await bot.galos.set(message.author.id + '.emRinha', true)
 
 			const embed = new Discord.MessageEmbed()
 				.setAuthor({
@@ -1896,8 +1864,8 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 
 			await wait(1000)
 			currTime = new Date().getTime()
-			uData = bot.data.get(message.author.id)
-			uGalo = bot.galos.get(message.author.id)
+			uData = await bot.data.get(message.author.id)
+			uGalo = await bot.galos.get(message.author.id)
 
 			let vencedor
 			let perdedor
@@ -1914,7 +1882,7 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				vencedor = uGalo
 				perdedor = caramuru
 				vencedorU = uData
-				
+
 				uGalo.caramuruWins += 1
 
 				if (uGalo.power >= 70)
@@ -1949,9 +1917,9 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 			const multiplicador_tempo_rinha = 1
 			uGalo.descansar = currTime + (7200000 * multiplicador_tempo_rinha)
 			uGalo.emRinha = false
-			bot.data.set(message.author.id, uData)
-			bot.galos.set(message.author.id, uGalo)
-			bot.galos.set('526203502318321665', caramuru)
+			await bot.data.set(message.author.id, uData)
+			await bot.galos.set(message.author.id, uGalo)
+			await bot.galos.set('526203502318321665', caramuru)
 
 			const embedPV = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.galo} Seu galo está pronto para outra batalha!`)
@@ -1961,7 +1929,7 @@ Você pode desafiar Caramuru quantas vezes quiser, e ele nunca fica cansado. Se 
 				bot.users.fetch(message.author.id).then(user => {
 					user.send({embeds: [embedPV]})
 						.catch(() => message.reply(`seu galo está pronto para outra batalha! ${bot.config.galo}`)
-							.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Galo\``))
+							.catch(async () => `Não consegui responder ${await bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Galo\``))
 				})
 			}, uGalo.descansar - currTime)
 

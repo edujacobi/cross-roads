@@ -8,7 +8,7 @@ exports.run = async (bot, interaction) => {
 	let topgrana = []
 	let toplevel = []
 
-	bot.gangs.forEach((gang, id) => {
+	await bot.gangs.filter(async (gang, id) => {
 		if (gang != '') {
 			if (gang.nome != '') { //&& id != '1'
 				top.push({
@@ -23,7 +23,7 @@ exports.run = async (bot, interaction) => {
 		}
 	})
 
-	const generateEmbed = start => {
+	const generateEmbed = async start => {
 		const current = top.slice(start, start + 10)
 
 		const resultado = new Discord.MessageEmbed()
@@ -40,13 +40,13 @@ exports.run = async (bot, interaction) => {
 			toplevel = top.sort((a, b) => b.level - a.level).slice(start, start + 10)
 
 			let gangComando
-			if (!topgrana.some(gang => gang.id === bot.data.get(interaction.user.id, 'gangID')))
-				gangComando = top.find(gang => gang.id === bot.data.get(interaction.user.id, 'gangID'))
+			if (!topgrana.some(async gang => gang.id === await bot.data.get(interaction.user.id + '.gangID')))
+				gangComando = top.find(async gang => gang.id === await bot.data.get(interaction.user.id + '.gangID'))
 
 			let topgranaString = ""
 			let toplevelString = ""
 
-			let userGangId = bot.data.get(interaction.user.id, 'gangID')
+			let userGangId = await bot.data.get(interaction.user.id + '.gangID')
 
 			topgrana.forEach((gang, i) => {
 				let mod = gang.id == userGangId && userGangId != null ? "__" : ""
@@ -60,7 +60,7 @@ exports.run = async (bot, interaction) => {
 			})
 
 			if (gangComando) {
-				let gang = bot.gangs.get(userGangId)
+				let gang = await bot.gangs.get(userGangId)
 				const i = top.indexOf(gangComando)
 				let base = bot.bases[gang.base] ? bot.bases[gang.base].desc.split(" ")[0] : ''
 				topgranaString += `\`${i + 1}.\` ${getIcone(gang.boneco)} __**${gang.nome}**__ R$ ${(gang.caixa).toLocaleString().replace(/,/g, ".")}\n`
@@ -91,7 +91,7 @@ exports.run = async (bot, interaction) => {
 		.setCustomId(interaction.id + interaction.user.id + 'next')
 
 	await interaction.reply({
-		embeds: [generateEmbed(0)],
+		embeds: [await generateEmbed(0)],
 		components: top.length > 10 ? [new Discord.MessageActionRow().addComponents(buttonProx)] : []
 	})
 		.catch(() => console.log("Não consegui editar mensagem `topgangue`"))
@@ -125,7 +125,7 @@ exports.run = async (bot, interaction) => {
 
 
 		await interaction.editReply({
-			embeds: [generateEmbed(0)],
+			embeds: [await generateEmbed(currentIndex)],
 			components: [rowBtn]
 		})
 	})

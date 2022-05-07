@@ -5,7 +5,7 @@ exports.run = async (bot, message, args) => {
 	let {
 		uData,
 		alvo
-	} = bot.findUser(message, args)
+	} = await bot.findUser(message, args)
 
 	if (!uData) return
 
@@ -14,12 +14,15 @@ exports.run = async (bot, message, args) => {
 	bot.users.fetch(alvo).then(user => {
 		alvo = user.id
 		avatar = user.avatarURL({dynamic: true, size: 1024})
-	}).then(() => {
+	}).then(async () => {
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`Avatar de ${uData.username}`)
 			.setImage(avatar)
 			.setColor(message.member.displayColor)
-			.setFooter(bot.data.get(message.author.id, "username"), message.member.user.avatarURL())
+			.setFooter({
+				text: await bot.data.get(message.author.id + ".username"),
+				iconURL: message.member.user.avatarURL()
+			})
 			.setTimestamp()
 
 		return message.channel.send({embeds: [embed]})

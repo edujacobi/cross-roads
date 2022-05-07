@@ -1,7 +1,7 @@
 const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 	// let total = 0
 
@@ -41,7 +41,7 @@ exports.run = async (bot, message, args) => {
 		let btnConfirmar = new Discord.MessageButton()
 			.setStyle('SUCCESS')
 			.setLabel('Confirmar')
-			.setCustomId(message.id + message.author.id + 'confirmar')
+			.setCustomId('confirmar')
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(btnConfirmar)
@@ -52,10 +52,10 @@ exports.run = async (bot, message, args) => {
 		})
 
 		const filterConfirmar = (button) => [
-			message.id + message.author.id + 'confirmar',
+			'confirmar',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collectorConfirmar = message.channel.createMessageComponentCollector({
+		const collectorConfirmar = msg.createMessageComponentCollector({
 			filter: filterConfirmar,
 			time: 90000,
 		})
@@ -68,21 +68,21 @@ exports.run = async (bot, message, args) => {
 			uData.moni -= preço
 			uData.hospitalizado = 0
 			uData.hospitalGastos += preço
-			bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
-			bot.data.set(message.author.id, uData)
+			await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
+			await bot.data.set(message.author.id, uData)
 
 			msg.edit({embeds: [confirmed], components: []})
 				.catch(() => console.log("Não consegui editar mensagem `hospital part`"))
 		})
-		
+
 		collectorConfirmar.on('end', () => {
 			if (msg)
-				msg.edit({
-					components: []
-				}).catch(() => console.log("Não consegui editar mensagem `hospital part`"))
+				msg.edit({components: []})
+					.catch(() => console.log("Não consegui editar mensagem `hospital part`"))
 		})
-		
-	} else {
+
+	}
+	else {
 
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.hospital} Hospital`)
@@ -98,13 +98,13 @@ exports.run = async (bot, message, args) => {
 			.setStyle('SECONDARY')
 			.setLabel('Hospitalizados')
 			.setEmoji(bot.config.hospital)
-			.setCustomId(message.id + message.author.id + 'hosp')
+			.setCustomId('hosp')
 
 		let btnParticular = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('Pagar particular')
 			.setEmoji(bot.badges.hipocondriaco_s5)
-			.setCustomId(message.id + message.author.id + 'particular')
+			.setCustomId('particular')
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(btnHosp)
@@ -118,11 +118,11 @@ exports.run = async (bot, message, args) => {
 		}).catch(() => console.log("Não consegui enviar mensagem `hospital`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'hosp',
-			message.id + message.author.id + 'particular',
+			'hosp',
+			'particular',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			time: 90000,
 		})
@@ -131,18 +131,17 @@ exports.run = async (bot, message, args) => {
 			await b.deferUpdate()
 			currTime = Date.now()
 
-			if (b.customId === message.id + message.author.id + 'hosp') {
+			if (b.customId === 'hosp') {
 				let hospitalizados = []
 
-				bot.data.forEach((user, id) => {
+				await bot.data.filter(async (user, id) => {
 					if (id !== bot.config.adminID) { // && message.guild.members.cache.get(user)
 						if (user.hospitalizado > currTime && user.morto < currTime) {
-							if (bot.users.fetch(id) != undefined)
-								hospitalizados.push({
-									nick: user.username,
-									tempo: user.hospitalizado - currTime,
-									vezes: user.qtHospitalizado,
-								})
+							hospitalizados.push({
+								nick: user.username,
+								tempo: user.hospitalizado - currTime,
+								vezes: user.qtHospitalizado,
+							})
 							// total += 1
 						}
 					}
@@ -156,7 +155,8 @@ exports.run = async (bot, message, args) => {
 
 				if (hospitalizados.length > 0) {
 					hospitalizados.forEach(hospitalizado => Hospitalizados.addField(hospitalizado.nick, `Curado em ${bot.segToHour((hospitalizado.tempo / 1000))}\nHospitalizado ${hospitalizado.vezes} vezes`, true))
-				} else
+				}
+				else
 					Hospitalizados.setDescription("Não há hospitalizados")
 
 				btnHosp.setDisabled(true)
@@ -166,7 +166,8 @@ exports.run = async (bot, message, args) => {
 					components: [row]
 				}).catch(() => console.log("Não consegui enviar mensagem `hospital`"))
 
-			} else if (b.customId === message.id + message.author.id + 'particular') {
+			}
+			else if (b.customId === 'particular') {
 				btnParticular.setDisabled(true)
 
 				msg.edit({

@@ -2,7 +2,7 @@ const wait = require('util').promisify(setTimeout)
 const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	let time = new Date().getTime()
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let multiplicador = args[0] ? parseInt(args[0]) : 1
 	const MULT_INVEST = uData.invest ? bot.investimentos[uData.invest].id : 1
 	const MAX = 5 * MULT_INVEST
@@ -26,9 +26,9 @@ exports.run = async (bot, message, args) => {
 		return bot.msgPreso(message, uData)
 	if (uData.hospitalizado > time)
 		return bot.msgHospitalizado(message, uData)
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 	let embed = new Discord.MessageEmbed()
@@ -42,12 +42,14 @@ exports.run = async (bot, message, args) => {
 	if (multiplicador > 1)
 		embed.description += `\n**Multiplicador: ${multiplicador}x**`
 
+	let isGaloEmRinha = await bot.isGaloEmRinha(message.author.id)
+
 	const button = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		.setLabel('Jogar')
 		.setEmoji('🎰')
 		.setCustomId(message.id + message.author.id)
-		.setDisabled(uData.preso > time || uData.hospitalizado > time || uData.jobTime > time || uData.emRoubo.tempo > time || uData.emEspancamento.tempo > time || bot.isGaloEmRinha(message.author.id))
+		.setDisabled(uData.preso > time || uData.hospitalizado > time || uData.jobTime > time || uData.emRoubo.tempo > time || uData.emEspancamento.tempo > time || isGaloEmRinha)
 
 	let row = new Discord.MessageActionRow()
 		.addComponents(button)
@@ -59,7 +61,7 @@ exports.run = async (bot, message, args) => {
 
 		const filter = (button) => (message.id + message.author.id) === button.customId && button.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			idle: 40000
 		})
@@ -77,21 +79,21 @@ exports.run = async (bot, message, args) => {
 				components: [row]
 			}).catch(() => console.log("Não consegui editar mensagem `niquel`"))
 
-			uData = bot.data.get(message.author.id)
+			uData = await bot.data.get(message.author.id)
 
 			if (uData.preso > time)
 				return bot.msgPreso(message, uData)
 			if (uData.hospitalizado > time)
 				return bot.msgHospitalizado(message, uData)
-			if (bot.isPlayerMorto(uData))
+			if (await bot.isPlayerMorto(uData))
 				return bot.msgPlayerMorto(message)
-			if (bot.isPlayerViajando(uData))
+			if (await bot.isPlayerViajando(uData))
 				return bot.msgPlayerViajando(message)
 			if (uData.jobTime > time)
 				return bot.msgTrabalhando(message, uData)
-			if (bot.isUserEmRouboOuEspancamento(message, uData))
+			if (await bot.isUserEmRouboOuEspancamento(message, uData))
 				return
-			if (bot.isGaloEmRinha(message.author.id))
+			if (await bot.isGaloEmRinha(message.author.id))
 				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 			if (uData.ficha < 1 * multiplicador) {
@@ -189,8 +191,8 @@ exports.run = async (bot, message, args) => {
 				uData.betL += 1
 				uData.cassinoPerdidos += 80 * multiplicador
 
-				bot.banco.set('cassino', bot.banco.get('cassino') + 30 * multiplicador)
-				bot.banco.set('caixa', bot.banco.get('caixa') + 60 * multiplicador)
+				await bot.banco.set('cassino', await bot.banco.get('cassino') + 30 * multiplicador)
+				await bot.banco.set('caixa', await bot.banco.get('caixa') + 60 * multiplicador)
 
 				embed.addField(`Você não ganhou ${bot.config.mafiaCasino}`, `╔══╦══╦══╗\n${resultado}\n╚══╩══╩══╝`)
 					.setColor('RED')
@@ -198,7 +200,7 @@ exports.run = async (bot, message, args) => {
 
 			uData.betJ += 1
 
-			bot.data.set(message.author.id, uData)
+			await bot.data.set(message.author.id, uData)
 
 			embed.setFooter({
 				text: `${uData.username} • ${uData.ficha.toLocaleString().replace(/,/g, ".")} fichas`
@@ -231,7 +233,7 @@ exports.run = async (bot, message, args) => {
 				})
 
 			if (multiplicador > 1)
-				embed.description += `**Multiplicador: ${multiplicador}x**`
+				embed.description += `\n**Multiplicador: ${multiplicador}x**`
 
 			await msg.edit({
 				embeds: [embed],

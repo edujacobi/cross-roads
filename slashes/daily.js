@@ -3,14 +3,14 @@ const {SlashCommandBuilder} = require('@discordjs/builders')
 
 exports.run = async (bot, interaction) => {
 	let currTime = new Date().getTime()
-	let uData = bot.data.get(interaction.user.id)
-	const MULT = uData.invest ? bot.investimentos[uData.invest].id : 1
+	let uData = await bot.data.get(interaction.user.id)
+	const MULT = !!uData.invest ? bot.investimentos[uData.invest].id : 1
 	const isVip = uData.vipTime > currTime
 	let daily = isVip ? 750 * MULT : 500 * MULT
 	const evento = false
 	const dia = 86040000
 
-	let uCasamento = bot.casais.get(uData.casamentoID)
+	let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 	let casado = uCasamento ? true : false
 	let flores = isVip ? 2 : 1
@@ -36,14 +36,14 @@ exports.run = async (bot, interaction) => {
 		let ovo = isVip ? 3 : 1
 		// uData._ovo += ovo
 
-		bot.data.set(interaction.user.id, uData)
+		await bot.data.set(interaction.user.id, uData)
 
 		let aviso = Math.random() < 0.5 ? '' : '\nHabilite mensagens privadas com o Cross Roads e seja avisado sobre notificações importantes!'
 
 		setTimeout(() => {
 			interaction.user.send(`Seu daily está disponível novamente ${bot.config.coin}`)
 				.catch(() => interaction.reply(`seu daily está disponível novamente ${bot.config.coin}${aviso}`)
-					.catch(() => `Não consegui responder ${bot.data.get(interaction.user.id, 'username')} nem no PV nem no canal. \`Daily\``))
+					.catch(async () => `Não consegui responder ${await bot.data.get(interaction.user.id + '.username')} nem no PV nem no canal. \`Daily\``))
 		}, dia)
 
 		let textEvent = evento ? ` e ${bot.config.ovo} ${ovo} ${isVip ? 'Presentes' : 'Presente'}` : ''

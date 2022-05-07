@@ -9,7 +9,7 @@ exports.run = async (bot, message, args) => {
 	bot.data.indexes.forEach(user => { //gera lista para top global
 		if (bot.users.fetch(user)) {
 			let uData = bot.data.get(user)
-			let uGalo = bot.galos.get(user)
+			let uGalo = await bot.galos.get(user)
 			if ((uGalo.wins + uGalo.loses) >= 20) {
 				top.push({
 					nick: uData.username,
@@ -71,7 +71,7 @@ exports.run = async (bot, message, args) => {
 
 			if (userComando) {
 				let user = bot.data.get(userComando.id)
-				let galo = bot.galos.get(userComando.id)
+				let galo = await bot.galos.get(userComando.id)
 				const i = top.indexOf(userComando)
 				let emote = user.classe ? bot.guilds.cache.get('798984428248498177').emojis.cache.find(emoji => emoji.id == bot.classes[user.classe].emote) : `<:Inventario:814663379536052244>`
 				topWinsString += `\`${i + 1}.\` ${emote} __**${user.username}**__ ${galo.wins.toLocaleString().replace(/,/g, ".")}\n`;

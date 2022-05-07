@@ -48,7 +48,7 @@ exports.run = async (bot, interaction) => {
 			`\`;inventario [jogador]\` ou \`;i\` Abre o inventário do jogador
 \`;userinfo [jogador]\` ou \`;ui\` Informações relevantes sobre o jogador
 \`/top\` Rankings da temporada
-\`;badges\` Todas as badges existentes
+\`/badges\` Todas as badges existentes
 \`;arma (nome)\` Informações das armas
 \`/stats\` Estatísticas interessantes
 \`/vip\` Informações sobre o VIP`)
@@ -63,7 +63,7 @@ exports.run = async (bot, interaction) => {
 
 		.addField(`${bot.config.vadiando} Úteis`,
 			`\`/daily\` Recebe o bônus diário
-\`;weekly\` ou \`;w\` Recebe o bônus semanal
+\`/weekly\` Recebe o bônus semanal
 \`;me [ação]\` Realiza uma ação
 \`;nick\` Altera seu nick
 \`;classe\` Informações sobre as classes

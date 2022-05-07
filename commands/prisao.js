@@ -7,7 +7,7 @@ exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 	let option = args[0] ? args[0].toString().toLowerCase() : args[0]
 	let multiplicador_evento_chance_fuga = 1
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let chanceBase = uData.classe === 'advogado' ? 15 : uData.classe === 'ladrao' ? 25 : 20
 	let chanceJetpack = chanceBase + 30
 
@@ -20,7 +20,7 @@ exports.run = async (bot, message, args) => {
 			return bot.msgHospitalizado(message, uData)
 		if (uData.fugindo > currTime)
 			return bot.createEmbed(message, `Você já está tentando fugir ${bot.config.prisao}`, 'Este tipo de coisa pede paciência', bot.colors.policia)
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
 
 		let frasesSucesso = [
@@ -107,15 +107,15 @@ exports.run = async (bot, message, args) => {
 
 		let tempoFugindo = 15000
 
-		bot.data.set(message.author.id, currTime + 16000, 'fugindo')
+		await bot.data.set(message.author.id + '.fugindo', currTime + 16000,)
 
 		const fugaInicio = new Discord.MessageEmbed()
-			.setAuthor('Fuga em andamento...', bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url)
+			.setTitle(`${bot.config.prisao} Fuga em andamento...`)
 			.setColor(bot.colors.policia)
 			.setFooter(`${uData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`}`, message.member.user.avatarURL())
 			.setTimestamp()
 
-		let uCasamento = bot.casais.get(uData.casamentoID)
+		let uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(new Discord.MessageButton()
@@ -123,16 +123,16 @@ exports.run = async (bot, message, args) => {
 				.setLabel('Participar')
 				.setEmoji(bot.config.prisao)
 				.setDisabled(uCasamento?.anel === null)
-				.setCustomId(message.id + 'participar'))
+				.setCustomId('participar'))
 
 		let msgFuga = await message.channel.send({
 			embeds: [fugaInicio],
 			components: uData.casamentoID != null ? [row] : []
 		})
 
-		const filter = (button) => message.id + 'participar' === button.customId && button.user.id === uData.conjuge
+		const filter = (button) => 'participar' === button.customId && button.user.id === uData.conjuge
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msgFuga.createMessageComponentCollector({
 			filter,
 			time: tempoFugindo,
 		})
@@ -145,7 +145,7 @@ exports.run = async (bot, message, args) => {
 		collector.on('collect', async b => {
 			await b.deferUpdate()
 			let currTime = new Date().getTime()
-			let cData = bot.data.get(uData.conjuge)
+			let cData = await bot.data.get(uData.conjuge)
 
 			if (isConjugeParticipando) return
 
@@ -161,9 +161,9 @@ exports.run = async (bot, message, args) => {
 			if (cData.fugindo > currTime)
 				return bot.createEmbed(message, `Você já está tentando fugir, ${cData.username} ${bot.config.prisao}`, 'Este tipo de coisa pede paciência', bot.colors.policia)
 
-			if (bot.isUserEmRouboOuEspancamento(message, cData)) return
+			if (await bot.isUserEmRouboOuEspancamento(message, cData)) return
 
-			uCasamento = bot.casais.get(uData.casamentoID)
+			uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 
 			if (uCasamento.nivel === 0)
 				return bot.createEmbed(message, `Vocês estão com o nível do casamento muito baixo para realizar ações em dupla!`, null, bot.colors.casamento)
@@ -182,15 +182,12 @@ exports.run = async (bot, message, args) => {
 			uCasamento.ultimoDecrescimo = 1
 			isConjugeParticipando = true
 
-			bot.data.set(uData.conjuge, currTime + 11000, 'fugindo')
+			await bot.data.set(uData.conjuge + '.fugindo', currTime + 11000)
 
 			msgFuga.edit({
 				components: [],
 				embeds: [fugaInicio
-					.setAuthor({
-						name: 'Fuga em andamento... O amor pode tudo!',
-						iconURL: bot.guilds.cache.get('529674666692837378').emojis.cache.find(emoji => emoji.name === 'prisao').url
-					})
+					.setTitle(`${bot.config.prisao} Fuga em andamento... O amor pode tudo!`)
 					// .addField("Debug", `Chance base: ${chanceBase}\nSucesso necessarario: ${sucessoNecessario}\nSucesso conjuge: ${sucessoConjuge}\nChance calculada: ${chance}`)
 					.setFooter({
 						text: `${uData.username} e ${cData.username} • ${uData.arma.jetpack.tempo > currTime ? `Com Jetpack` : `Sem Jetpack`} e ${cData.arma.jetpack.tempo > currTime ? `com Jetpack` : `sem Jetpack`}`,
@@ -199,17 +196,17 @@ exports.run = async (bot, message, args) => {
 				]
 			})
 
-			bot.data.set(uData.conjuge, cData)
-			bot.casais.set(uData.casamentoID.toString(), uCasamento)
+			await bot.data.set(uData.conjuge, cData)
+			await bot.casais.set(uData.casamentoID.toString(), uCasamento)
 
-			conjuge = bot.data.get(uData.conjuge)
+			conjuge = await bot.data.get(uData.conjuge)
 		})
 
 		let sucesso = (chance <= sucessoNecessario)
 
 		await wait(tempoFugindo)
 
-		uData = bot.data.get(message.author.id)
+		uData = await bot.data.get(message.author.id)
 
 		uData.fugindo = 0
 
@@ -219,7 +216,7 @@ exports.run = async (bot, message, args) => {
 			uData.preso = 0
 			uData.qtFugas += 1
 
-			bot.data.set(message.author.id, uData)
+			await bot.data.set(message.author.id, uData)
 
 			const embedFinal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
@@ -253,17 +250,17 @@ exports.run = async (bot, message, args) => {
 			setTimeout(() => {
 				message.author.send({embeds: [embedPV]})
 					.catch(() => message.reply(`você já pode roubar novamente! ${bot.config.roubar}`)
-						.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Prisao Fugir\``))
+						.catch(() => `Não consegui responder ${bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Prisao Fugir\``))
 			}, uData.roubo - currTime)
 
 			if (isConjugeParticipando && conjuge) {
-				conjuge = bot.data.get(uData.conjuge)
+				conjuge = await bot.data.get(uData.conjuge)
 				conjuge.fuga = conjuge.preso
 				conjuge.roubo = currTime + (conjuge.classe === 'advogado' ? 1530000 : 1800000) //+30m
 				conjuge.preso = 0
 				conjuge.qtFugas += 1
 				conjuge.fugindo = 0
-				bot.data.set(uData.conjuge, conjuge)
+				await bot.data.set(uData.conjuge, conjuge)
 
 				setTimeout(() => {
 					bot.users.fetch(uData.conjuge).then(user => {
@@ -334,22 +331,22 @@ exports.run = async (bot, message, args) => {
 				setTimeout(() => {
 					message.author.send({embeds: [embedPV]})
 						.catch(() => message.reply(`você está curado! ${bot.config.hospital}`)
-							.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Prisao fugir\``))
+							.catch(() => `Não consegui responder ${bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Prisao fugir\``))
 
 					if (isConjugeParticipando && conjuge) {
 						bot.users.fetch(uData.conjuge).then(user => {
 							user.send({embeds: [embedPV]})
 								.catch(() => message.channel.send(`<@${uData.conjuge}> você está curado! ${bot.config.hospital}`)
-									.catch(() => `Não consegui responder ${bot.data.get(uData.conjuge, "username")} nem no PV nem no canal. \`Prisao fugir\``))
+									.catch(() => `Não consegui responder ${bot.data.get(uData.conjuge + ".username")} nem no PV nem no canal. \`Prisao fugir\``))
 						})
 					}
 				}, uData.hospitalizado - currTime)
 			}
 
-			bot.data.set(message.author.id, uData)
+			await bot.data.set(message.author.id, uData)
 
 			if (isConjugeParticipando && conjuge)
-				bot.data.set(uData.conjuge, conjuge)
+				await bot.data.set(uData.conjuge, conjuge)
 
 			const embed = new Discord.MessageEmbed()
 				.setTitle('Fuga fracassada')
@@ -388,7 +385,7 @@ exports.run = async (bot, message, args) => {
 			setTimeout(() => {
 				message.author.send({embeds: [embedPV]})
 					.catch(() => message.reply(`você está livre! ${bot.config.prisao}`)
-						.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Prisao\``))
+						.catch(() => `Não consegui responder ${bot.data.get(message.author.id + ".username")} nem no PV nem no canal. \`Prisao\``))
 			}, uData.preso - currTime)
 
 			const logF = new Discord.MessageEmbed()
@@ -426,9 +423,9 @@ exports.run = async (bot, message, args) => {
 			return bot.createEmbed(message, `Você está tentando fugir e não pode subornar ${bot.config.prisao}`, 'Foco!', bot.colors.policia)
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.policia)
 
 		const confirmed = new Discord.MessageEmbed()
@@ -448,7 +445,7 @@ exports.run = async (bot, message, args) => {
 		let btnConfirmar = new Discord.MessageButton()
 			.setStyle('SUCCESS')
 			.setLabel('Confirmar')
-			.setCustomId(message.id + message.author.id + 'confirmar')
+			.setCustomId('confirmar')
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(btnConfirmar)
@@ -459,17 +456,17 @@ exports.run = async (bot, message, args) => {
 		})
 
 		const filterConfirmar = (button) => [
-			message.id + message.author.id + 'confirmar',
+			'confirmar',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collectorConfirmar = message.channel.createMessageComponentCollector({
+		const collectorConfirmar = msg.createMessageComponentCollector({
 			filter: filterConfirmar,
 			time: 90000,
 		})
 
 		collectorConfirmar.on('collect', async b => {
 			await b.deferUpdate()
-			uData = bot.data.get(message.author.id)
+			uData = await bot.data.get(message.author.id)
 			currTime = new Date().getTime()
 			if (uData.subornoPago === uData.preso)
 				return bot.createEmbed(message, `Não aceitaremos nada vindo de você, espertalhão! ${bot.config.prisao}`, "\"Quem sabe na próxima tu deixa de ser idiota\"", bot.colors.policia)
@@ -481,9 +478,9 @@ exports.run = async (bot, message, args) => {
 				return bot.createEmbed(message, `Você está tentando fugir e não pode subornar ${bot.config.prisao}`, 'Foco!', bot.colors.policia)
 			if (uData.hospitalizado > currTime)
 				return bot.msgHospitalizado(message, uData)
-			if (bot.isUserEmRouboOuEspancamento(message, uData))
+			if (await bot.isUserEmRouboOuEspancamento(message, uData))
 				return
-			if (bot.isGaloEmRinha(message.author.id))
+			if (await bot.isGaloEmRinha(message.author.id))
 				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.policia)
 
 			if (sucesso) {
@@ -492,7 +489,7 @@ exports.run = async (bot, message, args) => {
 				uData.roubo = currTime + (uData.classe === 'advogado' ? 1530000 : 1800000) // 30 min
 				uData.preso = 0
 
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 
 				msg.edit({
 					embeds: [confirmed], components: []
@@ -507,7 +504,7 @@ exports.run = async (bot, message, args) => {
 				uData.prisaoGastos += preço
 				uData.subornoPago = uData.preso
 
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 
 				const failed = new Discord.MessageEmbed()
 					.setTitle(`${bot.config.police} Suborno recusado`)
@@ -552,20 +549,20 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 			.setStyle('SECONDARY')
 			.setLabel('Prisioneiros')
 			.setEmoji(bot.config.prisao)
-			.setCustomId(message.id + message.author.id + 'presos')
+			.setCustomId('presos')
 
 		let btnFugir = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('Fugir')
 			.setEmoji(bot.badges.fujao_s5)
 			.setDisabled(uData.fuga === uData.preso)
-			.setCustomId(message.id + message.author.id + 'fugir')
+			.setCustomId('fugir')
 
 		let btnSubornar = new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('Subornar')
 			.setEmoji(bot.badges.deputado_s5)
-			.setCustomId(message.id + message.author.id + 'subornar')
+			.setCustomId('subornar')
 
 		const row = new Discord.MessageActionRow()
 			.addComponents(btnPresos)
@@ -580,12 +577,12 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 		}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
 		const filter = (button) => [
-			message.id + message.author.id + 'presos',
-			message.id + message.author.id + 'fugir',
-			message.id + message.author.id + 'subornar',
+			'presos',
+			'fugir',
+			'subornar',
 		].includes(button.customId) && button.user.id === message.author.id
 
-		const collector = message.channel.createMessageComponentCollector({
+		const collector = msg.createMessageComponentCollector({
 			filter,
 			time: 90000,
 		})
@@ -594,22 +591,21 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 			await b.deferUpdate()
 			currTime = Date.now()
 
-			if (b.customId === message.id + message.author.id + 'presos') {
+			if (b.customId === 'presos') {
 				let presos = []
 				let ps = []
 				// let total = 0
-
-				bot.data.forEach((user, id) => {
+				
+				await bot.data.filter(async (user, id) => {
 					if (id !== bot.config.adminID) { // && message.guild.members.cache.get(user)
 						if (user.preso > currTime) {
-							if (bot.users.fetch(id) != undefined)
-								presos.push({
-									nick: user.username,
-									tempo: user.preso - currTime,
-									vezes: user.roubosL,
-									fugiu: user.qtFugas,
-									tentou: user.fuga === user.preso
-								})
+							presos.push({
+								nick: user.username,
+								tempo: user.preso - currTime,
+								vezes: user.roubosL,
+								fugiu: user.qtFugas,
+								tentou: user.fuga === user.preso
+							})
 							// total += 1
 						}
 					}
@@ -644,13 +640,13 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 					.setStyle('SECONDARY')
 					.setLabel('Anterior')
 					.setEmoji('⬅️')
-					.setCustomId(message.id + message.author.id + 'prev')
+					.setCustomId('prev')
 
 				let buttonProx = new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Próximo')
 					.setEmoji('➡️')
-					.setCustomId(message.id + message.author.id + 'next')
+					.setCustomId('next')
 
 				const rowPresos = new Discord.MessageActionRow()
 
@@ -660,21 +656,21 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 				}).catch(() => console.log("Não consegui enviar mensagem `prisao`"))
 
 				const filterPresos = (button) => [
-					message.id + message.author.id + 'prev',
-					message.id + message.author.id + 'next',
+					'prev',
+					'next',
 				].includes(button.customId) && button.user.id === message.author.id
 
-				const collectorPresos = message.channel.createMessageComponentCollector({
+				const collectorPresos = msgPresos.createMessageComponentCollector({
 					filter: filterPresos,
 					time: 90000,
 				})
 
 				collectorPresos.on('collect', async b => {
 					await b.deferUpdate()
-					if (b.customId === message.id + message.author.id + 'prev' || b.customId === message.id + message.author.id + 'next') {
-						if (b.customId === message.id + message.author.id + 'prev')
+					if (b.customId === 'prev' || b.customId === 'next') {
+						if (b.customId === 'prev')
 							currentIndex -= 15
-						else if (b.customId === message.id + message.author.id + 'next')
+						else if (b.customId === 'next')
 							currentIndex += 15
 
 						let rowBtn = new Discord.MessageActionRow()
@@ -696,7 +692,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 						}).catch(() => console.log("Não consegui editar mensagem `presos`"))
 				})
 			}
-			else if (b.customId === message.id + message.author.id + 'fugir') {
+			else if (b.customId === 'fugir') {
 				btnFugir.setDisabled(true)
 
 				msg.edit({
@@ -706,7 +702,7 @@ Caso falhe em fugir, há uma pequena chance de ser baleado e hospitalizado.`)
 				bot.commands.get('prisao').run(bot, message, ['fugir'])
 
 			}
-			else if (b.customId === message.id + message.author.id + 'subornar') {
+			else if (b.customId === 'subornar') {
 				btnSubornar.setDisabled(true)
 
 				msg.edit({

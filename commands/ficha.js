@@ -26,17 +26,17 @@ exports.run = async (bot, message, args) => {
 	if (id < 0 || (id % 1 != 0) || id.toString().length != 18)
 		return bot.createEmbed(message, `Caralho, Jacobi, o ID é inválido`)
 
-	let uData = bot.data.get(id)
+	let uData = await bot.data.get(id)
 
 	if (!uData || uData.username == undefined) return bot.createEmbed(message, `Este usuário não possui um inventário`)
 
 	if (option == "add") {
 		let fichas = uData.ficha + valor
-		bot.data.set(id, fichas, "ficha")
+		await bot.data.set(`${id}.ficha`, fichas)
 
 		const moneyAddado = new Discord.MessageEmbed()
 			.setColor(bot.colors.darkGrey)
-			.setDescription(`**${bot.data.get(message.author.id, "username")}** adicionou ${valor.toLocaleString().replace(/,/g, ".")} fichas no seu inventário`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")}** adicionou ${valor.toLocaleString().replace(/,/g, ".")} fichas no seu inventário`)
 
 		bot.users.fetch(id).then(user => user.send({
 			embeds: [moneyAddado]
@@ -45,18 +45,18 @@ exports.run = async (bot, message, args) => {
 		bot.createEmbed(message, `${bot.config.ficha} Surgiram magicamente ${valor.toLocaleString().replace(/,/g, ".")} fichas no inventário de **${uData.username}**`)
 
 		return bot.log(message, new Discord.MessageEmbed()
-			.setDescription(`**${bot.data.get(message.author.id, "username")} adicionou ${valor.toLocaleString().replace(/,/g, ".")} fichas no inventário de ${uData.username}**`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")} adicionou ${valor.toLocaleString().replace(/,/g, ".")} fichas no inventário de ${uData.username}**`)
 			.setColor(bot.colors.admin))
 	}
 
 	if (option == "set") {
 		let oldFichas = uData.ficha
 		let fichas = valor
-		bot.data.set(id, fichas, "ficha")
+		await bot.data.set(`${id}.ficha`, fichas)
 
 		const moneySetado = new Discord.MessageEmbed()
 			.setColor(bot.colors.darkGrey)
-			.setDescription(`**${bot.data.get(message.author.id, "username")}** removeu ${oldFichas.toLocaleString().replace(/,/g, ".")} fichas do seu inventário, mas setou outras ${fichas.toLocaleString().replace(/,/g, ".")}`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")}** removeu ${oldFichas.toLocaleString().replace(/,/g, ".")} fichas do seu inventário, mas setou outras ${fichas.toLocaleString().replace(/,/g, ".")}`)
 
 		bot.users.fetch(id).then(user => user.send({
 			embeds: [moneySetado]
@@ -65,7 +65,7 @@ exports.run = async (bot, message, args) => {
 		bot.createEmbed(message, `${bot.config.ficha} Sumiram ${oldFichas.toLocaleString().replace(/,/g, ".")} do inventário de **${uData.username}**, mas outras ${fichas.toLocaleString().replace(/,/g, ".")} apareceram`)
 
 		return bot.log(message, new Discord.MessageEmbed()
-			.setDescription(`**${bot.data.get(message.author.id, "username")} removeu ${oldFichas.toLocaleString().replace(/,/g, ".")} fichas do inventário de ${uData.username}, mas adicionou ${fichas.toLocaleString().replace(/,/g, ".")}**`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")} removeu ${oldFichas.toLocaleString().replace(/,/g, ".")} fichas do inventário de ${uData.username}, mas adicionou ${fichas.toLocaleString().replace(/,/g, ".")}**`)
 			.setColor(bot.colors.admin))
 	}
 

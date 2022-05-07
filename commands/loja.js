@@ -4,7 +4,7 @@ exports.run = async (bot, message, args) => {
 	let option = args[0]
 	let multiplicador = args[1] ? args[1] : 1
 	const tres_dias = 259200000
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	// const desconto = uData.classe == 'mafioso' ? 0.95 : 1 // 1 = 0%, 0.7 = 30%
 
 	if (!option) {
@@ -68,13 +68,13 @@ exports.run = async (bot, message, args) => {
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
 
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
-	Object.values(bot.guns).forEach(gun => {
+	for (const gun of Object.values(bot.guns)) {
 		if (parseInt(option) === gun.id) {
 			let preço = uData.classe === 'mafioso' ? gun.preço * multiplicador : gun.preço * multiplicador * (1 + bot.imposto)
 			if (uData.moni < preço)
@@ -90,7 +90,7 @@ exports.run = async (bot, message, args) => {
 
 			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${emote} **${gun.desc}**`, `Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 'GREEN')
 
-			bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
+			await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
 
 			Object.entries(uData.arma).forEach(([key, value]) => {
 				if (key === gun.data && gun.data !== 'minigun')
@@ -105,8 +105,8 @@ exports.run = async (bot, message, args) => {
 				.addField("Tempo restante", bot.segToHour((uData.arma[gun.data].tempo - currTime) / 1000), true)
 				.setColor('GREEN'))
 		}
-	})
-	return bot.data.set(message.author.id, uData)
+	}
+	return await bot.data.set(message.author.id, uData)
 
 
 }

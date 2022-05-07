@@ -2,14 +2,14 @@ const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	// if (message.author.id != bot.config.adminID)
 	// 	return
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	// const LIMIT = 100
 	let currTime = new Date().getTime()
 	let valorFicha = 80 // cada ficha vale 80 no câmbio
 	let texto = ''
 	let option = args[0]
 
-	if (!option){
+	if (!option) {
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.mafiaCasino} Câmbio`)
 			.setDescription(`Troque suas fichas por dinheiro! Cada ficha vale R$ 80.
@@ -19,7 +19,7 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 \`;cambio [quantidade]\``)
 			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 			.setTimestamp()
-		
+
 		return message.channel.send({embeds: [embed]})
 			.catch(() => console.log("Não consegui enviar mensagem `cambio`"))
 	}
@@ -38,10 +38,10 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 	// if (uData.job != null)
 	// 	return bot.msgTrabalhando(message, uData)
 
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 	if (['allin', 'all', 'tudo'].includes(option))
@@ -70,7 +70,7 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`${bot.config.mafiaCasino} Câmbio`)
 		.setDescription(`${texto}Confirmar troca de ${bot.config.ficha} ${valor.toLocaleString().replace(/,/g, ".")} fichas por R$ ${cambio.toLocaleString().replace(/,/g, ".")}?`)
-		.setFooter(`${bot.user.username} • "Me manda uma esmola!"`, bot.user.avatarURL())
+		.setFooter({text: `${bot.user.username} • "Me manda uma esmola!"`, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 
 	let row = new Discord.MessageActionRow()
@@ -78,13 +78,13 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 			.setStyle('SUCCESS')
 			.setLabel('Aceitar')
 			.setEmoji(aceitar)
-			.setCustomId(message.id + message.author.id + 'aceitar'))
+			.setCustomId('aceitar'))
 
 		.addComponents(new Discord.MessageButton()
 			.setStyle('DANGER')
 			.setLabel('Cancelar')
 			.setEmoji(negar)
-			.setCustomId(message.id + message.author.id + 'negar'))
+			.setCustomId('negar'))
 
 
 	let msg = await message.channel.send({embeds: [embed], components: [row]})
@@ -92,30 +92,30 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 
 
 	const filter = (button) => [
-		message.id + message.author.id + 'aceitar',
-		message.id + message.author.id + 'negar',
+		'aceitar',
+		'negar',
 	].includes(button.customId) && button.user.id === message.author.id
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter,
 		time: 90000,
 	})
 
 	collector.on('collect', async b => {
 		await b.deferUpdate()
-		
-		if (b.customId === message.id + message.author.id + 'aceitar') {
-			uData = bot.data.get(message.author.id)
 
-			if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (b.customId === 'aceitar') {
+			uData = await bot.data.get(message.author.id)
+
+			if (await bot.isUserEmRouboOuEspancamento(message, uData))
 				return
 
-			if (bot.isPlayerMorto(uData)) return
+			if (await bot.isPlayerMorto(uData)) return
 
-			if (bot.isPlayerViajando(uData))
+			if (await bot.isPlayerViajando(uData))
 				return bot.msgPlayerViajando(message)
 
-			if (bot.isGaloEmRinha(message.author.id))
+			if (await bot.isGaloEmRinha(message.author.id))
 				return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 			if (uData.ficha < 1)
@@ -124,28 +124,32 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 			if (parseInt(uData.ficha) < valor)
 				return bot.createEmbed(message, `Você não tem esta quantidade de ${bot.config.ficha} **fichas** para trocar`, `Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")}`)
 
-			if (cambio > bot.banco.get('cassino'))
-				return bot.createEmbed(message, `O Cassino não tem caixa suficiente para trocar fichas com você`, `Caixa: R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
+			if (cambio > await bot.banco.get('cassino'))
+				return bot.createEmbed(message, `O Cassino não tem caixa suficiente para trocar fichas com você`, `Caixa: R$ ${await bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`)
 
 			uData.ficha -= valor
 			uData.moni += cambio
-			bot.banco.set('cassino', bot.banco.get('cassino') - cambio)
+			await bot.banco.set('cassino', await bot.banco.get('cassino') - cambio)
 
-			bot.data.set(message.author.id, uData)
+			await bot.data.set(message.author.id, uData)
 
 			embed.setDescription(`Você trocou ${bot.config.ficha} **${valor.toLocaleString().replace(/,/g, ".")} fichas** por R$ ${cambio.toLocaleString().replace(/,/g, ".")} ${bot.config.mafiaCasino}`)
 				.setColor('GREEN')
-				.setFooter(`${bot.user.username} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, bot.user.avatarURL())
+				.setFooter({
+					text: `${bot.user.username} • Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`,
+					iconURL: bot.user.avatarURL()
+				})
 
 			return msg.edit({
 				embeds: [embed],
 				components: []
 			}).catch(() => console.log("Não consegui editar mensagem `cambio`"))
 
-		} else if (b.customId === message.id + message.author.id + 'negar') {
+		}
+		else if (b.customId === 'negar') {
 			embed.setDescription(`Câmbio recusado`)
 				.setColor('RED')
-				.setFooter(`${bot.user.username} • "Bora apostar mais!"`, bot.user.avatarURL())
+				.setFooter({text: `${bot.user.username} • "Bora apostar mais!"`, iconURL: bot.user.avatarURL()})
 
 			return msg.edit({
 				embeds: [embed],
@@ -159,7 +163,7 @@ O valor da ficha no ${bot.config.hospital} Hospital é de R$ 60 e na ${bot.confi
 			components: []
 		}).catch(() => console.log("Não consegui editar mensagem `cambio`"))
 	})
-		
+
 }
 exports.config = {
 	alias: ['c', 'exchange']

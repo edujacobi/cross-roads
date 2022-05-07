@@ -2,7 +2,7 @@ const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	let currTime = new Date().getTime()
 
-	function trabalhar(bot, message, job, uData, key) {
+	async function trabalhar(bot, message, job, uData, key) {
 		if (job == undefined || key == undefined)
 			return
 
@@ -22,18 +22,18 @@ exports.run = async (bot, message, args) => {
 		setTimeout(() => {
 			message.author.send({embeds: [embedPV]})
 				.catch(() => message.reply(`você terminou o trabalho **${job.desc}**! ${bot.config.trabalhando}${aviso}`)
-					.catch(() => `Não consegui responder ${bot.data.get(message.author.id, "username")} nem no PV nem no canal. \`Job\``))
+					.catch(async () => `Não consegui responder ${uData.username} nem no PV nem no canal. \`Job\``))
 		}, uData.jobTime - currTime)
 
-		bot.data.set(message.author.id, uData)
-		
+		await bot.data.set(message.author.id, uData)
+
 		return bot.log(message, new Discord.MessageEmbed()
 			.setDescription(`**${uData.username} começou a trabalhar de ${job.desc}**`)
 			.setColor('YELLOW'))
 
 	}
 
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 
 	let day = new Date().getDay()
 	let hora = new Date().getHours()
@@ -48,9 +48,9 @@ exports.run = async (bot, message, args) => {
 	if (!option) {
 		if (uData.job == null)
 			return bot.createEmbed(message, `Você não está trabalhando ${bot.config.trabalhos}`, null, 'YELLOW')
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		let minutes = Math.floor((uData.jobTime - currTime) / 1000)
@@ -81,7 +81,7 @@ exports.run = async (bot, message, args) => {
 		else
 			bot.createEmbed(message, `Você não pode parar o que nem começou ${bot.config.trabalhos}`, null, 'YELLOW')
 
-		return bot.data.set(message.author.id, uData)
+		return await bot.data.set(message.author.id, uData)
 	}
 
 
@@ -94,10 +94,10 @@ exports.run = async (bot, message, args) => {
 	// if (option == 13)
 	// 	return bot.createEmbed(message, `Trabalho em manutenção ${bot.config.trabalhando}`)
 	
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 	
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 	if (uData.job != null)

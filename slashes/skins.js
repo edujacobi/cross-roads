@@ -53,7 +53,7 @@ exports.run = async (bot, interaction) => {
 	collector.on('collect', async s => {
 		await s.deferUpdate()
 
-		let uData = bot.data.get(interaction.user.id)
+		let uData = await bot.data.get(interaction.user.id)
 
 		let armaSelecionada = null
 		let skins = ''
@@ -112,7 +112,7 @@ exports.run = async (bot, interaction) => {
 		collectorComprar.on('collect', async c => {
 			await c.deferUpdate()
 			let currTime = Date.now()
-			uData = bot.data.get(interaction.user.id)
+			uData = await bot.data.get(interaction.user.id)
 			if (c.user.id !== interaction.user.id) return
 
 			if (c.customId.includes('back'))
@@ -120,9 +120,9 @@ exports.run = async (bot, interaction) => {
 					.catch(() => console.log("Não consegui editar mensagem `skins`"))
 
 			else if (c.customId.includes('selecionar')) {
-				Object.values(bot.guns).forEach(arma => {
+				for (const arma of Object.values(bot.guns)) {
 					if (c.customId.includes(arma.desc)) {
-						Object.entries(arma.skins).forEach(([id, skin]) => {
+						for (const [id, skin] of Object.entries(arma.skins)) {
 							if (c.customId.includes(skin.nome)) {
 								if (uData.vipTime < currTime && !skin.evento && id !== 'default') {
 									const embed = new Discord.MessageEmbed()
@@ -130,7 +130,7 @@ exports.run = async (bot, interaction) => {
 										.setDescription(`Você precisa ser ${bot.config.vip} **VIP** para usar skins que não são de eventos!`)
 									// .setTimestamp()
 									// .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
-									return interaction.followUp({embeds: [embed]})
+									return await interaction.followUp({embeds: [embed]})
 								}
 								if (!uData.arma[arma.data].skinsCompradas.includes(id))
 									uData.arma[arma.data].skinsCompradas.push(id)
@@ -143,15 +143,15 @@ exports.run = async (bot, interaction) => {
 								// .setTimestamp()
 								// .setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 
-								interaction.editReply({components: [row]})
+								await interaction.editReply({components: [row]})
 
-								bot.data.set(interaction.user.id, uData)
-								return interaction.followUp({embeds: [embed]})
+								await bot.data.set(interaction.user.id, uData)
+								await interaction.followUp({embeds: [embed]})
 
 							}
-						})
+						}
 					}
-				})
+				}
 			}
 		})
 		collectorComprar.on('end', () => {

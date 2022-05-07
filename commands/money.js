@@ -12,63 +12,63 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `${bot.config.coin} \`;money <add|set> <quantidade> <id>\``)
 
 	if (!option)
-		return bot.createEmbed(message, `Pelo amor de deus, ${bot.data.get(message.author.id, "username")}, escolha uma opção`)
+		return bot.createEmbed(message, `Pelo amor de deus, ${bot.data.get(message.author.id + ".username")}, escolha uma opção`)
 
 	// if (!valor)
 	// 	return bot.createEmbed(message, `Porra, Jacobi, defina um valor`)
 
 	if (valor < 0 || (valor % 1 != 0))
-		return bot.createEmbed(message, `PQP, ${bot.data.get(message.author.id, "username")}, a quantidade é inválida`)
+		return bot.createEmbed(message, `PQP, ${bot.data.get(message.author.id + ".username")}, a quantidade é inválida`)
 
 	if (!id)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, escolha um ID de usuário`)
+		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id + ".username")}, escolha um ID de usuário`)
 
 	if (id < 0 || (id % 1 != 0) || id.toString().length != 18)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, o ID é inválido`)
+		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id + ".username")}, o ID é inválido`)
 
-	let uData = bot.data.get(id)
+	let uData = await bot.data.get(id)
 
 	if (!uData || uData.username == undefined) return bot.createEmbed(message, `Este usuário não possui um inventário`)
 
-	if (option == "add") {
+	if (option === "add") {
 		let money = uData.moni + valor
-		bot.data.set(id, money, "moni")
+		await bot.data.set(id + ".moni", money)
 
 		const moneyAddado = new Discord.MessageEmbed()
 			.setColor(bot.colors.darkGrey)
-			// .setDescription(`**${bot.data.get(message.author.id, "username")}** adicionou ${bot.config.ovo} ${valor.toLocaleString().replace(/,/g, ".")} Ovos de páscoa no seu inventário`)
+			// .setDescription(`**${bot.data.get(message.author.id + ".username")}** adicionou ${bot.config.ovo} ${valor.toLocaleString().replace(/,/g, ".")} Ovos de páscoa no seu inventário`)
 
-			.setDescription(`**${bot.data.get(message.author.id, "username")}** adicionou R$ ${valor.toLocaleString().replace(/,/g, ".")} no seu inventário`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")}** adicionou R$ ${valor.toLocaleString().replace(/,/g, ".")} no seu inventário`)
 
 		bot.users.fetch(id).then(user => user.send({
 			embeds: [moneyAddado]
-		}).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
+		}).catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
 		// return bot.createEmbed(message, `${bot.config.coin} Surgiram magicamente ${bot.config.ovo} ${valor.toLocaleString().replace(/,/g, ".")} Ovos de páscoa no inventário de **${uData.username}**`)
 
 		bot.createEmbed(message, `${bot.config.coin} Surgiram magicamente R$ ${valor.toLocaleString().replace(/,/g, ".")} no inventário de **${uData.username}**`)
 
 		return bot.log(message, new Discord.MessageEmbed()
-			.setDescription(`**${bot.data.get(message.author.id, "username")} adicionou R$ ${valor.toLocaleString().replace(/,/g, ".")} no inventário de ${uData.username}**`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")} adicionou R$ ${valor.toLocaleString().replace(/,/g, ".")} no inventário de ${uData.username}**`)
 			.setColor(bot.colors.admin))
 	}
 	if (option == "set") {
 		let oldMoney = uData.moni
 		let money = valor
-		bot.data.set(id, money, "moni")
+		await bot.data.set(id + ".moni", money)
 
 		const moneySetado = new Discord.MessageEmbed()
 			.setColor(bot.colors.darkGrey)
-			.setDescription(`**${bot.data.get(message.author.id, "username")}** removeu ${oldMoney.toLocaleString().replace(/,/g, ".")} do seu inventário, mas setou outros R$ ${valor.toLocaleString().replace(/,/g, ".")}`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")}** removeu ${oldMoney.toLocaleString().replace(/,/g, ".")} do seu inventário, mas setou outros R$ ${valor.toLocaleString().replace(/,/g, ".")}`)
 
-		bot.users.fetch(id).then(user => user.send({
-			embeds: [moneySetado]
-		}).catch(err => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
+		bot.users.fetch(id).then(user =>
+			user.send({embeds: [moneySetado]})
+				.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id})`)))
 
 		bot.createEmbed(message, `${bot.config.coin} Sumiram R$ ${oldMoney.toLocaleString().replace(/,/g, ".")} do inventário de **${uData.username}**, mas outros R$ ${valor.toLocaleString().replace(/,/g, ".")} apareceram`)
 
 		return bot.log(message, new Discord.MessageEmbed()
-			.setDescription(`**${bot.data.get(message.author.id, "username")} removeu R$ ${oldMoney.toLocaleString().replace(/,/g, ".")} do inventário de ${uData.username}, mas adicionou R$ ${valor.toLocaleString().replace(/,/g, ".")}**`)
+			.setDescription(`**${await bot.data.get(message.author.id + ".username")} removeu R$ ${oldMoney.toLocaleString().replace(/,/g, ".")} do inventário de ${uData.username}, mas adicionou R$ ${valor.toLocaleString().replace(/,/g, ".")}**`)
 			.setColor(bot.colors.admin))
 	}
 
-};
+}

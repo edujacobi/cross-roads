@@ -1,6 +1,7 @@
 const {SlashCommandBuilder} = require('@discordjs/builders')
 exports.run = async (bot, interaction) => {
 	const Discord = require('discord.js')
+	const QUANTIA = await bot.banco.get('caixa')
 	const embed = new Discord.MessageEmbed()
 
 		.setTitle(`${bot.config.cash} Banco Central`)
@@ -8,7 +9,7 @@ exports.run = async (bot, interaction) => {
 		.setColor('GREEN')
 		.setThumbnail("https://cdn.discordapp.com/attachments/531174573463306240/757057425735024720/radar_cash.png")
 		// .addField("Segurança aumentada", "Altamente protegido!")
-		.addField("Cofre", `R$ ${bot.banco.get('caixa').toLocaleString().replace(/,/g, ".")}`)
+		.addField("Cofre", `R$ ${QUANTIA.toLocaleString().replace(/,/g, ".")}`)
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
 

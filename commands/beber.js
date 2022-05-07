@@ -12,40 +12,42 @@ exports.run = async (bot, message, args) => {
 		return hora >= 20 && hora <= 22 || dia === 0 || dia === 6
 	}
 
-	function getTop(max) {
+	async function getTop(max) {
 		let top = []
 
-		bot.beberroes.forEach((user, id) => { //gera lista para top global
-			if (user.maximo.normal > 0 || user.maximo.happyHour > 0) {
+		await bot.beberroes.map(async (user, id) => {
+			// console.log(user)
+			if (typeof user != 'number' && (user.maximo.normal > 0 || user.maximo.happyHour > 0)) {
 				top.push({
-					nick: bot.data.get(id, "username"),
+					nick: await bot.data.get(`${id}.username`),
 					id: id,
 					maximo: user.maximo,
 					ultima: Math.round(user.ultimaBebida / 1000),
 				})
 			}
 		})
-		
+
 		return isHappyHour() ? top.sort((a, b) => b.maximo.happyHour - a.maximo.happyHour).slice(0, max) : top.sort((a, b) => b.maximo.normal - a.maximo.normal).slice(0, max)
 	}
 
 	const MINUTOS = 3
 
-	function getStrBeberroes() {
-		let uData = bot.data.get(message.author.id)
+	async function getStrBeberroes() {
+		let uData = await bot.data.get(message.author.id)
 		let bbrs = uData.username
-		bot.beberroes.forEach((user, id) => { //gera lista para top global
+		/*for (const user of bot.beberroes) {
+			const id = bot.beberroes.indexOf(user) //gera lista para top global
 			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 1000 > Date.now()) {
-				bbrs += `, ${bot.data.get(id, "username")}`
+				bbrs += `, ${await bot.data.get(`${id}.username`)}`
 			}
-		})
+		}*/
 
 		return bbrs
 	}
 
-	function getQtBeberroes() {
+	async function getQtBeberroes() {
 		let count = 1
-		bot.beberroes.forEach((user, id) => { //gera lista para top global
+		await bot.beberroes.map((user, id) => { //gera lista para top global
 			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 1000 > Date.now()) {
 				count += 1
 			}
@@ -54,7 +56,7 @@ exports.run = async (bot, message, args) => {
 		return count
 	}
 
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 
 	let adjetivo = ['campeão', 'guerreiro', 'meu bruxo', 'meu amigo', 'meu chapa', 'cliente', 'comparsa', 'parceiro', 'meu cupinxa']
 
@@ -79,13 +81,13 @@ exports.run = async (bot, message, args) => {
 		.setStyle('SECONDARY')
 		.setLabel('Beber!')
 		.setDisabled(uData.preso > currTime || uData.hospitalizado > currTime || (uData.jobTime > currTime && uData.job != null) || uData.emRoubo.tempo > currTime || uData.emEspancamento.tempo > currTime)
-		.setCustomId(message.id + message.author.id + 'beber')
+		.setCustomId('beber')
 
 	const buttonTop = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		.setLabel('Beberrões')
 		.setEmoji(bot.config.vadiando)
-		.setCustomId(message.id + message.author.id + 'top')
+		.setCustomId('top')
 
 	let row = new Discord.MessageActionRow()
 		.addComponents(button)
@@ -95,9 +97,9 @@ exports.run = async (bot, message, args) => {
 		components: [row], embeds: [embed]
 	}).catch(() => console.log("Não consegui enviar mensagem `beber`"))
 
-	const filter = (button) => [message.id + message.author.id + 'beber', message.id + message.author.id + 'top'].includes(button.customId) && button.user.id === message.author.id
+	const filter = (button) => ['beber', 'top'].includes(button.customId) && button.user.id === message.author.id
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter, idle: 60000
 	})
 
@@ -107,8 +109,8 @@ exports.run = async (bot, message, args) => {
 		await i.deferUpdate()
 		if (i.user.id !== message.author.id) return
 
-		if (i.customId === message.id + message.author.id + 'top') {
-			let topGlobal = getTop(15)
+		if (i.customId === 'top') {
+			let topGlobal = await getTop(15)
 
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.vadiando} Top Beberrões ${isHappyHour() ? `(Happy Hour)` : ''}`)
@@ -134,26 +136,26 @@ exports.run = async (bot, message, args) => {
 				.catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
 		}
 
-		else if (i.customId === message.id + message.author.id + 'beber') {
+		else if (i.customId === 'beber') {
 
-			let uData = bot.data.get(message.author.id)
+			let uData = await bot.data.get(message.author.id)
 			let currTime = new Date().getTime()
 
 			if (uData.preso > currTime) return bot.msgPreso(message, uData)
 			if (uData.hospitalizado > currTime) return bot.msgHospitalizado(message, uData)
 			if (uData.jobTime > currTime && uData.job != null) return bot.msgTrabalhando(message, uData)
-			if (bot.isUserEmRouboOuEspancamento(message, uData)) return
-			if (bot.isPlayerMorto(uData)) return
-			if (bot.isPlayerViajando(uData)) return bot.msgPlayerViajando(message)
+			if (await bot.isUserEmRouboOuEspancamento(message, uData)) return
+			if (await bot.isPlayerMorto(uData)) return
+			if (await bot.isPlayerViajando(uData)) return bot.msgPlayerViajando(message)
 
-			let beberrao = bot.beberroes.get(message.author.id)
+			let beberrao = await bot.beberroes.get(message.author.id)
 			if (!beberrao) {
 				let obj = {
 					maximo: {
 						normal: 0, happyHour: 0,
 					}, ultimaBebida: 0,
 				}
-				bot.beberroes.set(message.author.id, obj)
+				await bot.beberroes.set(message.author.id, obj)
 			}
 
 			button.setLabel('Beber mais!')
@@ -170,11 +172,11 @@ exports.run = async (bot, message, args) => {
 			let bebida = bot.shuffle(bebidas)[0]
 			let sensacao = bot.shuffle(sensacoes)[0]
 
-			bot.beberroes.set(message.author.id, Date.now(), 'ultimaBebida')
+			await bot.beberroes.set(message.author.id, Date.now(), 'ultimaBebida')
 
-			if (!isHappyHour() && count > bot.beberroes.get(message.author.id, 'maximo.normal')) bot.beberroes.set(message.author.id, count, 'maximo.normal')
+			if (!isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.normal')) await bot.beberroes.set(message.author.id, count, 'maximo.normal')
 
-			if (isHappyHour() && count > bot.beberroes.get(message.author.id, 'maximo.happyHour')) bot.beberroes.set(message.author.id, count, 'maximo.happyHour')
+			if (isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.happyHour')) await bot.beberroes.set(message.author.id, count, 'maximo.happyHour')
 
 			count++
 
@@ -184,7 +186,7 @@ exports.run = async (bot, message, args) => {
 				// uData.qtHospitalizado += 1
 				let minutos = Math.floor(bot.getRandom(1, 5))
 				uData.hospitalizado = currTime + minutos * 60 * 1000
-				bot.data.set(message.author.id, uData)
+				await bot.data.set(message.author.id, uData)
 				textoComa = `\n${bot.config.hospital} Você bebeu demais e entrou em coma alcoólico, e ficará hospitalizado por ${bot.segToHour(minutos * 60)}`
 				collector.stop()
 			}
@@ -207,7 +209,7 @@ exports.run = async (bot, message, args) => {
 				.setColor(textoComa === '' ? 'AQUA' : bot.colors.hospital)
 				.setTimestamp()
 				.setFooter({
-					text: `Bebendo agora (${getQtBeberroes()}): ${getStrBeberroes()}`,
+					text: `Bebendo agora (${await getQtBeberroes()}): ${await getStrBeberroes()}`,
 					iconURL: message.member.user.avatarURL()
 				})
 

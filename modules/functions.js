@@ -5,6 +5,9 @@ module.exports = bot => {
 	bot.moderators = ['145466251496390656', '843955033543540756', '606290632725626940', '555414232989040661', '731765213237346357', '274726815476744192']
 	bot.ajudantes = ['593444673297580042', '761236646116982844', '736646173225385985']
 
+	const semana = 604800000 // 7 dias
+	const hora = 3600000 // 1h
+
 	bot.palavrasBanidas = [
 		'arrombado', 'viado', 'fdp', 'buceta', 'puta', 'caralh', 'filhadaputagem', 'filhodaputa', 'nazista',
 		'fudido', 'verme', 'cuzin', 'fuder', 'biscate', 'meretriz', 'retardado', 'prostituta', 'vsf',
@@ -43,7 +46,7 @@ module.exports = bot => {
 		return `${segundos > 3600 ? `${Math.floor(segundos / 3600)} ${segundos < 7200 ? `hora` : `horas`}${segundos % 3600 === 0 ? '' : ` e ${Math.floor((segundos / 60) % 60)} minutos`}` : Math.floor(segundos) < 60 ? `${Math.floor(segundos)} segundos` : `${Math.floor(segundos / 60)} minutos`}`
 	}
 
-	bot.findUser = (message, args) => {
+	bot.findUser = async (message, args) => {
 		/*
 		Para ver inventário sem pingar (funciona para outros servidores)
 		 Se não tiver uma menção, ele irá pegar a string fornecida (espera-se o username do usuário) e irá procurar
@@ -53,14 +56,35 @@ module.exports = bot => {
 		*/
 		let targetMention = message.mentions.members.first()
 		let targetNoMention
+		let user
+
 		if (args[0] && !targetMention) {
 			// se não mencionou mas quer ver inv de outro user
-			let name = args.join(' ').toLowerCase()
+			let name = args.join(' ')
 
-			bot.data.forEach((user, id) => {
-				if (user.username?.toLowerCase() === name || id.toString() === name)
-					targetNoMention = id
-			})
+			user = await bot.data.get(name)
+
+			if (user)
+				targetNoMention = name
+
+			else {
+				user = await bot.data.find("username", name)
+
+				if (!user)
+					user = await bot.data.find(user => user.username?.toLowerCase() === name.toLowerCase())
+
+				if (user) {
+					targetNoMention = Object.entries(user)[0][0]
+					user = Object.entries(user)[0][1]
+				}
+			}
+			// bot.data.forEach((user, id) => {
+			// 	console.log(id)
+			// 	if (user.username?.toLowerCase() === name || id.toString() === name) {
+			// 		console.log(id)
+			// 		targetNoMention = id
+			// 	}
+			// })
 
 			if (!targetNoMention)
 				return bot.createEmbed(message, 'Usuário não encontrado.')
@@ -68,7 +92,7 @@ module.exports = bot => {
 
 		let alvo = targetNoMention ? targetNoMention : targetMention ? targetMention.id : message.author.id
 
-		let uData = bot.data.get(alvo)
+		let uData = user ? user : await bot.data.get(alvo)
 
 		if (!uData || uData.username === undefined)
 			return bot.createEmbed(message, 'Este usuário não possui um inventário')
@@ -77,15 +101,20 @@ module.exports = bot => {
 	}
 
 	bot.decrescimoNivelCasal = async () => {
-		bot.casais.forEach((casal, id) => {
+		if (Date.now() - bot.functionTimers.get('decrescimoNivelCasal') < hora)
+			return
+		
+		await bot.casais.map(async (casal, id) => {
 			if (casal.conjuges) {
 				casal.nivel -= casal.ultimoDecrescimo
 				casal.ultimoDecrescimo += casal.viagem > Date.now() ? 0 : 1
 				if (casal.nivel < 0)
 					casal.nivel = 0
-				bot.casais.set(id, casal)
+				await bot.casais.set(id, casal)
 			}
 		})
+		
+		bot.functionTimers.set('decrescimoNivelCasal', Date.now())
 	}
 
 	bot.defaultCarteira = {
@@ -252,6 +281,7 @@ module.exports = bot => {
 		celularCredito: 0,
 		dataInicio: '',
 		classeAlterada: 0,
+		lastCommandChannelId: null,
 	}
 
 	bot.defaultGalo = {
@@ -298,22 +328,39 @@ module.exports = bot => {
 		valorRoubadoBanco: 0,
 	}
 
-	bot.isGaloEmRinha = id => {
-		return bot.galos.get(id, 'emRinha')
+	bot.isGaloEmRinha = async id => {
+		return await bot.galos.get(id + '.emRinha')
 	}
 
 	bot.investReceber = async () => {
-		bot.channels.cache.get('848232046387396628').send({
-			embeds: [new Discord.MessageEmbed().setDescription(`${bot.config.propertyG} Pagamento dos investimentos iniciado`)],
-		})
-		const semana = 604800000 // 7 dias
 		const hora = 3600000 // 1h
+		if (Date.now() - bot.functionTimers.get('investReceber') < hora)
+			return
+		bot.functionTimers.set('investReceber', Date.now())
+		const embed = new Discord.MessageEmbed()
+			.setDescription(`${bot.config.propertyG} Pagamento dos investimentos iniciado`)
+
+		bot.shard.broadcastEval(async (c, {channelId, embed}) => {
+			const channel = c.channels.cache.get(channelId)
+			if (!channel)
+				return false
+
+			await channel.send({embeds: [embed]})
+
+			return true
+
+		}, {context: {channelId: '848232046387396628', embed}})
+			.then(sentArray => {
+				if (!sentArray.includes(true))
+					return console.warn('Não encontrei o canal de log.')
+
+			})
 
 		let currTime = new Date().getTime()
 
-		bot.data.forEach((user, id) => {
+		await bot.data.map(async (user, id) => {
 			if (user.username != undefined && user.invest != null && user.preso < currTime && user.hospitalizado < currTime) {
-				if (bot.isPlayerMorto(user)) user.investLast = currTime
+				if (await bot.isPlayerMorto(user)) user.investLast = currTime
 
 				let horas = user.investTime + semana > currTime ? currTime - user.investLast : user.investTime + semana - user.investLast
 				// se investimento ainda não passou de uma semana, então horas = tempo atual - ultimo saque, senão horas = investTime + semana - investLast
@@ -350,7 +397,7 @@ module.exports = bot => {
 						const embedPV = new Discord.MessageEmbed()
 							.setTitle(`${bot.config.propertyR} Seu investimento ${invest} acabou. Você recebeu R$ ${praSacar.toLocaleString().replace(/,/g, '.')} dele`)
 							.setColor('RED')
-						
+
 						bot.users.fetch(id).then(user_send => {
 							user_send.send({embeds: [embedPV]})
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
@@ -360,7 +407,7 @@ module.exports = bot => {
 						const embedPV = new Discord.MessageEmbed()
 							.setTitle(`${bot.config.propertyR} Seu investimento ${invest} acabou.`)
 							.setColor('RED')
-						
+
 						bot.users.fetch(id).then(user_send => {
 							user_send.send({embeds: [embedPV]})
 								.catch(() => console.log(`Não consegui mandar mensagem privada para ${user.username} (${id}) Investimento`))
@@ -372,15 +419,36 @@ module.exports = bot => {
 					user.invest = null
 					user.investTime = 0
 				}
-				bot.data.set(id, user)
+				await bot.data.set(id, user)
 			}
 		})
-		bot.channels.cache.get('848232046387396628').send({
-			embeds: [new Discord.MessageEmbed().setDescription(`${bot.config.propertyG} Pagamento dos investimentos encerrado`)],
-		})
+
+		const embedFim = new Discord.MessageEmbed()
+			.setDescription(`${bot.config.propertyG} Pagamento dos investimentos encerrado`)
+
+
+		bot.shard.broadcastEval(async (c, {channelId, embed}) => {
+			const channel = c.channels.cache.get(channelId)
+			if (!channel)
+				return false
+
+			await channel.send({embeds: [embed]})
+
+			return true
+
+		}, {context: {channelId: '848232046387396628', embed: embedFim}})
+			.then(sentArray => {
+				if (!sentArray.includes(true))
+					return console.warn('Não encontrei o canal de log.')
+
+			})
 	}
 
-	bot.informRinhaRouboCancelado = () => {
+	bot.informRinhaRouboCancelado = async () => {
+		const hora = 3600000 // 1h
+		if (Date.now() - bot.functionTimers.get('informRinhaRouboCancelado') < hora)
+			return
+		bot.functionTimers.set('informRinhaRouboCancelados', Date.now())
 		// let currtime = new Date().getTime()
 		// bot.data.forEach((user, id) => {
 		// 	if (user.emRoubo.tempo > currtime) {
@@ -396,36 +464,52 @@ module.exports = bot => {
 		// 		});
 		// 	}
 		// })
-		bot.galos.forEach((galo, id) => {
-			if (galo.emRinha) {
-				bot.users.fetch(id).then(user_send => {
-					user_send.send(`O Cross Roads foi reiniciado durante sua rinha e ela foi cancelada ${bot.config.galo}`).catch(() => console.log(`Não consegui mandar mensagem privada para ${bot.data.get(id, 'username')} (${id})`))
-				})
-				bot.galos.set(id, false, 'emRinha')
+
+		let galos = await bot.galos.filter("emRinha", true)
+		// let galos = await bot.galos.filter("nome", 'Sigmano')
+
+		if (galos)
+			for (const galo of Object.entries(galos)) {
+				const id = galo[0][0]
+				if (galo[1].emRinha) {
+					bot.users.fetch(id).then(user_send => {
+						user_send.send(`O Cross Roads foi reiniciado durante sua rinha e ela foi cancelada ${bot.config.galo}`)
+							.catch(async () => console.log(`Não consegui mandar mensagem privada para ${await bot.data.get(`${id}.username`)} (${id})`))
+					})
+					await bot.galos.set(`${id}.emRinha`, false)
+				}
 			}
-		})
 	}
 
-	bot.putMoneyCassino = () => {
-		if (bot.banco.get('caixa') - bot.carregamentoCassino > 0) {
-			bot.banco.set('caixa', bot.banco.get('caixa') - bot.carregamentoCassino)
-			bot.banco.set('cassino', bot.banco.get('cassino') + bot.carregamentoCassino)
+	bot.putMoneyCassino = async () => {
+		const hora = 3600000 // 1h
+		if (Date.now() - bot.functionTimers.get('putMoneyCassino') < hora)
+			return
+		bot.functionTimers.set('putMoneyCassino', Date.now())
+		
+		if (await bot.banco.get('caixa') - bot.carregamentoCassino > 0) {
+			await bot.banco.set('caixa', await bot.banco.get('caixa') - bot.carregamentoCassino)
+			await bot.banco.set('cassino', await bot.banco.get('cassino') + bot.carregamentoCassino)
 		}
 	}
 
-	bot.removeSkinsNoVIP = () => {
-		bot.data.forEach((user, id) => {
+	bot.removeSkinsNoVIP = async () => {
+		if (Date.now() - bot.functionTimers.get('removeSkinsNoVIP') < hora)
+			return
+		bot.functionTimers.set('removeSkinsNoVIP', Date.now())
+		
+		await bot.data.map(async (user, id) => {
 			if (user.username != undefined && user.vipTime < Date.now()) {
 				Object.entries(user.arma).forEach(arma => {
 					if (arma[1].skinAtual !== 'default' && !bot.guns[arma[0]].evento)
 						arma[1].skinAtual = 'default'
 				})
-				bot.data.set(id, user)
+				await bot.data.set(id, user)
 			}
 		})
 	}
 
-	bot.getUserBadges = (userId, isInv) => {
+	bot.getUserBadges = async (userId, isInv) => {
 		let textoBadge = ''
 
 		// BADGES ------------------------------------
@@ -437,7 +521,7 @@ module.exports = bot => {
 			textoBadge += bot.badges.ajd
 		if (['592022325835202600', '565928906356424705', '666077411615572031'].includes(userId)) //ARTISTA
 			textoBadge += bot.badges.art
-		if (bot.data.get(userId, 'vipTime') > new Date().getTime()) // VIP
+		if (await bot.data.get(`${userId}.vipTime`) > new Date().getTime()) // VIP
 			textoBadge += bot.badges.vip
 
 		if (!isInv) {
@@ -661,13 +745,13 @@ module.exports = bot => {
 
 		if (['332228051871989761', '493121335749246989', '843955033543540756', '517013970310397974', '390655016307916812'].includes(userId)) textoBadge += bot.badges.evento_natal_2020 // 12/2020
 
-		if (bot.data.has(userId, 'badgePascoa2020_dourado') && bot.data.get(userId, 'badgePascoa2020_dourado') === true) textoBadge += bot.badges.ovos_dourados // 04/2021
+		if (await bot.data.has(`${userId}.badgePascoa2020_dourado`) && await bot.data.get(`${userId}.badgePascoa2020_dourado`) === true) textoBadge += bot.badges.ovos_dourados // 04/2021
 
 		if (['740753560706220153', '145466251496390656', '352125425901895687', '859916007853785128', '400425520182853647'].includes(userId)) textoBadge += bot.badges.coroamuruDerrotei // 06/2021
 
-		if (bot.data.has(userId, 'badgeHalloween2021') && bot.data.get(userId, 'badgeHalloween2021') === true) textoBadge += bot.badges.evento_halloween_2021 // 10/2021
+		if (await bot.data.has(`${userId}.badgeHalloween2021`) && await bot.data.get(`${userId}.badgeHalloween2021`) === true) textoBadge += bot.badges.evento_halloween_2021 // 10/2021
 
-		if (bot.data.has(userId, 'badgeNatal2021') && bot.data.get(userId, 'badgeNatal2021') === true) textoBadge += bot.badges.evento_natal_2021 // 12/2021
+		if (await bot.data.has(`${userId}.badgeNatal2021`) && await bot.data.get(`${userId}.badgeNatal2021`) === true) textoBadge += bot.badges.evento_natal_2021 // 12/2021
 
 		if ([
 			'593444673297580042', '782981311249121341', '662380115308576801',
@@ -685,7 +769,12 @@ module.exports = bot => {
 		return textoBadge + '\n'
 	}
 
-	bot.sortearBilhete = () => {
+	bot.sortearBilhete = async () => {
+		const _hora = 3600000 // 1h
+		if (Date.now() - bot.functionTimers.get('sortearBilhete') < _hora)
+			return
+		bot.functionTimers.set('sortearBilhete', Date.now())
+		
 		let hoje = new Date().getDay()
 		let hora = new Date().getHours()
 		let diaUltimoSorteio = bot.bilhete.get('diaUltimoSorteio')
@@ -697,12 +786,13 @@ module.exports = bot => {
 			// let cassino = 0
 			let participantes = []
 
-			bot.bilhete.forEach((user, id) => {
-				if (id === parseInt(id)) participantes.push(id)
+			await bot.bilhete.map((user, id) => {
+				if (id == parseInt(id))
+					participantes.push(id)
 			})
 
 			if (participantes.length === 0) {
-				bot.bilhete.set('diaUltimoSorteio', hoje)
+				await bot.bilhete.set('diaUltimoSorteio', hoje)
 				return
 			}
 
@@ -716,10 +806,10 @@ module.exports = bot => {
 				premio: total,
 			}
 
-			let uData = bot.data.get(numeroVencedor)
+			let uData = await bot.data.get(numeroVencedor)
 			uData.moni += total
 			uData.cassinoGanhos += total
-			bot.data.set(numeroVencedor, uData)
+			await bot.data.set(numeroVencedor, uData)
 
 			let dias = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado']
 
@@ -755,39 +845,55 @@ module.exports = bot => {
 				.addField('Bilhete vencedor', `#${bot.bilhete.get(numeroVencedor, 'numero')}`, true)
 				.setColor(bot.colors.darkGrey)
 
-			bot.banco.set('cassino', bot.banco.get('cassino') + cassino)
-			bot.bilhete.clear()
-			bot.bilhete.set('diaUltimoSorteio', hoje)
-			bot.bilhete.set('lastWinner', ganhador)
-			bot.bilhete.set('acumulado', 0)
+			await bot.banco.set('cassino', await bot.banco.get('cassino') + cassino)
+			await bot.bilhete.clear()
+			await bot.bilhete.set('diaUltimoSorteio', hoje)
+			await bot.bilhete.set('lastWinner', ganhador)
+			await bot.bilhete.set('acumulado', 0)
 
-			return bot.channels.cache.get('848232046387396628').send({embeds: [log],})
+			return bot.shard.broadcastEval(async (c, {channelId, embed}) => {
+				const channel = c.channels.cache.get(channelId)
+				if (!channel)
+					return false
+
+				await channel.send({embeds: [embed]})
+
+				return true
+
+			}, {context: {channelId: '848232046387396628', log}})
+				.then(sentArray => {
+					if (!sentArray.includes(true))
+						return console.warn('Não encontrei o canal de log.')
+
+				})
 		}
 	}
 
+	bot.findEmoji = async (client, {nameOrId}) => {
+		return await client.emojis.cache.get(nameOrId) || client.emojis.cache.find(e => e.name.toLowerCase() === nameOrId.toLowerCase())
+	}
+
 	bot.clean = async (bot, text) => {
-		if (text && text.constructor.name === 'Promise') text = await text
+		if (text && text.constructor.name === 'Promise')
+			text = await text
 
-		if (typeof evaled !== 'string')
-			text = require('util').inspect(text, {
-				depth: 1,
-			})
+		if (typeof text !== 'string')
+			text = require('util').inspect(text, {depth: 1,})
 
-		text = text
-			.replace(/`/g, '`' + String.fromCharCode(8203))
+		text = text.replace(/`/g, '`' + String.fromCharCode(8203))
 			.replace(/@/g, '@' + String.fromCharCode(8203))
 			.replace(bot.token, 'NDYxMTQ4OTc4MjI3MDUyNTU0.DhPW2g.ePkaYG2oUh10JkOWdzdbwAgHPlY')
 
 		return text
 	}
 
-	bot.loadCommand = commandName => {
+	bot.loadCommand = async commandName => {
 		try {
 			const props = require(`../commands/${commandName}`)
 			if (props.init) props.init(bot)
 
 			let cmd = commandName.substring(0, commandName.length - 3)
-			bot.commands.set(cmd, props)
+			await bot.commands.set(cmd, props)
 			console.log('comando ' + commandName + ' carregado')
 			return false
 		} catch (e) {
@@ -797,7 +903,8 @@ module.exports = bot => {
 
 	bot.unloadCommand = async commandName => {
 		let command
-		if (bot.commands.has(commandName)) command = bot.commands.get(commandName)
+		if (await bot.commands.has(commandName))
+			command = await bot.commands.get(commandName)
 
 		if (!command) return `O comando \`${commandName}\` não existe!`
 
@@ -809,16 +916,36 @@ module.exports = bot => {
 
 	bot.log = async (message, logMessage) => {
 		if (!logMessage || !message) return
-		
+
 		let user = message.author ? message.author : message.user
 		
-		logMessage
-			.setAuthor(`${bot.data.get(user.id, 'username')} (${user.id})`, user.avatarURL())
-			.setTimestamp()
-			.setFooter(`Servidor ${message.guild.name}. Canal #${message.channel.name}`, message.guild.iconURL())
+		if (logMessage.type !== 'rich')
+			logMessage = new Discord.MessageEmbed(logMessage)
 
-		bot.channels.cache.get('848232046387396628').send({
-			embeds: [logMessage],
-		})
+		logMessage
+			.setAuthor({name: `${await bot.data.get(`${user.id}.username`)} (${user.id})`, iconURL: user.avatarURL()})
+			.setTimestamp()
+			.setFooter({
+				text: `Servidor ${message.guild.name}. Canal #${message.channel.name}`,
+				iconURL: message.guild.iconURL()
+			})
+
+		const LOG_CHANNEL_ID = '848232046387396628'
+
+		bot.shard.broadcastEval(async (c, {channelId, embed}) => {
+			const channel = c.channels.cache.get(channelId)
+			if (!channel)
+				return false
+
+			await channel.send({embeds: [embed]})
+
+			return true
+
+		}, {context: {channelId: LOG_CHANNEL_ID, embed: logMessage}})
+			.then(sentArray => {
+				if (!sentArray.includes(true))
+					return console.warn('Não encontrei o canal de log.')
+
+			})
 	}
 }

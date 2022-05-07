@@ -1,7 +1,7 @@
 const Discord = require("discord.js")
 
 exports.run = async (bot, message, args) => {
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 	let currTime = new Date().getTime()
 	let dia = new Date().getDay()
 	let hora = new Date().getHours()
@@ -104,10 +104,10 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 	if (uData.hospitalizado > currTime)
 		return bot.msgHospitalizado(message, uData)
 
-	if (bot.isUserEmRouboOuEspancamento(message, uData))
+	if (await bot.isUserEmRouboOuEspancamento(message, uData))
 		return
 
-	if (bot.isGaloEmRinha(message.author.id))
+	if (await bot.isGaloEmRinha(message.author.id))
 		return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 	uData.moni -= preço
@@ -123,7 +123,7 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote} **${bot.guns.minigun.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
-				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(72 * multiplicador * 60 * 60)} de ${bot.config.minigun} ${bot.guns.minigun.desc}**`)
+				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(72 * multiplicador * 60 * 60)} de ${bot.guns.minigun.skins[uData.arma.minigun.skinAtual].emote} ${bot.guns.minigun.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
 				.addField("Tempo restante", bot.segToHour((uData.arma.minigun.tempo - currTime) / 1000), true)
 				.setColor(0))
@@ -138,7 +138,7 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 			bot.createEmbed(message, `Você comprou ${bot.segToHour(168 * 60 * 60 * multiplicador)} de ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} **${bot.guns.jetpack.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
-				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(168 * 60 * 60)} de ${bot.config.jetpack} ${bot.guns.jetpack.desc}**`)
+				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(168 * 60 * 60)} de ${bot.guns.jetpack.skins[uData.arma.jetpack.skinAtual].emote} ${bot.guns.jetpack.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
 				.addField("Tempo restante", bot.segToHour((uData.arma.jetpack.tempo - currTime) / 1000), true)
 				.setColor(0))
@@ -153,7 +153,7 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 			bot.createEmbed(message, `Você comprou ${bot.segToHour(72 * 60 * 60 * multiplicador)} de ${bot.guns.exoesqueleto.skins[uData.arma.exoesqueleto.skinAtual].emote} **${bot.guns.exoesqueleto.desc}** ${bot.config.mercadonegro}`, `R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`, 0)
 
 			bot.log(message, new Discord.MessageEmbed()
-				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(72 * 60 * 60)} de ${bot.config.exoesqueleto} ${bot.guns.exoesqueleto.desc}**`)
+				.setDescription(`${bot.config.mercadonegro} **${uData.username} comprou ${bot.segToHour(72 * 60 * 60)} de ${bot.guns.exoesqueleto.skins[uData.arma.exoesqueleto.skinAtual].emote} ${bot.guns.exoesqueleto.desc}**`)
 				.addField("Preço", "R$" + preço.toLocaleString().replace(/,/g, "."), true)
 				.addField("Tempo restante", bot.segToHour((uData.arma.exoesqueleto.tempo - currTime) / 1000), true)
 				.setColor(0))
@@ -191,7 +191,7 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 
 		case 6:
 			//whey
-			let uGalo = bot.galos.get(message.author.id)
+			let uGalo = await bot.galos.get(message.author.id)
 
 			if (multiplicador > 1)
 				return bot.createEmbed(message, `Não é possível comprar ${bot.config.superWhey} **Super Whey** em quantidade ${bot.config.mercadonegro}`, null, 0)
@@ -218,7 +218,7 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 				.addField("Nível do galo", (uGalo.power - 30).toString(), true)
 				.setColor(0))
 
-			bot.galos.set(message.author.id, uGalo)
+			await bot.galos.set(message.author.id, uGalo)
 
 			break
 
@@ -251,8 +251,8 @@ Necessário: ${bot.guns.bazuca.skins[uData.arma.bazuca.skinAtual].emote}${bot.gu
 		// 	break
 
 	}
-	bot.banco.set('caixa', bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
-	return bot.data.set(message.author.id, uData)
+	await bot.banco.set('caixa', await bot.banco.get('caixa') + Math.floor(preço * bot.imposto))
+	return await bot.data.set(message.author.id, uData)
 
 }
 exports.config = {

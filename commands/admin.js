@@ -8,7 +8,7 @@ exports.run = async (bot, message, args) => {
 		.setColor('GREEN')
 		.addField(`${bot.config.coin} Adicionar, remover ou setar grana`, "`;money`", true)
 		.addField(`${bot.config.ficha} Adicionar, remover ou setar ficha`, "`;ficha`", true)
-		.addField(`${bot.config.ak47} Adicionar ou remover armas`, "`;setgun`", true)
+		.addField(`${bot.guns.ak47.skins.default.emote} Adicionar ou remover armas`, "`;setgun`", true)
 		.addField(`📝 Alterar nick`, "`;setnick`", true)
 		.addField(`🚫 Liberar ação`, "`;liberar opcoes`", true)
 		.addField(`💬 Comunicar`, "`;comunicar`", true)

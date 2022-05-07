@@ -13,7 +13,7 @@ const minToHuman = (time) => {
 exports.run = async (bot, message, args) => {
 	let necessario = ""
 	let emote = ""
-	let uData = bot.data.get(message.author.id)
+	let uData = await bot.data.get(message.author.id)
 
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`${bot.config.trabalhos} Trabalhos`)

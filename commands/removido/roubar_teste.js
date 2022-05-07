@@ -202,7 +202,7 @@ Há uma pequena chance do alvo ser também espancado!`)
 			embed.addField(`${lugar.id}: ${lugar.desc}`, `Sucesso: ${lugar.sucesso}%\n${necessario}\nR$ ${lugar.min.toLocaleString().replace(/,/g, ".")} - R$ ${lugar.max.toLocaleString().replace(/,/g, ".")}`, true)
 			emotes = ""
 		});
-		embed.setFooter(bot.data.get(message.author.id, "username"), message.member.user.avatarURL())
+		embed.setFooter(bot.data.get(message.author.id + ".username"), message.member.user.avatarURL())
 			.setTimestamp();
 
 		return message.channel.send({

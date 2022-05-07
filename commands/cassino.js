@@ -13,6 +13,7 @@ exports.run = async (bot, message, args) => {
 		// }
 
 		// let proxDeposito = 30 * 60 * horasPassadas - ((bot.uptime) / 1000)
+		let quantBanco = await bot.banco.get('cassino')
 
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.mafiaCasino} Cassino`)
@@ -22,7 +23,7 @@ exports.run = async (bot, message, args) => {
 			.addField("🪙 Cara ou Coroa", `Aposte um valor em fichas. Você tem 50% de chance de vencer! O imposto é triplicado.\n\`;bet [cara|coroa] [valor]\``, true)
 			.addField("🎰 Caça-níquel", `Acerte três figuras iguais e ganhe fichas!!\n\`;niquel <multiplicador>\``, true)
 			.addField(`🎟️ Bilhete premiado`, `Compre um bilhete e torça para ser o vencedor!\n\`;bilhete\``, true)
-			.addField(`Caixa do Cassino`, `R$ ${bot.banco.get('cassino').toLocaleString().replace(/,/g, ".")}`) //\nPróximo depósito de R$ ${bot.carregamentoCassino.toLocaleString().replace(/,/g, ".")} em: ${bot.segToHour(proxDeposito)}
+			.addField(`Caixa do Cassino`, `R$ ${quantBanco.toLocaleString().replace(/,/g, ".")}`) //\nPróximo depósito de R$ ${bot.carregamentoCassino.toLocaleString().replace(/,/g, ".")} em: ${bot.segToHour(proxDeposito)}
 			.addField(`${bot.config.ficha} Fichas`, "Use-as na máquina caça-níquel! Preço por ficha: R$ 100\n`;cassino <quantidade>`", true)
 			.addField("Câmbio", `Troque suas fichas por dinheiro! Cada ficha vale R$ 80.\n\`;cambio [quantidade]\``)
 			.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
@@ -34,7 +35,7 @@ exports.run = async (bot, message, args) => {
 	} else {
 		let currTime = new Date().getTime()
 
-		let uData = bot.data.get(message.author.id)
+		let uData = await bot.data.get(message.author.id)
 
 		if (uData.preso > currTime)
 			return bot.msgPreso(message, uData)
@@ -42,10 +43,10 @@ exports.run = async (bot, message, args) => {
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
             return
 
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`)
 
 		if (option == 'allin' || option == 'all' || option == 'tudo')
@@ -74,13 +75,13 @@ exports.run = async (bot, message, args) => {
 
 		let imposto = uData.classe == 'mafioso' ? 0 : bot.imposto
 
-		bot.banco.set('caixa', bot.banco.get('caixa') + price * imposto)
-		bot.banco.set('cassino', bot.banco.get('cassino') + (price - price * imposto))
+		await bot.banco.set('caixa', await bot.banco.get('caixa') + price * imposto)
+		await bot.banco.set('cassino', await bot.banco.get('cassino') + (price - price * imposto))
 
 
 		uData.ficha += option
 		bot.createEmbed(message, `Você comprou ${bot.config.ficha} **${option.toLocaleString().replace(/,/g, ".")} fichas** por R$ ${price.toLocaleString().replace(/,/g, ".")} ${bot.config.mafiaCasino}`, `Fichas: ${uData.ficha.toLocaleString().replace(/,/g, ".")} • Dinheiro: R$ ${uData.moni.toLocaleString().replace(/,/g, ".")}`)
 
-		return bot.data.set(message.author.id, uData)
+		return await bot.data.set(message.author.id, uData)
 	}
 }

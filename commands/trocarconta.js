@@ -10,28 +10,30 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `\`;trocarconta <ID1> <ID2>\``)
 
 	if (!user1)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, escolha o ID do primeiro usuário`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}, escolha o ID do primeiro usuário`)
 
 	if (user1 < 0 || (user1 % 1 != 0) || user1.toString().length != 18)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, o ID 1 é inválido`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}, o ID 1 é inválido`)
 
 	if (!user2)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, escolha o ID do segundo usuário`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}, escolha o ID do segundo usuário`)
 
 	if (user2 < 0 || (user2 % 1 != 0) || user2.toString().length != 18)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id, "username")}, o ID 2 é inválido`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}, o ID 2 é inválido`)
 
 	if (user1 === user2)
-		return bot.createEmbed(message, `Porra, ${bot.data.get(message.author.id, "username")}, os IDs devem ser diferentes`)
+		return bot.createEmbed(message, `Porra, ${await bot.data.get(message.author.id + ".username")}, os IDs devem ser diferentes`)
 
-	let uData1 = bot.data.get(user1)
-	let uData2 = bot.data.get(user2)
+	let uData1 = await bot.data.get(user1)
+	let uData2 = await bot.data.get(user2)
 
-	if (!uData1 || uData1.username == undefined) return bot.createEmbed(message, `Usuário 1 não possui um inventário`)
-	if (!uData2 || uData2.username == undefined) return bot.createEmbed(message, `Usuário 2 não possui um inventário`)
+	if (!uData1 || uData1.username == undefined) 
+		return bot.createEmbed(message, `Usuário 1 não possui um inventário`)
+	if (!uData2 || uData2.username == undefined) 
+		return bot.createEmbed(message, `Usuário 2 não possui um inventário`)
 
-	let uGang1 = bot.gangs.get(uData1.gangID)
-	let uGang2 = bot.gangs.get(uData2.gangID)
+	let uGang1 = await bot.gangs.get(uData1.gangID)
+	let uGang2 = await bot.gangs.get(uData2.gangID)
 
 	let msg = await bot.createEmbed(message, `Confirmar troca das contas ${uData1.username} e ${uData2.username}?`, null, bot.colors.admin)
 
@@ -45,29 +47,31 @@ exports.run = async (bot, message, args) => {
 		errors: ['time'],
 	})
 
-	confirm.on('collect', r => {
+	confirm.on('collect', async r => {
+		
+		//todo verificar
 		if (uGang1) {
 			uGang1.membros[uGang1.membros.findIndex(user => user.id === user1)].id = user2
-			bot.gangs.set(uData2.gangID.toString(), uGang1)
+			await bot.gangs.set(uData2.gangID.toString(), uGang1)
 		}
 		if (uGang2) {
 			uGang2.membros[uGang2.membros.findIndex(user => user.id === user2)].id = user1
-			bot.gangs.set(uData1.gangID.toString(), uGang2)
+			await bot.gangs.set(uData1.gangID.toString(), uGang2)
 		}
 
-		let uGalo1 = bot.galos.get(user1)
-		let uGalo2 = bot.galos.get(user2)
+		let uGalo1 = await bot.galos.get(user1)
+		let uGalo2 = await bot.galos.get(user2)
 
-		bot.galos.set(user1, uGalo2)
-		bot.galos.set(user2, uGalo1)
+		await bot.galos.set(user1, uGalo2)
+		await bot.galos.set(user2, uGalo1)
 
-		bot.data.set(user1, uData2)
-		bot.data.set(user2, uData1)
+		await bot.data.set(user1, uData2)
+		await bot.data.set(user2, uData1)
 
 		bot.createEmbed(message, `Troca realizada!`, null, bot.colors.admin)
 
 		return bot.log(message, new Discord.MessageEmbed()
-			.setDescription(`**${bot.data.get(message.author.id, "username")} trocou as contas "${uData1.username}" e "${uData2.username}"`)
+			.setDescription(`**${bot.data.get(message.author.id + ".username")} trocou as contas "${uData1.username}" e "${uData2.username}"`)
 			.setColor(bot.colors.admin))
 	})
 }

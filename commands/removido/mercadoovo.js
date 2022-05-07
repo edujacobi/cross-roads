@@ -45,10 +45,10 @@ exports.run = async (bot, message, args) => {
 		if (uData.hospitalizado > currTime)
 			return bot.msgHospitalizado(message, uData)
 
-		if (bot.isUserEmRouboOuEspancamento(message, uData))
+		if (await bot.isUserEmRouboOuEspancamento(message, uData))
 			return
 
-		if (bot.isGaloEmRinha(message.author.id))
+		if (await bot.isGaloEmRinha(message.author.id))
 			return bot.createEmbed(message, `Seu galo está em uma rinha e você não pode fazer isto ${bot.config.galo}`, null, bot.colors.white)
 
 		uData._ovo -= prices[option - 1]

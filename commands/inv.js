@@ -12,7 +12,7 @@ exports.run = async (bot, message, args) => {
 	let {
 		uData,
 		alvo
-	} = bot.findUser(message, args)
+	} = await bot.findUser(message, args)
 
 	if (!uData) return
 
@@ -25,6 +25,8 @@ exports.run = async (bot, message, args) => {
 
 	let classe = uData.classe !== undefined ? `, ${bot.classes[uData.classe].desc}` : ""
 
+	let isViajando = await bot.isPlayerViajando(uData)
+	
 	let miniSituation = `Vadiando`
 	if (uData.emRoubo.tempo > currTime && uData.emRoubo.isAlvo)
 		miniSituation = `Sendo roubado`
@@ -50,14 +52,14 @@ exports.run = async (bot, message, args) => {
 		miniSituation += ` e procurado`
 	if (uData.jobTime < currTime && uData.job)
 		miniSituation += ` e pode receber salário`
-	if (bot.isPlayerViajando(uData))
+	if (isViajando)
 		miniSituation = 'Viajando'
 
-	let badges = bot.getUserBadges(alvo, true)
+	let badges = await bot.getUserBadges(alvo, true)
 
-	let uGang = bot.gangs.get(uData.gangID)
+	let uGang = await bot.gangs.get(uData.gangID?.toString())
 
-	let conjugeClosed = uData.conjuge != null ? ` • <:girlfriend:799053368189911081> ${bot.data.get(uData.conjuge, 'username')}` : ''
+	let conjugeClosed = uData.conjuge != null ? ` • <:girlfriend:799053368189911081> ${await bot.data.get(uData.conjuge + '.username')}` : ''
 
 	const invClosed = new Discord.MessageEmbed()
 		.setColor(uGang ? uGang.cor : bot.colors.darkGrey)
@@ -133,7 +135,7 @@ exports.run = async (bot, message, args) => {
 			defPower = (defPower * 0.9).toFixed(1)
 	}
 
-	let conjugeOpen = uData.conjuge != null ? ` • <:girlfriend:799053368189911081> Casado com ${bot.data.get(uData.conjuge, 'username')}` : ''
+	let conjugeOpen = uData.conjuge != null ? ` • <:girlfriend:799053368189911081> Casado com ${await bot.data.get(uData.conjuge + '.username')}` : ''
 
 	const invOpen = new Discord.MessageEmbed()
 		.setTitle(`${online} Inventário de ${uData.username}${classe}`)
@@ -147,7 +149,7 @@ exports.run = async (bot, message, args) => {
 
 	if (uData.gangID != null) {
 		let cargo = 'Membro'
-		let uGang = bot.gangs.get(uData.gangID)
+		let uGang = await bot.gangs.get(uData.gangID?.toString())
 		if (uGang.membros.find(user => user.cargo === 'lider') && uGang.membros.find(user => user.cargo === 'lider').id == alvo)
 			cargo = "Líder"
 		else if (uGang.membros.find(user => user.cargo === 'vice') && uGang.membros.find(user => user.cargo === 'vice').id == alvo)
@@ -206,13 +208,13 @@ exports.run = async (bot, message, args) => {
 
 	let textSituation = `${bot.config.vadiando} Vadiando`
 	if (uData.emRoubo.tempo > currTime && uData.emRoubo.isAlvo)
-		textSituation = `${bot.config.roubar} Sendo roubado por ${bot.data.get(uData.emRoubo.user, 'username')}`
+		textSituation = `${bot.config.roubar} Sendo roubado por ${await bot.data.get(uData.emRoubo.user + '.username')}`
 	else if (uData.emRoubo.tempo > currTime && !uData.emRoubo.isAlvo)
-		textSituation = `${bot.config.roubar} Roubando ${!isNaN(uData.emRoubo.user) ? bot.data.get(uData.emRoubo.user, 'username') : uData.emRoubo.user}`
+		textSituation = `${bot.config.roubar} Roubando ${!isNaN(uData.emRoubo.user) ? await bot.data.get(uData.emRoubo.user + '.username') : uData.emRoubo.user}`
 	else if (uData.emEspancamento.tempo > currTime && uData.emEspancamento.isAlvo)
-		textSituation = `${bot.config.espancar} Sendo espancado por ${bot.data.get(uData.emEspancamento.user, 'username')}`
+		textSituation = `${bot.config.espancar} Sendo espancado por ${await bot.data.get(uData.emEspancamento.user + '.username')}`
 	else if (uData.emEspancamento.tempo > currTime && !uData.emEspancamento.isAlvo)
-		textSituation = `${bot.config.espancar} Espancando ${bot.data.get(uData.emEspancamento.user, 'username')}`
+		textSituation = `${bot.config.espancar} Espancando ${await bot.data.get(uData.emEspancamento.user + '.username')}`
 	else if (uData.fugindo > currTime)
 		textSituation = `${bot.config.prisao} Fugindo`
 	else if (uData.morto > currTime)
@@ -230,8 +232,8 @@ exports.run = async (bot, message, args) => {
 		textSituation += ` e ${bot.config.police} Procurado por mais ${bot.segToHour((uData.roubo - currTime) / 1000)}`
 	if (uData.jobTime < currTime && uData.job)
 		textSituation += ` e ${bot.config.trabalhando} pode receber salário`
-	if (bot.isPlayerViajando(uData))
-		textSituation = `${bot.config.aviao} Viajando por mais ${bot.segToHour((bot.casais.get(uData.casamentoID, 'viagem') - currTime) / 1000)}`
+	if (isViajando)
+		textSituation = `${bot.config.aviao} Viajando por mais ${bot.segToHour((bot.casais.get(uData.casamentoID + '.viagem') - currTime) / 1000)}`
 	invOpen.addField("\u200b󠀀󠀀", textSituation)
 
 	/*
@@ -248,34 +250,37 @@ exports.run = async (bot, message, args) => {
 			.setStyle('SECONDARY')
 			.setLabel('Abrir')
 			.setEmoji(emoteAbrir)
-			.setCustomId(message.id + message.author.id + 'abrir'))
+			.setCustomId('abrir'))
 
 	const rowFechar = new Discord.MessageActionRow()
 		.addComponents(new Discord.MessageButton()
 			.setStyle('SECONDARY')
 			.setLabel('Fechar')
 			.setEmoji(emoteFechar)
-			.setCustomId(message.id + message.author.id + 'fechar'))
+			.setCustomId('fechar'))
 
 	const buttonUI = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		.setLabel('User info')
 		.setEmoji(uData.classe != null ? bot.classes[uData.classe].emote : '<:CrossRoadsLogo:757021182020157571>')
-		.setCustomId(message.id + message.author.id + 'userinfo')
+		.setCustomId('userinfo')
 
 	const buttonAnuncio = new Discord.MessageButton()
 		.setStyle('PRIMARY')
 		.setLabel('Slashes!')
-		.setCustomId(message.id + message.author.id + 'anuncio')
+		.setCustomId('anuncio')
 
 	let boneco = uGang?.boneco === 0 ? bot.config.gang : bot.config['gang' + uGang?.boneco]
+
+	let canUseGang = await bot.isComandoUsavelViagem(message, 'gang')
+	
 	const buttonGang = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		// .setLabel(`Gangue ${uGang.tag !== '' ? `[${uGang.tag}]` : ''} ${uGang.nome}`)
 		.setLabel(`Gangue`)
 		.setEmoji(boneco)
-		.setDisabled(!bot.isComandoUsavelViagem(message, 'gang'))
-		.setCustomId(message.id + message.author.id + 'gang')
+		.setDisabled(!canUseGang)
+		.setCustomId('gang')
 
 	rowAbrir.addComponents(buttonUI)
 	rowFechar.addComponents(buttonUI)
@@ -285,16 +290,24 @@ exports.run = async (bot, message, args) => {
 		rowFechar.addComponents(buttonGang)
 	}
 
-	let userD = bot.data.get(message.author.id)
+	let userD = await bot.data.get(message.author.id)
+
+	let galoEmRinhaAuthor = await bot.isGaloEmRinha(message.author.id)
+	let galoEmRinhaAlvo = await bot.isGaloEmRinha(alvo)
+	
+	let canUseInvestir = await bot.isComandoUsavelViagem(message, 'investir')
+	let canUseRoubar = await bot.isComandoUsavelViagem(message, 'roubar')
+	let canUseEspancar = await bot.isComandoUsavelViagem(message, 'espancar')
+	let canUseEsmola = await bot.isComandoUsavelViagem(message, 'esmola')
 
 	const buttonInvest = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		// .setLabel(bot.investimentos[uData.invest].desc)
 		.setLabel('Investimento')
 		.setEmoji(bot.config.propertyG)
-		.setDisabled(!bot.isComandoUsavelViagem(message, 'investir'))
-		.setCustomId(message.id + message.author.id + 'invest')
-
+		.setDisabled(!canUseInvestir)
+		.setCustomId('invest')
+	
 	const buttonRoubar = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		.setLabel('Roubar')
@@ -312,12 +325,12 @@ exports.run = async (bot, message, args) => {
 			uData.emEspancamento.tempo > currTime ||
 			userD.gangID != null && userD.gangID === uData.gangID ||
 			alvo === uData.conjuge ||
-			bot.isGaloEmRinha(message.author.id) ||
-			bot.isGaloEmRinha(alvo) ||
-			bot.isPlayerViajando(uData) ||
-			!bot.isComandoUsavelViagem(message, 'roubar')
+			galoEmRinhaAuthor ||
+			galoEmRinhaAlvo  ||
+			isViajando ||
+			!canUseRoubar
 		)
-		.setCustomId(message.id + message.author.id + 'roubar')
+		.setCustomId('roubar')
 
 	const buttonEspancar = new Discord.MessageButton()
 		.setStyle('SECONDARY')
@@ -340,13 +353,13 @@ exports.run = async (bot, message, args) => {
 			uData.emEspancamento.tempo > currTime ||
 			userD.gangID != null && userD.gangID === uData.gangID ||
 			alvo === uData.conjuge ||
-			bot.isGaloEmRinha(message.author.id) ||
-			bot.isGaloEmRinha(alvo) ||
-			bot.isPlayerViajando(uData) ||
-			!bot.isComandoUsavelViagem(message, 'espancar')
+			galoEmRinhaAuthor ||
+			galoEmRinhaAlvo  ||
+			isViajando ||
+			!canUseEspancar
 		)
-		.setCustomId(message.id + message.author.id + 'espancar')
-
+		.setCustomId('espancar')
+	
 	const buttonEsmola = new Discord.MessageButton()
 		.setStyle('SECONDARY')
 		.setLabel('Dar esmola')
@@ -356,13 +369,13 @@ exports.run = async (bot, message, args) => {
 			userD.emEspancamento.tempo > currTime ||
 			uData.emRoubo.tempo > currTime ||
 			uData.emEspancamento.tempo > currTime ||
-			bot.isGaloEmRinha(message.author.id) ||
-			bot.isGaloEmRinha(alvo) ||
+			galoEmRinhaAuthor ||
+			galoEmRinhaAlvo  ||
 			userD.esmolaEntregueHoje > currTime ||
 			uData.esmolaRecebidaHoje > currTime ||
-			!bot.isComandoUsavelViagem(message, 'esmola')
+			!canUseEsmola
 		)
-		.setCustomId(message.id + message.author.id + 'esmola')
+		.setCustomId('esmola')
 
 	if (alvo === message.author.id) {
 		if (uData.invest != null) {
@@ -385,59 +398,60 @@ exports.run = async (bot, message, args) => {
 	let msg = await message.channel.send({
 		embeds: [invClosed],
 		components: rowActions.components.length === 0 ? [rowAbrir] : [rowAbrir, rowActions]
-	}).catch(() => console.log("Não consegui enviar mensagem `inv`"))
+	})
+		// .catch(() => console.log("Não consegui enviar mensagem `inv`"))
 
 
 	const filter = (button) => [
-		message.id + message.author.id + 'abrir',
-		message.id + message.author.id + 'fechar',
-		message.id + message.author.id + 'invest',
-		message.id + message.author.id + 'userinfo',
-		message.id + message.author.id + 'roubar',
-		message.id + message.author.id + 'espancar',
-		message.id + message.author.id + 'esmola',
-		message.id + message.author.id + 'gang',
-		message.id + message.author.id + 'anuncio',
+		'abrir',
+		'fechar',
+		'invest',
+		'userinfo',
+		'roubar',
+		'espancar',
+		'esmola',
+		'gang',
+		'anuncio',
 	].includes(button.customId) && button.user.id === message.author.id
 
-	const collector = message.channel.createMessageComponentCollector({
+	const collector = msg.createMessageComponentCollector({
 		filter,
 		time: 90000,
 	})
 
 	collector.on('collect', async b => {
 		await b.deferUpdate()
-		if (b.customId === message.id + message.author.id + 'abrir') {
+		if (b.customId === 'abrir') {
 			isAberto = true
 		}
-		else if (b.customId === message.id + message.author.id + 'fechar') {
+		else if (b.customId === 'fechar') {
 			isAberto = false
 		}
-		else if (b.customId === message.id + message.author.id + 'invest') {
+		else if (b.customId === 'invest') {
 			buttonInvest.setDisabled(true)
 			bot.commands.get('investir').run(bot, message, args)
 		}
-		else if (b.customId === message.id + message.author.id + 'userinfo') {
+		else if (b.customId === 'userinfo') {
 			buttonUI.setDisabled(true)
 			bot.commands.get('userinfo').run(bot, message, [alvo])
 		}
-		else if (b.customId === message.id + message.author.id + 'roubar') {
+		else if (b.customId === 'roubar') {
 			buttonRoubar.setDisabled(true)
 			bot.commands.get('roubar').run(bot, message, [alvo])
 		}
-		else if (b.customId === message.id + message.author.id + 'espancar') {
+		else if (b.customId === 'espancar') {
 			buttonEspancar.setDisabled(true)
 			bot.commands.get('espancar').run(bot, message, [alvo])
 		}
-		else if (b.customId === message.id + message.author.id + 'esmola') {
+		else if (b.customId === 'esmola') {
 			buttonEsmola.setDisabled(true)
 			bot.commands.get('esmola').run(bot, message, [alvo])
 		}
-		else if (b.customId === message.id + message.author.id + 'gang') {
+		else if (b.customId === 'gang') {
 			buttonGang.setDisabled(true)
 			bot.commands.get('gang').run(bot, message, [uGang?.nome])
 		}
-		else if (b.customId === message.id + message.author.id + 'anuncio') {
+		else if (b.customId === 'anuncio') {
 			buttonAnuncio.setDisabled(true)
 
 			let avatar

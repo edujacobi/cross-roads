@@ -4,6 +4,7 @@ const colors = {
 	"policia": 0x000080,
 	"hospital": "RED",
 	"vasculhar": "LIGHT_GREY",
+	"trabalhar": "YELLOW",
 
 	"white": 0xebebeb,
 

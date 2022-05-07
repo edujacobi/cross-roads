@@ -6,15 +6,20 @@ module.exports = async (bot, interaction) => {
 
 	if (!cmd) return
 
+	// if (!(bot.isAdmin(interaction.user.id) || bot.isMod(interaction.user.id) || bot.isAjudante(interaction.user.id) || await bot.data.get(interaction.user.id + ".vipTime") > Date.now()))
+	// 	return
+
 	try {
 		await cmd.run(bot, interaction)
+
+		await bot.data.set(interaction.user.id + ".lastCommandChannelId", interaction.channel.id)
+
+		let uData = await bot.data.get(interaction.user.id)
 		
-		let uData = bot.data.get(interaction.user.id)
 
 		const embed = new Discord.MessageEmbed()
-			.setTitle("Slash")
 			.setAuthor({
-				name: uData.username ? `${uData.username} (${interaction.user.id})` : `${interaction.user.username} (${interaction.user.id})`,
+				name: uData?.username ? `${uData.username} (${interaction.user.id})` : `${interaction.user.username} (${interaction.user.id})`,
 				iconURL: interaction.user.avatarURL()
 			})
 			.setDescription(`${uData.username ? uData.username : interaction.user.username} **/${interaction.commandName}**`)
@@ -25,8 +30,23 @@ module.exports = async (bot, interaction) => {
 			})
 			.setTimestamp()
 
-		bot.channels.cache.get('564988393713303579')?.send({embeds: [embed],})
-			.catch(() => console.log('Não consegui fazer log de ', interaction.commandName, args))
+		const LOG_CHANNEL_ID = '564988393713303579'
+
+		bot.shard.broadcastEval(async (c, {channelId, embed}) => {
+			const channel = c.channels.cache.get(channelId)
+			if (!channel)
+				return false
+			
+			await channel.send({embeds: [embed]})
+
+			return true
+
+		}, {context: {channelId: LOG_CHANNEL_ID, embed}})
+			.then(sentArray => {
+				if (!sentArray.includes(true))
+					return console.warn('Não encontrei o canal de log.')
+
+			})
 
 	} catch (e) {
 		console.error(e)
