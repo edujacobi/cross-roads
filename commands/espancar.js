@@ -85,7 +85,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 		return bot.createEmbed(message, `Quem em sã consciência espancaria o Jacobi? ${bot.config.espancar}`, null, bot.colors.espancar)
 	if (alvo === '526203502318321665') // bot
 		return bot.createEmbed(message, `01000100 01100101 01110011 01101001 01110011 01110100 01100001 <:CrossRoadsLogo:757021182020157571>`, null, bot.colors.espancar)
-	if (uData.gangID != null && uData.gangID === targetD.gangID)
+	if (uData.gangID != null && uData.gangID == targetD.gangID)
 		return bot.createEmbed(message, `Você não pode espancar membros da sua gangue ${bot.config.espancar}`, null, bot.colors.espancar)
 	if (uData.fugindo > currTime)
 		return bot.createEmbed(message, `Você está tentando fugir da prisão e não pode tentar espancar ninguém ${bot.config.police}`, 'Foco!', bot.colors.espancar)

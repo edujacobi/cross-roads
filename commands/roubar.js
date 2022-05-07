@@ -529,7 +529,7 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 	if (alvo === '526203502318321665') // bot
 		return bot.createEmbed(message, `01000100 01100101 01110011 01101001 01110011 01110100 01100001 <:CrossRoadsLogo:757021182020157571>`, null, bot.colors.roubar)
 
-	if (uData.gangID != null && uData.gangID === tData.gangID)
+	if (uData.gangID != null && uData.gangID == tData.gangID)
 		return bot.createEmbed(message, `Você não pode roubar membros da sua gangue ${bot.config.roubar}`, null, bot.colors.roubar)
 
 	if (tData.classe == undefined)
@@ -735,8 +735,8 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 			return bot.createEmbed(message, `Você está apostando em uma rinha e não pode fazer isto ${bot.config.galo}`, null, bot.colors.roubar)
 		if (await bot.isGaloEmRinha(alvo))
 			return bot.createEmbed(message, `${tData.username} está em uma rinha, torça para ele perder e espere um pouco ${bot.config.galo}`, null, bot.colors.roubar)
-		// if (alvo === uData.conjuge)
-		// 	return bot.createEmbed(message, `Você não pode roubar o seu cônjuge ${bot.config.roubar}`, null, bot.colors.roubar)
+		if (alvo === uData.conjuge)
+			return bot.createEmbed(message, `Você não pode roubar o seu cônjuge ${bot.config.roubar}`, null, bot.colors.roubar)
 
 		currTime = new Date().getTime()
 
