@@ -149,8 +149,8 @@ exports.run = async (bot, message, args) => {
 				user.investTime += tempoAdicional
 			if (user.investLast > 0)
 				user.investLast += tempoAdicional*/
-			if (user.vipTime > 0)
-				user.vipTime += tempoAdicional
+			// if (user.vipTime > 0)
+			// 	user.vipTime += tempoAdicional
 			// user.investNotification = null
 			// user.investGanhos = 0
 			// user.espancarW = 0
@@ -194,9 +194,15 @@ exports.run = async (bot, message, args) => {
 
 			// if (user.username != undefined && user.username.length > 18)
 			// // 		bot.data.delete(id, 'username')
-			count += 1
-			await bot.data.set(id, user)
-			console.log(`${count} done`)
+			// count += 1
+			
+			if (typeof user.casamentoID == 'object') {
+				user.casamentoID = null
+				user.conjuge = null
+				await bot.data.set(id, user)
+			}
+			
+			// console.log(`${count} done`)
 
 			// bot.data.delete(id, '_knife')
 			// bot.data.delete(id, '_colt45')

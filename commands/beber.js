@@ -3,11 +3,11 @@ const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
 	// if (message.author.id != bot.config.adminID) return message.reply("Comando em manutenção")
 	let currTime = new Date().getTime()
-	
+
 	function isHappyHour() {
 		let dia = new Date().getDay()
 		let hora = new Date().getHours()
-		
+
 		// if (dia === 0 || dia === 6 || (dia === 5 && hora >= 20)) //FDS
 		return hora >= 20 && hora <= 22 || dia === 0 || dia === 6
 	}
@@ -35,12 +35,13 @@ exports.run = async (bot, message, args) => {
 	async function getStrBeberroes() {
 		let uData = await bot.data.get(message.author.id)
 		let bbrs = uData.username
-		/*for (const user of bot.beberroes) {
-			const id = bot.beberroes.indexOf(user) //gera lista para top global
+		await bot.beberroes.map(async (user, id) => {
+			// console.log(user)
+			let name = await bot.data.get(`${id}.username`)
 			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 1000 > Date.now()) {
-				bbrs += `, ${await bot.data.get(`${id}.username`)}`
+				bbrs += `, ${name}`
 			}
-		}*/
+		})
 
 		return bbrs
 	}
@@ -153,7 +154,8 @@ exports.run = async (bot, message, args) => {
 				let obj = {
 					maximo: {
 						normal: 0, happyHour: 0,
-					}, ultimaBebida: 0,
+					},
+					ultimaBebida: 0,
 				}
 				await bot.beberroes.set(message.author.id, obj)
 			}
@@ -172,11 +174,11 @@ exports.run = async (bot, message, args) => {
 			let bebida = bot.shuffle(bebidas)[0]
 			let sensacao = bot.shuffle(sensacoes)[0]
 
-			await bot.beberroes.set(message.author.id, Date.now(), 'ultimaBebida')
+			await bot.beberroes.set(message.author.id + '.ultimaBebida', Date.now(),)
 
-			if (!isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.normal')) await bot.beberroes.set(message.author.id, count, 'maximo.normal')
+			if (!isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.normal')) await bot.beberroes.set(message.author.id + '.maximo.normal', count)
 
-			if (isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.happyHour')) await bot.beberroes.set(message.author.id, count, 'maximo.happyHour')
+			if (isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.happyHour')) await bot.beberroes.set(message.author.id + '.maximo.happyHour', count)
 
 			count++
 
