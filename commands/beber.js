@@ -39,10 +39,11 @@ exports.run = async (bot, message, args) => {
 			// console.log(user)
 			let name = await bot.data.get(`${id}.username`)
 			if (id !== message.author.id && user.ultimaBebida + MINUTOS * 60 * 1000 > Date.now()) {
+				console.log(user.ultimaBebida)
 				bbrs += `, ${name}`
 			}
 		})
-
+		console.log(bbrs)
 		return bbrs
 	}
 
@@ -112,9 +113,10 @@ exports.run = async (bot, message, args) => {
 
 		if (i.customId === 'top') {
 			let topGlobal = await getTop(15)
-
+			//hora >= 20 && hora <= 22 || dia === 0 || dia === 6
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`${bot.config.vadiando} Top Beberrões ${isHappyHour() ? `(Happy Hour)` : ''}`)
+				.setDescription(isHappyHour() ? `O Happy Hour ocorre todo dia das 19h às 22h e aos finais de semana` : '')
 				.setColor(bot.colors.background)
 				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 				.setTimestamp()
@@ -130,11 +132,11 @@ exports.run = async (bot, message, args) => {
 
 			buttonTop.setDisabled(true)
 
-			msg.edit({components: [row]})
+			msg.edit({embeds: [...msg.embeds, embed], components: [row]})
 				.catch(() => console.log("Não consegui editar mensagem `beber`"))
 
-			return message.channel.send({embeds: [embed]})
-				.catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
+			// return message.channel.send({})
+			// 	.catch(() => console.log("Não consegui enviar mensagem `beber beberroes`"))
 		}
 
 		else if (i.customId === 'beber') {
@@ -174,11 +176,16 @@ exports.run = async (bot, message, args) => {
 			let bebida = bot.shuffle(bebidas)[0]
 			let sensacao = bot.shuffle(sensacoes)[0]
 
-			await bot.beberroes.set(message.author.id + '.ultimaBebida', Date.now(),)
+			await bot.beberroes.set(message.author.id + '.ultimaBebida', Date.now())
 
-			if (!isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.normal')) await bot.beberroes.set(message.author.id + '.maximo.normal', count)
+			let maxNormal = await bot.beberroes.get(message.author.id, 'maximo.normal')
+			let maxHappy = await bot.beberroes.get(message.author.id, 'maximo.happyHour')
 
-			if (isHappyHour() && count > await bot.beberroes.get(message.author.id, 'maximo.happyHour')) await bot.beberroes.set(message.author.id + '.maximo.happyHour', count)
+			if (!isHappyHour() && count > maxNormal)
+				await bot.beberroes.set(message.author.id + '.maximo.normal', count)
+
+			if (isHappyHour() && count > maxHappy)
+				await bot.beberroes.set(message.author.id + '.maximo.happyHour', count)
 
 			count++
 
@@ -189,7 +196,7 @@ exports.run = async (bot, message, args) => {
 				let minutos = Math.floor(bot.getRandom(1, 5))
 				uData.hospitalizado = currTime + minutos * 60 * 1000
 				await bot.data.set(message.author.id, uData)
-				textoComa = `\n${bot.config.hospital} Você bebeu demais e entrou em coma alcoólico, e ficará hospitalizado por ${bot.segToHour(minutos * 60)}`
+				textoComa = `\n${bot.config.hospital} Você bebeu demais e entrou em coma alcoólico. Você ficará hospitalizado por ${bot.segToHour(minutos * 60)}`
 				collector.stop()
 			}
 
@@ -206,12 +213,15 @@ exports.run = async (bot, message, args) => {
 			if (count > 80) textoCount += "\"Meu estoque acabou, eu nem sei mais o que você está bebendo.\"\n"
 			if (count > 100) textoCount += "\"POR ACASO VOCÊ É O JACOBI???!.\"\n"
 
+			let qtBbrs = await getQtBeberroes()
+			let strBbrs = await getStrBeberroes()
+
 			const embed = new Discord.MessageEmbed()
 				.setDescription(`${bot.config.dateDrink} Você bebeu **${bebida}** e se sente **${sensacao}**!${textoCount}${textoComa}`)
 				.setColor(textoComa === '' ? 'AQUA' : bot.colors.hospital)
 				.setTimestamp()
 				.setFooter({
-					text: `Bebendo agora (${await getQtBeberroes()}): ${await getStrBeberroes()}`,
+					text: `Bebendo agora (${qtBbrs}): ${strBbrs}`,
 					iconURL: message.member.user.avatarURL()
 				})
 
@@ -223,14 +233,20 @@ exports.run = async (bot, message, args) => {
 				.addComponents(new Discord.MessageButton()
 					.setStyle('SECONDARY')
 					.setLabel('Você já bebeu demais.')
-					.setCustomId(message.id + message.author.id + 'coma')
+					.setCustomId('hosp')
 					.setDisabled(true))
+				.addComponents(new Discord.MessageButton()
+					.setStyle('SECONDARY')
+					.setLabel('Beberrões')
+					.setEmoji(bot.config.vadiando)
+					.setCustomId('top'))
 
 			if (button.label.length < 64) button.setLabel(button.label + "!")
 
 			msg.edit({
 				embeds: [embed], components: textoComa === '' ? [row] : [rowHosp]
-			}).catch(() => console.log("Não consegui editar mensagem `beber`"))
+			})
+			// .catch(() => console.log("Não consegui editar mensagem `beber`"))
 		}
 	})
 

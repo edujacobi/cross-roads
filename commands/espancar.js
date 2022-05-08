@@ -4,6 +4,7 @@ function getPercent(percent, from) {
 
 const Discord = require("discord.js")
 exports.run = async (bot, message, args) => {
+	let membro = message.member.user
 	let currTime = new Date().getTime()
 	let option = args[0]
 	let multiplicador_evento_tempo = 1
@@ -11,8 +12,6 @@ exports.run = async (bot, message, args) => {
 	let uData = await bot.data.get(message.author.id)
 	let authorId = message.author.id
 	let membroAvatar = membro.avatarURL()
-
-	let membro = message.member.user
 
 	// if (message.author.id != bot.config.adminID)
 	// 	return bot.createEmbed(message, "Espancar desativado temporiamente.")
