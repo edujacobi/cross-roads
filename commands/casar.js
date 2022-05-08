@@ -278,12 +278,15 @@ exports.run = async (bot, message, args) => {
 
 				aceitoOuNegado = true
 				let anelLog = uData.anel
+				let tam = await bot.casais.size
+				tam = tam.toString()
+				
 				uData.anel = null
 				tData.anel = null
 				uData.conjuge = target.id.toString()
 				tData.conjuge = message.author.id.toString()
-				uData.casamentoID = bot.casais.size
-				tData.casamentoID = bot.casais.size
+				uData.casamentoID = tam
+				tData.casamentoID = tam
 
 				let casamento = {
 					conjuges: {
@@ -301,9 +304,7 @@ exports.run = async (bot, message, args) => {
 					ultimoDecrescimo: 0,
 				}
 				
-				let tam = await bot.casais.size
-
-				await bot.casais.ensure(tam.toString(), casamento)
+				await bot.casais.set(tam, casamento)
 
 				await bot.data.set(message.author.id, uData)
 				await bot.data.set(target.id, tData)
