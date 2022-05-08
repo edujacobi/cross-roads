@@ -9,6 +9,8 @@ exports.run = async (bot, message, args) => {
 	let multiplicador_evento_tempo = 1
 	let multiplicador_evento_espancado_tempo = 1
 	let uData = await bot.data.get(message.author.id)
+	let authorId = message.author.id
+	let membroAvatar = membro.avatarURL()
 
 	let membro = message.member.user
 
@@ -366,6 +368,10 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 				.setFooter(uData.username, membro.avatarURL())
 				.setTimestamp()
 		}
+		//canal da mensagem Você está roubando...
+		const channelLadrao = await bot.channels.cache.get(uData.lastCommandChannelId)
+		//mensagem Você está roubando...
+		const messageRobb = await channelLadrao.messages.fetch(message_robb.id)
 
 		await bot.shard.broadcastEval(async (bot, {
 				channelId, embed, component, alvo,
@@ -374,21 +380,13 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 				uData, authorId, granadaUsada,
 				atkPower, messageId
 			}) => {
+				//canal da mensagem Você está sendo roubado
 				const channel = await bot.channels.cache.get(channelId)
-				const channelLadrao = await bot.channels.cache.get(uData.lastCommandChannelId)
-				console.log('channel espancar', channel)
-				console.log('channelLadrao espancar', channelLadrao)
-				if (!channel)
-					return false
+				if (!channel) return null
 
-				const messageRobb = await channelLadrao.messages.fetch(message_robb.id)
-
-				const message = await channelLadrao.messages.fetch(messageId)
-
-				if (!channelLadrao || !channel)
-					return message.reply({embeds: [embeds.erro]})
-			
-				let msg = await channel.send({content: `<@${alvo}>`, embeds: [embed], components: [component]})
+				let msg = await channel.send({
+					content: `<@${alvo}>`, embeds: [embed], components: [component]
+				})
 
 				const filterEsp = (button) => button.user.id === alvo
 
@@ -400,7 +398,6 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 				collectorEsp.on('collect', async b => {
 					await b.deferUpdate()
 					let targetD = await bot.data.get(alvo)
-					collectorEsp.stop()
 
 					if (b.customId === 'brigar') {
 						collectorEsp.stop()
@@ -442,159 +439,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 					if (msg) msg.delete()
 				}, 60000)
 
-
-				setTimeout(async () => {
-					uData = await bot.data.get(authorId)
-					let targetD = await bot.data.get(alvo)
-
-					if (granadaUsada)
-						uData.arma.granada.quant -= 1
-
-					let randomDesafiante = bot.getRandom(1, 100)
-					let randomDesafiado = bot.getRandom(1, 100)
-
-					let desafianteVencedor = (randomDesafiante * atkPower) > (randomDesafiado * atkPowerDefensor)
-
-					// atkPower -= getPercent(defPower, atkPower)
-					if (desafianteVencedor) {
-						// bot.createEmbed(message, `Você espancou **${targetD.username}** e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`, null, bot.colors.espancar)
-						let surras = ['espancou', 'surrou', 'socou com muita força', 'chutou as bolas de', 'trucidou', 'acabou com a raça de', 'mostrou quem é que manda para', 'escadeirou', 'arrochou', 'marretou', 'moeu a pau']
-						bot.shuffle(surras)
-						let textoSurra = surras[0]
-
-						const embed_espancar_final = {
-							description: `Você ${textoSurra} **${targetD.username}** e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`,
-							color: bot.colors.espancar,
-							footer: {
-								text: uData.username,
-								icon_url: membroAvatar
-							},
-							timestamp: new Date(),
-						}
-
-						messageRobb.edit({embeds: [embed_espancar_final]})
-							.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-						let surrado = ['espancado', 'surrado', 'socado com muita força', 'chutado nas bolas', 'trucidado', 'acabado', 'escadeirado', 'arrochado', 'marretado', 'moído a pau']
-						bot.shuffle(surrado)
-						let textoSurrado = surrado[0]
-
-						bot.users.fetch(alvo).then(async user => {
-							user.send(`Você foi ${textoSurrado} pelo **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}e ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`)
-								.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
-						})
-
-						targetD.qtHospitalizado += 1
-						targetD.hospitalizado = currTime + tempoHospitalizado * 60 * 1000
-						targetD.espancarL++
-						uData.espancarW++
-						uData.roubo = currTime + 1800000 * multiplicador_evento_tempo
-						uData.espancar = currTime + 3000000 * multiplicador_evento_tempo
-
-						setTimeout(() => {
-							bot.users.fetch(authorId).then(user => {
-								user.send({embeds: [embeds.pv.espancar]})
-									.catch(() => message.reply(`você já pode espancar novamente! ${bot.config.espancar}`)
-										.catch(async () => `Não consegui responder ${uData.username} nem no PV nem no canal. \`Espancar\``))
-							})
-						}, uData.espancar - currTime)
-
-						setTimeout(() => {
-							bot.users.fetch(alvo).then(user => {
-								user.send({embeds: [embeds.pv.heal]})
-									.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
-
-							})
-						}, targetD.hospitalizado - currTime)
-
-						await bot.data.set(alvo, targetD)
-						await bot.data.set(authorId, uData)
-
-						return bot.log(message, {
-							description: `**${uData.username} espancou ${targetD.username}**`,
-							color: bot.colors.espancar,
-							fields: [
-								{
-									name: 'Tempo',
-									value: bot.segToHour(tempoHospitalizado * 60),
-									inline: true,
-								},
-								{
-									name: 'Chance',
-									value: `${randomDesafiante}(desafiante) > ${randomDesafiado}(desafiado)`,
-									inline: true,
-								},
-							]
-						})
-
-					}
-					else {
-						// bot.createEmbed(message, `Você até tentou, mas apanhou e ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`, null, bot.colors.hospital)
-
-						let surrado = ['espancado', 'surrado', 'socado com muita força', 'chutado nas bolas', 'trucidado', 'acabado', 'escadeirado', 'arrochado', 'marretado', 'moído a pau']
-						bot.shuffle(surrado)
-						let textoSurrado = surrado[0]
-
-						const embed_espancar_final = {
-							description: `Você até tentou, mas foi ${textoSurrado} e ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`,
-							color: bot.colors.espancar,
-							footer: {
-								text: uData.username,
-								icon_url: membroAvatar
-							},
-							timestamp: new Date(),
-						}
-
-						messageRobb.edit({embeds: [embed_espancar_final]})
-							.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-						uData.espancar = currTime + 3000000 * multiplicador_evento_tempo
-						uData.roubo = currTime + 1800000 * multiplicador_evento_tempo
-						uData.hospitalizado = currTime + tempoHospitalizado * 60 * 1000
-						uData.qtHospitalizado += 1
-						uData.espancarL++
-						targetD.espancarW++
-
-						let surras = ['apanhou', 'foi surrado', 'foi socado com muita força', 'foi chutado nas bolas', 'foi trucidado', 'você acabou com a raça dele', 'você mostrou quem é que manda', 'foi escadeirado', 'foi arrochado', 'você o marretou', 'foi moído a pau']
-						bot.shuffle(surras)
-						let textoSurra = surras[0]
-
-						bot.users.fetch(alvo).then(async user => {
-							user.send(`**${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}tentou lhe espancar, mas ${textoSurra} e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`)
-								.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
-						})
-
-						setTimeout(() => {
-							bot.users.fetch(authorId).then(user => {
-								user.send({embeds: [embeds.pv.heal]})
-									.catch(() => message.reply(`Você está curado! ${bot.config.hospital}`)
-										.catch(async () => `Não consegui responder ${await bot.data.get(authorId + ".username")} nem no PV nem no canal. \`Espancar\``))
-
-							})
-						}, uData.hospitalizado - currTime)
-
-						await bot.data.set(alvo, targetD)
-						await bot.data.set(authorId, uData)
-
-						return bot.log(message, {
-							description: `**${uData.username} falhou em espancar ${targetD.username} e apanhou**`,
-							color: bot.colors.espancar,
-							fields: [
-								{
-									name: 'Tempo',
-									value: bot.segToHour(tempoHospitalizado * 60),
-									inline: true,
-								},
-								{
-									name: 'Chance',
-									value: `${randomDesafiante}(desafiante) > ${randomDesafiado}(desafiado)`,
-									inline: true,
-								},
-							]
-						})
-					}
-				}, 62000)
-
+				return
 			},
 			{
 				context: {
@@ -617,6 +462,158 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 					messageId: message.id,
 				}
 			})
+
+		setTimeout(async () => {
+			uData = await bot.data.get(authorId)
+			let targetD = await bot.data.get(alvo)
+
+			if (granadaUsada)
+				uData.arma.granada.quant -= 1
+
+			let randomDesafiante = bot.getRandom(1, 100)
+			let randomDesafiado = bot.getRandom(1, 100)
+
+			let desafianteVencedor = (randomDesafiante * atkPower) > (randomDesafiado * atkPowerDefensor)
+
+			// atkPower -= getPercent(defPower, atkPower)
+			if (desafianteVencedor) {
+				// bot.createEmbed(message, `Você espancou **${targetD.username}** e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`, null, bot.colors.espancar)
+				let surras = ['espancou', 'surrou', 'socou com muita força', 'chutou as bolas de', 'trucidou', 'acabou com a raça de', 'mostrou quem é que manda para', 'escadeirou', 'arrochou', 'marretou', 'moeu a pau']
+				bot.shuffle(surras)
+				let textoSurra = surras[0]
+
+				const embed_espancar_final = {
+					description: `Você ${textoSurra} **${targetD.username}** e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`,
+					color: bot.colors.espancar,
+					footer: {
+						text: uData.username,
+						icon_url: membroAvatar
+					},
+					timestamp: new Date(),
+				}
+
+				messageRobb.edit({embeds: [embed_espancar_final]})
+					.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+
+				let surrado = ['espancado', 'surrado', 'socado com muita força', 'chutado nas bolas', 'trucidado', 'acabado', 'escadeirado', 'arrochado', 'marretado', 'moído a pau']
+				bot.shuffle(surrado)
+				let textoSurrado = surrado[0]
+
+				bot.users.fetch(alvo).then(async user => {
+					user.send(`Você foi ${textoSurrado} pelo **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}e ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`)
+						.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
+				})
+
+				targetD.qtHospitalizado += 1
+				targetD.hospitalizado = currTime + tempoHospitalizado * 60 * 1000
+				targetD.espancarL++
+				uData.espancarW++
+				uData.roubo = currTime + 1800000 * multiplicador_evento_tempo
+				uData.espancar = currTime + 3000000 * multiplicador_evento_tempo
+
+				setTimeout(() => {
+					bot.users.fetch(authorId).then(user => {
+						user.send({embeds: [embeds.pv.espancar]})
+							.catch(() => message.reply(`você já pode espancar novamente! ${bot.config.espancar}`)
+								.catch(async () => `Não consegui responder ${uData.username} nem no PV nem no canal. \`Espancar\``))
+					})
+				}, uData.espancar - currTime)
+
+				setTimeout(() => {
+					bot.users.fetch(alvo).then(user => {
+						user.send({embeds: [embeds.pv.heal]})
+							.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
+
+					})
+				}, targetD.hospitalizado - currTime)
+
+				await bot.data.set(alvo, targetD)
+				await bot.data.set(authorId, uData)
+
+				return bot.log(message, {
+					description: `**${uData.username} espancou ${targetD.username}**`,
+					color: bot.colors.espancar,
+					fields: [
+						{
+							name: 'Tempo',
+							value: bot.segToHour(tempoHospitalizado * 60),
+							inline: true,
+						},
+						{
+							name: 'Chance',
+							value: `${randomDesafiante}(desafiante) > ${randomDesafiado}(desafiado)`,
+							inline: true,
+						},
+					]
+				})
+
+			}
+			else {
+				// bot.createEmbed(message, `Você até tentou, mas apanhou e ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`, null, bot.colors.hospital)
+
+				let surrado = ['espancado', 'surrado', 'socado com muita força', 'chutado nas bolas', 'trucidado', 'acabado', 'escadeirado', 'arrochado', 'marretado', 'moído a pau']
+				bot.shuffle(surrado)
+				let textoSurrado = surrado[0]
+
+				const embed_espancar_final = {
+					description: `Você até tentou, mas foi ${textoSurrado} e ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`,
+					color: bot.colors.espancar,
+					footer: {
+						text: uData.username,
+						icon_url: membroAvatar
+					},
+					timestamp: new Date(),
+				}
+
+				messageRobb.edit({embeds: [embed_espancar_final]})
+					.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+
+				uData.espancar = currTime + 3000000 * multiplicador_evento_tempo
+				uData.roubo = currTime + 1800000 * multiplicador_evento_tempo
+				uData.hospitalizado = currTime + tempoHospitalizado * 60 * 1000
+				uData.qtHospitalizado += 1
+				uData.espancarL++
+				targetD.espancarW++
+
+				let surras = ['apanhou', 'foi surrado', 'foi socado com muita força', 'foi chutado nas bolas', 'foi trucidado', 'você acabou com a raça dele', 'você mostrou quem é que manda', 'foi escadeirado', 'foi arrochado', 'você o marretou', 'foi moído a pau']
+				bot.shuffle(surras)
+				let textoSurra = surras[0]
+
+				bot.users.fetch(alvo).then(async user => {
+					user.send(`**${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}tentou lhe espancar, mas ${textoSurra} e ele ficará hospitalizado por ${bot.segToHour(tempoHospitalizado * 60)} ${bot.config.hospital}`)
+						.catch(() => console.log(`Não consegui mandar mensagem privada para ${targetD.username} (${alvo})`))
+				})
+
+				setTimeout(() => {
+					bot.users.fetch(authorId).then(user => {
+						user.send({embeds: [embeds.pv.heal]})
+							.catch(() => message.reply(`Você está curado! ${bot.config.hospital}`)
+								.catch(async () => `Não consegui responder ${await bot.data.get(authorId + ".username")} nem no PV nem no canal. \`Espancar\``))
+
+					})
+				}, uData.hospitalizado - currTime)
+
+				await bot.data.set(alvo, targetD)
+				await bot.data.set(authorId, uData)
+
+				return bot.log(message, {
+					description: `**${uData.username} falhou em espancar ${targetD.username} e apanhou**`,
+					color: bot.colors.espancar,
+					fields: [
+						{
+							name: 'Tempo',
+							value: bot.segToHour(tempoHospitalizado * 60),
+							inline: true,
+						},
+						{
+							name: 'Chance',
+							value: `${randomDesafiante}(desafiante) > ${randomDesafiado}(desafiado)`,
+							inline: true,
+						},
+					]
+				})
+			}
+		}, 62000)
 
 	}
 }

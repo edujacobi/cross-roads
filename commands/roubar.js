@@ -897,11 +897,13 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 			tempo_preso, embeds, membroAvatar, currTime,
 			uData, authorId, tempo_adicional_preso_chamar_policia, granadaUsada,
 			atkPower, chance, moneyAtkPower, messageId,
-			multiplicador_evento_tempo_roubar, tempo_hospitalizado
+			multiplicador_evento_tempo_roubar, tempo_hospitalizado, channelLadrao
 		}) => {
 			//canal da mensagem Você está sendo roubado
 			const channel = await bot.channels.cache.get(channelId)
 			if (!channel) return null
+
+			// const messageRobb = await channelLadrao.messages.fetch(message_robb.id)
 
 			let msg = await channel.send({
 				content: `<@${alvo}>`, embeds: [embed], components: [component]
@@ -1005,7 +1007,8 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 				moneyAtkPower,
 				messageId: message.id,
 				multiplicador_evento_tempo_roubar,
-				tempo_hospitalizado
+				tempo_hospitalizado,
+				channelLadrao
 		}})
 			// .then(async array => {
 			// 	console.log('array', array)

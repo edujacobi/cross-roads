@@ -116,8 +116,7 @@ exports.run = async (bot, message, args) => {
 
 		return row
 	}
-
-
+	
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`${emote} ${alvo === message.author.id ? `Seu casamento com ${await bot.data.get(uData.conjuge.toString() + '.username')}` : `Casamento de ${await bot.data.get(uCasamento.conjuges._1 + '.username')} e ${await bot.data.get(uCasamento.conjuges._2 + '.username')}`}`)
 		.setThumbnail('https://media.discordapp.net/attachments/531174573463306240/862135638945824768/radar_girlfriend.png')

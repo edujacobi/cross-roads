@@ -9,11 +9,12 @@ exports.run = async (bot, message, args) => {
 		.addField(`${bot.config.coin} Adicionar, remover ou setar grana`, "`;money`", true)
 		.addField(`${bot.config.ficha} Adicionar, remover ou setar ficha`, "`;ficha`", true)
 		.addField(`${bot.guns.ak47.skins.default.emote} Adicionar ou remover armas`, "`;setgun`", true)
+		.addField(`${bot.config.prisao} Prender`, "`;prender`", true)
 		.addField(`📝 Alterar nick`, "`;setnick`", true)
 		.addField(`🚫 Liberar ação`, "`;liberar opcoes`", true)
 		.addField(`💬 Comunicar`, "`;comunicar`", true)
 		.addField(`👥 Trocar conta`, "`;trocarconta`", true)
-		.addField(`<:Classe_Mafioso:823012843288657970> Top classes`, "`;classes top`", true)
+		.addField(`${bot.classes.mafioso.emote} Top classes`, "`;classes top`", true)
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp();
 	return message.channel.send({

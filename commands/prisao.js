@@ -227,13 +227,15 @@ exports.run = async (bot, message, args) => {
 					iconURL: message.member.user.avatarURL()
 				})
 				.setTimestamp()
+			
+			console.log(conjuge)
 
 			const embedFinalCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga bem sucedida!')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge.arma.jetpack.tempo > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
+				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge?.arma?.jetpack?.tempo > currTime ? bot.shuffle(frasesSucessoJetpackCasal)[0] : bot.shuffle(frasesSucessoCasal)[0]}, mas a polícia ${bot.shuffle(frasesProcuradoCasal)[0]} ${bot.config.police}`)
 				.setFooter({
-					text: `${uData.username} e ${conjuge.username} • Esperem 30 minutos para roubar novamente`,
+					text: `${uData.username} e ${conjuge?.username} • Esperem 30 minutos para roubar novamente`,
 					iconURL: message.member.user.avatarURL()
 				})
 				.setTimestamp()
@@ -361,9 +363,9 @@ exports.run = async (bot, message, args) => {
 			const embedCasal = new Discord.MessageEmbed()
 				.setTitle('Fuga fracassada')
 				.setColor(bot.colors.policia)
-				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge.arma.jetpack.tempo > currTime ? bot.shuffle(frasesFracassoJetpackCasal)[0] : bot.shuffle(frasesFracassoCasal)[0]}. Vocês ficarão presos por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
+				.setDescription(`${uData.arma.jetpack.tempo > currTime && conjuge?.arma?.jetpack.tempo > currTime ? bot.shuffle(frasesFracassoJetpackCasal)[0] : bot.shuffle(frasesFracassoCasal)[0]}. Vocês ficarão presos por mais ${bot.segToHour((900000 + tempo_adicional) / 1000)}! ${bot.config.prisao}`)
 				.setFooter({
-					text: `${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}\n${conjuge.username} • Tempo preso: ${bot.segToHour((conjuge.preso - currTime) / 1000)}`,
+					text: `${uData.username} • Tempo preso: ${bot.segToHour((uData.preso - currTime) / 1000)}\n${conjuge?.username} • Tempo preso: ${bot.segToHour((conjuge.preso - currTime) / 1000)}`,
 					iconURL: message.member.user.avatarURL()
 				})
 				.setTimestamp()

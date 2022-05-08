@@ -300,8 +300,10 @@ exports.run = async (bot, message, args) => {
 					desde: new Date().getTime(),
 					ultimoDecrescimo: 0,
 				}
+				
+				let tam = await bot.casais.size
 
-				await bot.casais.ensure((await bot.casais.size).toString(), casamento)
+				await bot.casais.ensure(tam.toString(), casamento)
 
 				await bot.data.set(message.author.id, uData)
 				await bot.data.set(target.id, tData)
