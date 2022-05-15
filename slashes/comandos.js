@@ -17,8 +17,8 @@ exports.run = async (bot, interaction) => {
 \`;receber\` ou \`;rcb\` Recebe pagamento pelo trabalho`)
 
 		.addField(`${bot.config.propertyG} Investir`,
-			`\`;investir\` ou \`;in\`  Compra e administra seu investimento`)	
-		
+			`\`;investir\` ou \`;in\`  Compra e administra seu investimento`)
+
 		.addField(`${bot.config.vasculhar} Vasculhar`,
 			`\`;vasculhar\` ou \`;v\` Abre a lista de locais para vasculhar
 \`;vasculhar [id]\` ou \`;v [ID]\` Procura por itens`)
@@ -39,9 +39,9 @@ exports.run = async (bot, interaction) => {
 		.addField(`${bot.config.hospital} Hospital`,
 			`\`;hospital\` ou \`;h\` Informações sobre o hospital
 \`;hospital particular\` ou \`;h p\` Paga pelo tratamento`)
-		
-.addField(`${bot.config.espancar} Espancar`,
-`\`;espancar\` ou \`;esp\` Informações sobre espancamentos
+
+		.addField(`${bot.config.espancar} Espancar`,
+			`\`;espancar\` ou \`;esp\` Informações sobre espancamentos
 \`;espancar [jogador]\` ou \`;esp [jogado]\` Tenta espancar um jogador`)
 
 		.addField(`${bot.config.car} Informações`,
@@ -53,7 +53,7 @@ exports.run = async (bot, interaction) => {
 \`/stats\` Estatísticas interessantes
 \`/vip\` Informações sobre o VIP`)
 
-		.addField(`${bot.config.gang} Gangues`,
+		.addField(`${bot.config.gangues} Gangues`,
 			`\`;gangue (info)\` ou \`;gg\` Informações sobre gangues
 \`;gangue base (info)\` ou \`;gg b\` Informações sobre bases de gangues`)
 
@@ -76,7 +76,7 @@ exports.run = async (bot, interaction) => {
 \`/eventos\` Vê o último registro de Eventos`)
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()
-	
+
 	await interaction.reply({embeds: [embed]})
 		.catch(() => console.log("Não consegui enviar mensagem `comandos`"))
 }

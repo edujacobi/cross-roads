@@ -72,7 +72,7 @@ exports.run = async (bot, message, args) => {
 	const getRow = async (uData) => {
 		uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 		
-		console.log(uCasamento)
+		// console.log(uCasamento)
 
 		let isViajando = await bot.isPlayerViajando(uData)
 
@@ -560,7 +560,7 @@ exports.run = async (bot, message, args) => {
 			if (uData.anel == null)
 				return bot.createEmbed(message, `${emote} Você não possui um ${bot.aneis.prata.emote} Anel! Compre um para melhorar os benefícios do seu casamento!`, null, bot.colors.casamento)
 			if (cData.anel == null || cData.anel !== uData.anel)
-				return bot.createEmbed(message, `${emote} Seu parceiro não possui um ${bot.aneis.prata.emote} Anel igual ao seu! Vocês devem possui o mesmo tipo de anel`, null, bot.colors.casamento)
+				return bot.createEmbed(message, `${emote} Seu parceiro não possui um ${bot.aneis.prata.emote} Anel igual ao seu! Vocês devem possuir o mesmo tipo de anel`, null, bot.colors.casamento)
 
 			const embedAnel = new Discord.MessageEmbed()
 				.setDescription(`${bot.aneis[uData.anel].emote} O primeiro passo para um casamento feliz é a inteligência financeira!`)
@@ -623,7 +623,7 @@ exports.run = async (bot, message, args) => {
 				if (uData.anel == null)
 					return bot.createEmbed(message, `${emote} Você não possui um ${bot.aneis.prata.emote} Anel! Compre um para melhorar os benefícios do seu casamento!`, null, bot.colors.casamento)
 				if (cData.anel == null || cData.anel !== uData.anel)
-					return bot.createEmbed(message, `${emote} Seu parceiro não possui um ${bot.aneis.prata.emote} Anel igual ao seu! Vocês devem possui o mesmo tipo de anel`, null, bot.colors.casamento)
+					return bot.createEmbed(message, `${emote} Seu parceiro não possui um ${bot.aneis.prata.emote} Anel igual ao seu! Vocês devem possuir o mesmo tipo de anel`, null, bot.colors.casamento)
 
 				uCasamento = await bot.casais.get(uData.casamentoID?.toString())
 

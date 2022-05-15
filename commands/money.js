@@ -12,19 +12,19 @@ exports.run = async (bot, message, args) => {
 		return bot.createEmbed(message, `${bot.config.coin} \`;money <add|set> <quantidade> <id>\``)
 
 	if (!option)
-		return bot.createEmbed(message, `Pelo amor de deus, ${bot.data.get(message.author.id + ".username")}, escolha uma opção`)
+		return bot.createEmbed(message, `Pelo amor de deus, ${await bot.data.get(message.author.id + ".username")}, escolha uma opção`)
 
 	// if (!valor)
 	// 	return bot.createEmbed(message, `Porra, Jacobi, defina um valor`)
 
 	if (valor < 0 || (valor % 1 != 0))
-		return bot.createEmbed(message, `PQP, ${bot.data.get(message.author.id + ".username")}, a quantidade é inválida`)
+		return bot.createEmbed(message, `PQP, ${await bot.data.get(message.author.id + ".username")}, a quantidade é inválida`)
 
 	if (!id)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id + ".username")}, escolha um ID de usuário`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}, escolha um ID de usuário`)
 
 	if (id < 0 || (id % 1 != 0) || id.toString().length != 18)
-		return bot.createEmbed(message, `Caralho, ${bot.data.get(message.author.id + ".username")}, o ID é inválido`)
+		return bot.createEmbed(message, `Caralho, ${await bot.data.get(message.author.id + ".username")}, o ID é inválido`)
 
 	let uData = await bot.data.get(id)
 

@@ -39,6 +39,7 @@ const config = {
 	"police": "<:policia:539502682545717288>",
 	//"ryder": "<:radar_RYDER:738241043178324022>",
 	"hospital": "<:hospital:539497344450691077>",
+	"gangues" : "<:Gangues:973709675474346105>",
 	"gang": "<:gang_roxo:754773626141540423>",
 	"gang1": "<:gang_amarelo:758817092341334017>",
 	"gang2": "<:gang_azul:758817092119035935>",

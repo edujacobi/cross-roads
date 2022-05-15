@@ -279,7 +279,7 @@ exports.run = async (bot, message, args) => {
 				aceitoOuNegado = true
 				let anelLog = uData.anel
 				let tam = await bot.casais.size
-				tam = tam.toString()
+				tam = (tam + 1).toString()
 				
 				uData.anel = null
 				tData.anel = null
@@ -304,7 +304,9 @@ exports.run = async (bot, message, args) => {
 					ultimoDecrescimo: 0,
 				}
 				
-				await bot.casais.set(tam, casamento)
+				console.log(tam)
+				
+				await bot.casais.ensure(tam, casamento)
 
 				await bot.data.set(message.author.id, uData)
 				await bot.data.set(target.id, tData)

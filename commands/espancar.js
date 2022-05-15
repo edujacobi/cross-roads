@@ -274,13 +274,13 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 		let emote = uData.classe ? bot.classes[uData.classe].emote : `<:Inventario:814663379536052244>`
 
 		uData.emEspancamento = {
-			tempo: currTime + 63000,
+			tempo: currTime + 23000,
 			user: alvo,
 			isAlvo: false
 		}
 
 		targetD.emEspancamento = {
-			tempo: currTime + 63000,
+			tempo: currTime + 23000,
 			user: message.author.id,
 			isAlvo: true
 		}
@@ -297,11 +297,12 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 
 		const embed_robb_private = new Discord.MessageEmbed()
 			.setAuthor(`Vou quebrar tua cara!`, membro.avatarURL())
-			.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}está tentando lhe espancar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
-			.addField(`💪 Brigar`, `+5 ATK, mas quem apanhar ficará mais ${tempoHospitalizadoAdicional} minutos hospitalizado`, true)
-			.addField(`👟 Correr`, `-5 ATK, mas quem apanhar ficará menos ${tempoHospitalizadoAdicional} minutos hospitalizado, `, true)
+			// .setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}está tentando lhe espancar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.espancar}\nO que você deseja fazer?`)
+			.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID + '.nome')}** ` : ""}está tentando lhe espancar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.espancar}`)
+			// .addField(`💪 Brigar`, `+5 ATK, mas quem apanhar ficará mais ${tempoHospitalizadoAdicional} minutos hospitalizado`, true)
+			// .addField(`👟 Correr`, `-5 ATK, mas quem apanhar ficará menos ${tempoHospitalizadoAdicional} minutos hospitalizado, `, true)
 			.setColor(bot.colors.espancar)
-			.setFooter("Você tem 60 segundos para responder")
+			// .setFooter("Você tem 60 segundos para responder")
 			.setTimestamp()
 
 		let rowReagir = new Discord.MessageActionRow()
@@ -384,61 +385,65 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 				if (!channel) return null
 
 				let msg = await channel.send({
-					content: `<@${alvo}>`, embeds: [embed], components: [component]
+					content: `<@${alvo}>`, embeds: [embed]//, components: [component]
 				})
 
-				const filterEsp = (button) => button.user.id === alvo
+				// setTimeout(() => {
+				// 	if (msg)
+				// 		msg.edit({components: []})
+				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+				// }, 20000)
 
-				const collectorEsp = msg.createMessageComponentCollector({
-					filter: filterEsp,
-					time: 59000,
-				})
-
-				collectorEsp.on('collect', async b => {
-					await b.deferUpdate()
-					let targetD = await bot.data.get(alvo)
-
-					if (b.customId === 'brigar') {
-						collectorEsp.stop()
-
-						msg.edit({embeds: [embeds.private.brigar]})
-							.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-						messageRobb.edit({embeds: [embeds.inicio.brigar]})
-							.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-						atkPowerDefensor += 5
-						tempoHospitalizado += tempoHospitalizadoAdicional
-
-					}
-					else if (b.customId === 'correr') {
-						if (atkPowerDefensor == 0)
-							return msg.reply(`Você está fraco demais para correr! 👟`)
-
-						collectorEsp.stop()
-
-						msg.edit({embeds: [embeds.private.correr]})
-							.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-						messageRobb.edit({embeds: [embeds.inicio.correr]})
-							.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-						atkPowerDefensor -= 5
-						tempoHospitalizado -= tempoHospitalizadoAdicional
-					}
-				})
-
-				collectorEsp.on('end', () => {
-					if (msg) msg.edit({components: []})
-						.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-
-				})
-
-				setTimeout(() => {
-					if (msg) msg.delete()
-				}, 60000)
-
-				return
+				// const filterEsp = (button) => button.user.id === alvo
+				//
+				// const collectorEsp = msg.createMessageComponentCollector({
+				// 	filter: filterEsp,
+				// 	time: 59000,
+				// })
+				//
+				// collectorEsp.on('collect', async b => {
+				// 	await b.deferUpdate()
+				// 	let targetD = await bot.data.get(alvo)
+				//
+				// 	if (b.customId === 'brigar') {
+				// 		collectorEsp.stop()
+				//
+				// 		msg.edit({embeds: [embeds.private.brigar]})
+				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+				//
+				// 		messageRobb.edit({embeds: [embeds.inicio.brigar]})
+				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+				//
+				// 		atkPowerDefensor += 5
+				// 		tempoHospitalizado += tempoHospitalizadoAdicional
+				//
+				// 	}
+				// 	else if (b.customId === 'correr') {
+				// 		if (atkPowerDefensor == 0)
+				// 			return msg.reply(`Você está fraco demais para correr! 👟`)
+				//
+				// 		collectorEsp.stop()
+				//
+				// 		msg.edit({embeds: [embeds.private.correr]})
+				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+				//
+				// 		messageRobb.edit({embeds: [embeds.inicio.correr]})
+				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+				//
+				// 		atkPowerDefensor -= 5
+				// 		tempoHospitalizado -= tempoHospitalizadoAdicional
+				// 	}
+				// })
+				//
+				// collectorEsp.on('end', () => {
+				// 	if (msg) msg.edit({components: []})
+				// 		.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+				//
+				// })
+				//
+				// 
+				//
+				// return
 			},
 			{
 				context: {
@@ -612,7 +617,7 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 					]
 				})
 			}
-		}, 62000)
+		}, 22000)
 
 	}
 }

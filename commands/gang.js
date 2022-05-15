@@ -2057,9 +2057,9 @@ Aceitar convite?`)
 
 		if ((uData.gangID == null && !option) || option === 'info') {
 			const embed = new Discord.MessageEmbed()
-				.setTitle(`${bot.badges.topGangue_s6} Gangues`)
+				.setTitle(`${bot.config.gangues} Gangues`)
 				.setColor('GREEN')
-				.setThumbnail('https://cdn.discordapp.com/attachments/531174573463306240/942895894628536420/TopGangue.png')
+				.setThumbnail('https://media.discordapp.net/attachments/531174573463306240/973709111889915924/Gangues.png')
 				.setDescription("Crie sua gangue e trabalhe em equipe! Participe de assaltos em grupo e lutas generalizadas [em breve]!\n\n**Custo para criar uma gangue: R$ 2.500.000**")
 				.addField("Comandos Geral",
 					`\`;gangue (gangue)/(@user)\` Exibe informações de uma gangue

@@ -308,7 +308,7 @@ Você só poderá alterá-lo uma vez depois, por R$ 50.000.`)
 		if (!isServerCrossRoads && !isServerCrossRoadsBanidos) {
 			const embed = new Discord.MessageEmbed()
 				.setTitle(`<:CrossRoadsLogo:757021182020157571> Cadastro anti-fake`)
-				.setDescription(`${uData.username}, parabéns por conseguir sua ${bot.guns.rpg.skins.default.emote} RPG! Prossiga para o servidor oficial para completar seu cadastro anti-fake.`)
+				.setDescription(`${uData.username}, parabéns por conseguir sua ${bot.guns.rpg.skins.default.emote} RPG! Prossiga para o servidor oficial para completar seu cadastro anti-fake.\nVocê precisará utilizar um comando em qualquer canal da categoria GAMEPLAY.`)
 				.setColor(bot.colors.admin)
 				.setTimestamp()
 				.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})

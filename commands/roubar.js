@@ -510,7 +510,7 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 		args.shift()
 		granadaUsada = false
 	}
-	
+
 	let {
 		uData: tData,
 		alvo
@@ -741,13 +741,13 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 		currTime = new Date().getTime()
 
 		uData.emRoubo = {
-			tempo: currTime + 63000,
+			tempo: currTime + 23000,
 			user: alvo,
 			isAlvo: false
 		}
 
 		tData.emRoubo = {
-			tempo: currTime + 63000,
+			tempo: currTime + 23000,
 			user: message.author.id,
 			isAlvo: true
 		}
@@ -781,12 +781,13 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 
 		const embed_robb_private = new Discord.MessageEmbed()
 			.setAuthor(`Mãos ao alto!`, membro.avatarURL())
-			.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID.toString() + '.nome')}** ` : ""}está tentando lhe roubar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.roubar}\nO que você deseja fazer?`)
-			.addField(`${bot.config.emmetGun} Reagir`, `+5 DEF, mas você ficará hospitalizado caso seja roubado`, true)
-			.addField(`${bot.config.police} Chamar a polícia`, `-5 DEF, mas ele ficará preso +${tempo_adicional_preso_chamar_policia} min caso falhe`, true)
-			.addField(`<:fazer_nada:758817091872096267> Não fazer nada`, `Nenhum efeito adicional`, true)
+			// .setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID.toString() + '.nome')}** ` : ""}está tentando lhe roubar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.roubar}\nO que você deseja fazer?`)
+			.setDescription(`${emote} **${uData.username}** ${uData.gangID != null ? `da gangue **${await bot.gangs.get(uData.gangID.toString() + '.nome')}** ` : ""}está tentando lhe roubar utilizando **${armaATK}**${granadaUsada ? ` e ${bot.guns.granada.skins[uData.arma.granada.skinAtual].emote} **Granada**` : ''} ${bot.config.roubar}`)
+			// .addField(`${bot.config.emmetGun} Reagir`, `+5 DEF, mas você ficará hospitalizado caso seja roubado`, true)
+			// .addField(`${bot.config.police} Chamar a polícia`, `-5 DEF, mas ele ficará preso +${tempo_adicional_preso_chamar_policia} min caso falhe`, true)
+			// .addField(`<:fazer_nada:758817091872096267> Não fazer nada`, `Nenhum efeito adicional`, true)
 			.setColor(bot.colors.roubar)
-			.setFooter("Você tem 60 segundos para responder")
+			// .setFooter("Você tem 60 segundos para responder")
 			.setTimestamp()
 
 		let chance_espancar = bot.getRandom(0, 100)
@@ -886,18 +887,17 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 		//canal da mensagem Você está roubando...
 		const channelLadrao = await bot.channels.cache.get(uData.lastCommandChannelId)
 
-		console.log('channelLadrao roubar', channelLadrao)
+		// console.log('channelLadrao roubar', channelLadrao)
 
 		//mensagem Você está roubando...
 		const messageRobb = await channelLadrao.messages.fetch(message_robb.id)
 
-		await bot.shard.broadcastEval(async (bot, {
+		let retornoRoubo = await bot.shard.broadcastEval(async (bot, {
 			channelId, embed, component, alvo,
-			moneyDefPower, message_robb, defPower, chance_espancar,
-			tempo_preso, embeds, membroAvatar, currTime,
-			uData, authorId, tempo_adicional_preso_chamar_policia, granadaUsada,
-			atkPower, chance, moneyAtkPower, messageId,
-			multiplicador_evento_tempo_roubar, tempo_hospitalizado, channelLadrao
+			moneyDefPower, defPower, chance_espancar,
+			tempo_preso, embeds, currTime,
+			tempo_adicional_preso_chamar_policia,
+			message_robbId, channelLadrao
 		}) => {
 			//canal da mensagem Você está sendo roubado
 			const channel = await bot.channels.cache.get(channelId)
@@ -906,126 +906,143 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 			// const messageRobb = await channelLadrao.messages.fetch(message_robb.id)
 
 			let msg = await channel.send({
-				content: `<@${alvo}>`, embeds: [embed], components: [component]
-			})
-			
-			const filterRoubo = (button) => button.user.id === alvo
-
-			const collectorRoubo = msg.createMessageComponentCollector({
-				filter: filterRoubo,
-				time: 59000,
+				content: `<@${alvo}>`, embeds: [embed]//, components: [component]
 			})
 
-			collectorRoubo.on('collect', async b => {
-				await b.deferUpdate()
+			// setTimeout(() => {
+			// 	if (msg)
+			// 		msg.edit({components: []})
+			// 			.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			// }, 20000)
 
-				let tData = await bot.data.get(alvo)
+			// const filterRoubo = (button) => button.user.id === alvo
+			//
+			// const collectorRoubo = msg.createMessageComponentCollector({
+			// 	filter: filterRoubo,
+			// 	time: 29000,
+			// })
+			//
+			// await collectorRoubo.on('collect', async b => {
+			// 	await b.deferUpdate()
+			//
+			// 	let tData = await bot.data.get(alvo)
+			//
+			// 	if (b.customId === 'reagir') {
+			// 		if (tData.preso > currTime)
+			// 			return msg.reply(`Você está preso por mais ${bot.segToHour((tData.preso - currTime) / 1000)} e não pode fazer isto ${bot.config.police}`)
+			// 		if (tData.hospitalizado > currTime)
+			// 			return msg.reply(`Você está hospitalizado por mais ${bot.segToHour((tData.hospitalizado - currTime) / 1000)} e não pode fazer isto ${bot.config.hospital}`)
+			// 		if (tData.jobTime > currTime)
+			// 			return msg.reply(`Você está trabalhando por mais ${bot.segToHour((tData.jobTime - currTime) / 1000)} e não pode fazer isto ${bot.config.trabalhando}`)
+			// 		if (moneyDefPower == null)
+			// 			return msg.reply(`Você não pode reagir sem uma arma ${bot.config.roubar}`)
+			//
+			// 		collectorRoubo.stop()
+			//
+			// 		msg.edit({embeds: [embeds.private.reagiu], components: []})
+			// 			.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			//
+			// 		// await bot.shard.broadcastEval(async (bot, {
+			// 		// 	message_robbId, channelLadrao, embeds
+			// 		// }) => {
+			// 		// 	//canal da mensagem Você está sendo roubado
+			// 		// 	const channel = await bot.channels.cache.get(channelLadrao)
+			// 		// 	if (!channel) return null
+			// 		//
+			// 		// 	let messageRobb = await channel.messages.fetch(message_robbId)
+			// 		//
+			// 		// 	messageRobb.edit({embeds: [embeds.inicio.reagiu]})
+			// 		// 		.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			// 		// }, {
+			// 		// 	context: {
+			// 		// 		message_robbId, channelLadrao, embeds
+			// 		// 	}
+			// 		// })
+			//
+			// 		defPower += 5
+			// 		chance_espancar = 0 // deve ser menor que 25
+			// 	}
+			//
+			// 	if (b.customId === 'policia') {
+			// 		// if (tData.preso > currTime)
+			// 		// 	return msg.reply(`Você está preso por mais ${bot.segToHour((tData.preso - currTime) / 1000 / 60)} e não pode fazer isto ${bot.config.police}`)
+			//
+			// 		if (tData.hospitalizado > currTime)
+			// 			return msg.reply(`Você está hospitalizado por mais ${bot.segToHour((tData.hospitalizado - currTime) / 1000)} e não pode fazer isto ${bot.config.hospital}`)
+			// 		if (defPower == 0)
+			// 			return msg.reply(`Você não possui poder de defesa suficiente para convencer a polícia a te ajudar ${bot.config.police}`)
+			//
+			// 		collectorRoubo.stop()
+			//
+			// 		msg.edit({embeds: [embeds.private.policia], components: []})
+			// 			.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			//
+			// 		// messageRobb.edit({embeds: [embeds.inicio.policia]})
+			// 		// 	.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			//
+			// 		defPower -= 5
+			// 		tempo_preso += tempo_adicional_preso_chamar_policia
+			// 	}
+			//
+			// 	if (b.customId === 'nada') {
+			// 		collectorRoubo.stop()
+			//
+			// 		msg.edit({embeds: [embeds.private.nada], components: []})
+			// 			.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			//
+			// 		// messageRobb.edit({embeds: [embeds.inicio.nada]})
+			// 		// 	.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			// 	}
+			// })
+			//
+			// collectorRoubo.on('end', () => {
+			// 	if (msg) msg.edit({components: []})
+			// 		.catch(() => console.log("Não consegui editar mensagem `roubar`"))
+			// })
 
-				if (b.customId === 'reagir') {
-					if (tData.preso > currTime)
-						return msg.reply(`Você está preso por mais ${bot.segToHour((tData.preso - currTime) / 1000)} e não pode fazer isto ${bot.config.police}`)
-					if (tData.hospitalizado > currTime)
-						return msg.reply(`Você está hospitalizado por mais ${bot.segToHour((tData.hospitalizado - currTime) / 1000)} e não pode fazer isto ${bot.config.hospital}`)
-					if (tData.jobTime > currTime)
-						return msg.reply(`Você está trabalhando por mais ${bot.segToHour((tData.jobTime - currTime) / 1000)} e não pode fazer isto ${bot.config.trabalhando}`)
-					if (moneyDefPower == null)
-						return msg.reply(`Você não pode reagir sem uma arma ${bot.config.roubar}`)
+			// return {defPower, tempo_preso, chance_espancar}
 
-					collectorRoubo.stop()
-
-					msg.edit({embeds: [embeds.private.reagiu], components: []})
-						.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-
-					messageRobb.edit({embeds: [embeds.inicio.reagiu]})
-						.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-
-					defPower += 5
-					chance_espancar = 0 // deve ser menor que 25
-				}
-
-				if (b.customId === 'policia') {
-					// if (tData.preso > currTime)
-					// 	return msg.reply(`Você está preso por mais ${bot.segToHour((tData.preso - currTime) / 1000 / 60)} e não pode fazer isto ${bot.config.police}`)
-
-					if (tData.hospitalizado > currTime)
-						return msg.reply(`Você está hospitalizado por mais ${bot.segToHour((tData.hospitalizado - currTime) / 1000)} e não pode fazer isto ${bot.config.hospital}`)
-					if (defPower == 0)
-						return msg.reply(`Você não possui poder de defesa suficiente para convencer a polícia a te ajudar ${bot.config.police}`)
-
-					collectorRoubo.stop()
-
-					msg.edit({embeds: [embeds.private.policia], components: []})
-						.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-
-					messageRobb.edit({embeds: [embeds.inicio.policia]})
-						.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-
-					defPower -= 5
-					tempo_preso += tempo_adicional_preso_chamar_policia
-				}
-
-				if (b.customId === 'nada') {
-					collectorRoubo.stop()
-
-					msg.edit({embeds: [embeds.private.nada], components: []})
-						.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-
-					messageRobb.edit({embeds: [embeds.inicio.nada]})
-						.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-				}
-			})
-
-			collectorRoubo.on('end', () => {
-				if (msg) msg.edit({components: []})
-					.catch(() => console.log("Não consegui editar mensagem `roubar`"))
-			})
-			
-			setTimeout(() => {
-				if (msg) msg.delete()
-			}, 60000)
-			
-			return 
-		}, {context: {
+		}, {
+			context: {
 				channelId: tData.lastCommandChannelId,
 				embed: embed_robb_private,
 				component: rowReagir,
 				alvo,
 				moneyDefPower,
-				message_robb,
 				defPower,
 				chance_espancar,
 				tempo_preso,
 				embeds,
-				membroAvatar: membro.avatarURL(),
 				currTime,
-				uData,
-				authorId: message.author.id,
 				tempo_adicional_preso_chamar_policia,
-				granadaUsada,
-				atkPower,
-				chance,
-				moneyAtkPower,
-				messageId: message.id,
-				multiplicador_evento_tempo_roubar,
-				tempo_hospitalizado,
+				message_robbId: message_robb.id,
 				channelLadrao
-		}})
-			// .then(async array => {
-			// 	console.log('array', array)
-			// 	let findChannel = array.find(channel => channel)
-			// 	console.log('findChannel', findChannel)
-			//
-			// 	if (!findChannel)
-			// 		return message.reply({embeds: [embeds.erro]})
-			//	
-			// 	return findChannel
-			// })
-		
+			}
+		})
+		// 	.then(async array => {
+		// 	console.log('array', array)
+		// 	let retornoRoubo = array.find(channel => channel)
+		// 	console.log('retornoRoubo', retornoRoubo)
+		//
+		// 	if (!retornoRoubo)
+		// 		return message.reply({embeds: [embeds.erro]})
+		//
+		// 	console.log(retornoRoubo)
+		//
+		// 	return retornoRoubo
+		// })
+
 
 		//mensagem original
 		// const messageLadr = await channelLadrao.messages.fetch(message.id)
 
 		setTimeout(async () => {
+
+			// console.log('final', retornoRoubo)
+			//
+			// defPower = retornoRoubo.defPower
+			// chance_espancar = retornoRoubo.chance_espancar
+			// tempo_preso = retornoRoubo.tempo_preso
 
 			function getPercent(percent, from) {
 				return (from / 100) * percent
@@ -1191,7 +1208,7 @@ Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes,
 				})
 
 			}
-		}, 62000)
+		}, 22000)
 	}
 }
 

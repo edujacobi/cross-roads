@@ -54,9 +54,11 @@ module.exports = bot => {
 		 informará uma lista dos usuários junto de suas tags (username + discriminator). Se informar a tag ou id, 
 		 o usuário será selecionado corretamente
 		*/
-		let targetMention = message.mentions.members.first()
+		let targetMention = message.mentions?.members.first()
 		let targetNoMention
 		let user
+		
+		console.log(args)
 
 		if (args[0] && !targetMention) {
 			// se não mencionou mas quer ver inv de outro user

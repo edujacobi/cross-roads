@@ -10,7 +10,7 @@ module.exports = (bot) => {
 			def: 0,
 			moneyAtk: 6,
 			moneyDef: 8,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.açougueiro.desc}\n**Roubar:** ${bot.robbery.velhinha.desc}`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.açougueiro.desc}\n**Roubar:** ${bot.robbery.velhinha.desc}\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -35,7 +35,7 @@ module.exports = (bot) => {
 			def: 5,
 			moneyAtk: 8,
 			moneyDef: 12,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.vigilante.desc}\n**Roubar:** ${bot.robbery.mercearia.desc}`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.vigilante.desc}\n**Roubar:** ${bot.robbery.mercearia.desc}\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -60,7 +60,7 @@ module.exports = (bot) => {
 			def: 10,
 			moneyAtk: 10,
 			moneyDef: 16,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.segurança.desc}\n**Roubar:** ${bot.robbery.posto.desc}`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.segurança.desc}\n**Roubar:** ${bot.robbery.posto.desc}\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -91,7 +91,7 @@ module.exports = (bot) => {
 			def: 15,
 			moneyAtk: 12,
 			moneyDef: 20,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.caçador.desc}\n**Roubar:** ${bot.robbery.posto.desc}`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.caçador.desc}\n**Roubar:** ${bot.robbery.posto.desc}\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -116,7 +116,7 @@ module.exports = (bot) => {
 			def: 20,
 			moneyAtk: 14,
 			moneyDef: 24,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.funeral.desc}\n**Roubar:** ${bot.robbery.joalheria.desc}\n**Vasculhar:** Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.funeral.desc}\n**Roubar:** ${bot.robbery.joalheria.desc}\n**Vasculhar:** Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -141,7 +141,7 @@ module.exports = (bot) => {
 			def: 25,
 			moneyAtk: 16,
 			moneyDef: 28,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.milicia.desc}\n**Roubar:** ${bot.robbery.joalheria.desc}\n**Vasculhar:** Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.milicia.desc}\n**Roubar:** ${bot.robbery.joalheria.desc}\n**Vasculhar:** Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -166,7 +166,7 @@ module.exports = (bot) => {
 			def: 30,
 			moneyAtk: 18,
 			moneyDef: 32,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.mercenario.desc}\n**Roubar:** ${bot.robbery.banco.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.mercenario.desc}\n**Roubar:** ${bot.robbery.banco.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -197,7 +197,7 @@ module.exports = (bot) => {
 			def: 35,
 			moneyAtk: 20,
 			moneyDef: 36,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.rei.desc}\n**Roubar:** ${bot.robbery.banco.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.rei.desc}\n**Roubar:** ${bot.robbery.banco.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -222,7 +222,7 @@ module.exports = (bot) => {
 			def: 40,
 			moneyAtk: 22,
 			moneyDef: 40,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.espiao.desc}\n**Roubar:** ${bot.robbery.banco.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.espiao.desc}\n**Roubar:** ${bot.robbery.banco.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -247,7 +247,7 @@ module.exports = (bot) => {
 			def: 45,
 			moneyAtk: 24,
 			moneyDef: 44,
-			utilidade: `**Trabalho:** ${bot.jobs.duble.desc}, ${bot.jobs.jacobi.desc}, ${bot.jobs.et.desc} e ${bot.jobs.yakuza.desc}\n**Roubar:** ${bot.robbery.mafia.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.duble.desc}, ${bot.jobs.jacobi.desc}, ${bot.jobs.et.desc} e ${bot.jobs.yakuza.desc}\n**Roubar:** ${bot.robbery.mafia.desc}\n**Vasculhar:** Usina nuclear, Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -278,7 +278,7 @@ module.exports = (bot) => {
 			def: 35,
 			moneyAtk: 26,
 			moneyDef: 48,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc}, ${bot.jobs.et.desc} e ${bot.jobs.bomba.desc}\n**Roubar:** ${bot.robbery.mafia.desc}\n**Vasculhar:** Nave extraterrestre, Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc}, ${bot.jobs.et.desc} e ${bot.jobs.bomba.desc}\n**Roubar:** ${bot.robbery.mafia.desc}\n**Vasculhar:** Nave extraterrestre, Usina nuclear, Fábrica de armas\n**Disponível em:** ${bot.config.loja} Loja`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -303,7 +303,7 @@ module.exports = (bot) => {
 			def: '+3 (noite)',
 			moneyAtk: null,
 			moneyDef: null,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc}, ${bot.jobs.et.desc} e ${bot.jobs.duble.desc}\n Aumenta em 3 o ATK e DEF durante a noite (entre 20h e 4h)`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc}, ${bot.jobs.et.desc} e ${bot.jobs.duble.desc}\n**Disponível em:** ${bot.config.loja} Loja\n\n*Aumenta em 3 o ATK e DEF durante a noite (entre 20h e 4h)*`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -328,7 +328,7 @@ module.exports = (bot) => {
 			def: '+2',
 			moneyAtk: null,
 			moneyDef: null,
-			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.et.desc}\nAumenta em 2 a DEF (pode ser acumulado com outros coletes)`,
+			utilidade: `**Trabalho:** ${bot.jobs.jacobi.desc} e ${bot.jobs.et.desc}\n**Disponível em:** ${bot.config.loja} Loja\n\n*Aumenta em 2 a DEF (pode ser acumulado com outros coletes)*`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -348,7 +348,7 @@ module.exports = (bot) => {
 			def: '+5',
 			moneyAtk: null,
 			moneyDef: null,
-			utilidade: `**Trabalho:** ${bot.jobs.et.desc}\nAumenta em 5 a DEF (pode ser acumulado com outros coletes)`,
+			utilidade: `**Trabalho:** ${bot.jobs.et.desc}\n**Disponível em:** ${bot.config.loja} Loja\n\n*Aumenta em 5 a DEF (pode ser acumulado com outros coletes)*`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -393,7 +393,7 @@ module.exports = (bot) => {
 			def: null,
 			moneyAtk: null,
 			moneyDef: null,
-			utilidade: `**Trabalho:** ${bot.jobs.duble.desc} e ${bot.jobs.conquistador.desc}\n+30% de chance de fuga da prisão`,
+			utilidade: `**Trabalho:** ${bot.jobs.duble.desc} e ${bot.jobs.conquistador.desc}\n**Disponível em:** ${bot.config.mercadonegro} Mercado Negro\n\n*+30% de chance de fuga da prisão*`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -423,7 +423,7 @@ module.exports = (bot) => {
 			def: 45,
 			moneyAtk: 28,
 			moneyDef: 52,
-			utilidade: `**Trabalho:** ${bot.jobs.mafia.desc}, ${bot.jobs.informante.desc} e ${bot.jobs.conquistador.desc}\n**Roubar**: ${bot.robbery.deposito.desc}\n**Vasculhar:** Base militar, Nave extraterrestre, Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.mafia.desc}, ${bot.jobs.informante.desc} e ${bot.jobs.conquistador.desc}\n**Roubar**: ${bot.robbery.deposito.desc}\n**Vasculhar:** Base militar, Nave extraterrestre, Usina nuclear, Fábrica de armas\n**Disponível em:** ${bot.config.mercadonegro} Mercado Negro`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -448,7 +448,7 @@ module.exports = (bot) => {
 			def: 50,
 			moneyAtk: 30,
 			moneyDef: 56,
-			utilidade: `**Trabalho:** ${bot.jobs.conquistador.desc}\n**Roubar**: ${bot.robbery.palacio.desc}\n**Vasculhar:** Base militar, Nave extraterrestre, Usina nuclear, Fábrica de armas`,
+			utilidade: `**Trabalho:** ${bot.jobs.conquistador.desc}\n**Roubar**: ${bot.robbery.palacio.desc}\n**Vasculhar:** Base militar, Nave extraterrestre, Usina nuclear, Fábrica de armas\n**Disponível em:** -`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -473,7 +473,7 @@ module.exports = (bot) => {
 			def: '+5',
 			moneyAtk: null,
 			moneyDef: '+5',
-			utilidade: `**Trabalho:** ${bot.jobs.conquistador.desc}\nAumenta em 5 a DEF (pode ser acumulado com coletes) e em 5% o valor defendido`,
+			utilidade: `**Trabalho:** ${bot.jobs.conquistador.desc}\n**Disponível em:** ${bot.config.mercadonegro} Mercado Negro\nAumenta em 5 a DEF (pode ser acumulado com coletes) e em 5% o valor defendido`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
@@ -493,7 +493,7 @@ module.exports = (bot) => {
 			def: null,
 			moneyAtk: null,
 			moneyDef: null,
-			utilidade: 'Aumenta em 5 o ATK (é consumido ao utilizar) ',
+			utilidade: `**Disponível em:** ${bot.config.mercadonegro} Mercado Negro\n\n*Aumenta em 5 o ATK (é consumido ao utilizar)*`,
 			skins: {
 				'default': {
 					nome: 'Padrão',
