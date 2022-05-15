@@ -393,6 +393,8 @@ exports.run = async (bot, message, args) => {
 		if (uData.preso > currTime)
 			texto = `Você está preso por mais ${bot.segToHour((uData.preso - currTime) / 1000)}`
 
+		// Quando alguém tentar te roubar, você pode ${bot.config.emmetGun} **Reagir**, ${bot.config.police} **Chamar a polícia** ou <:fazer_nada:758817091872096267> **Fazer nada**!
+		
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.roubar} Roubar`)
 			.setThumbnail("https://media.discordapp.net/attachments/691019843159326757/791444366727708672/roubar_20201223201323.png")
@@ -402,8 +404,6 @@ Quanto melhor a arma, maior a chance de roubo contra outros jogadores e mais pro
 Se falhar, você será preso por um tempo definido pelo poder de sua arma.
 Se conseguir, deverá esperar 1 hora para roubar novamente.
 Há uma pequena chance do alvo ser também espancado!
-
-Quando alguém tentar te roubar, você pode ${bot.config.emmetGun} **Reagir**, ${bot.config.police} **Chamar a polícia** ou <:fazer_nada:758817091872096267> **Fazer nada**!
 
 Você já roubou \`${uData.roubosW.toLocaleString().replace(/,/g, ".")}\` vezes, falhou \`${uData.roubosL.toLocaleString().replace(/,/g, ".")}\` vezes e foi roubado \`${uData.qtRoubado.toLocaleString().replace(/,/g, ".")}\` vezes`)
 			.addField(`Comando`, `\`;roubar [user]\``, true)

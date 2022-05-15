@@ -5,7 +5,7 @@ exports.run = async (bot, interaction) => {
 	
 	const embed = new Discord.MessageEmbed()
 		.setTitle(`${bot.config.emmetGun} Armas, equipamentos e itens`)
-		.setDescription("As seguintes armas, equipamentos e itens estão disponíveis.\nVocê pode ver mais detalhes usando `/item MP5`, por exemplo.")
+		.setDescription("As seguintes armas, equipamentos e itens estão disponíveis.\nVocê pode ver mais detalhes escolhendo-a no seletor abaixo.")
 		.setColor('GREEN')
 		.setFooter({text: bot.user.username, iconURL: bot.user.avatarURL()})
 		.setTimestamp()

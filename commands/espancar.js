@@ -16,6 +16,8 @@ exports.run = async (bot, message, args) => {
 	// if (message.author.id != bot.config.adminID)
 	// 	return bot.createEmbed(message, "Espancar desativado temporiamente.")
 
+	// Quando alguém tentar te espancar, você pode 💪 **Brigar** ou 👟 **Correr**!
+	
 	if (!option) {
 		const embed = new Discord.MessageEmbed()
 			.setTitle(`${bot.config.espancar} Espancar`)
@@ -24,8 +26,6 @@ exports.run = async (bot, message, args) => {
 			.setDescription(`Derrote seu nêmesis e mostre quem é que manda!
 Quem perder a luta, ficará hospitalizado por um tempo determinado pela arma com maior defesa do jogador defensor.
 Para conseguir espancar, o alvo deve estar ${bot.config.vadiando} **Vadiando**.
-
-Quando alguém tentar te espancar, você pode 💪 **Brigar** ou 👟 **Correr**!
 
 Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, ".")}\` vezes e foi espancado \`${uData.espancarL.toLocaleString().replace(/,/g, ".")}\` vezes`)
 			.addField("Comando", `\`;espancar [user]\``)
