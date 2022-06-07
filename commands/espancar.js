@@ -187,6 +187,13 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			return bot.createEmbed(message, `${targetD.username} está em uma rinha, torça para ele perder e espere um pouco ${bot.config.galo}`, null, bot.colors.roubar)
 		if (uData.fugindo > currTime)
 			return bot.createEmbed(message, `Você está tentando fugir da prisão e não pode tentar espancar ninguém ${bot.config.police}`, 'Foco!', bot.colors.policia)
+		if (uData.hospitalizado > currTime)
+			return bot.msgHospitalizado(message, uData)
+		if (uData.espancar > currTime)
+			return bot.createEmbed(message, `Você só poderá espancar novamente em ${bot.segToHour(Math.floor((uData.espancar - currTime) / 1000))} ${bot.config.espancar}`, null, bot.colors.espancar)
+		if (uData.roubo > currTime)
+			return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((uData.roubo - currTime) / 1000))} ${bot.config.police}`, null, bot.colors.policia)
+
 		escolhido = true
 
 		if (b.customId === 'aceitar') { //aceitar
@@ -227,6 +234,13 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			return bot.createEmbed(message, `Você está apostando em uma rinha e não pode fazer isto ${bot.config.galo}`, null, bot.colors.roubar)
 		if (await bot.isGaloEmRinha(alvo))
 			return bot.createEmbed(message, `${targetD.username} está em uma rinha, torça para ele perder e espere um pouco ${bot.config.galo}`, null, bot.colors.roubar)
+		if (uData.hospitalizado > currTime)
+			return bot.msgHospitalizado(message, uData)
+		if (uData.espancar > currTime)
+			return bot.createEmbed(message, `Você só poderá espancar novamente em ${bot.segToHour(Math.floor((uData.espancar - currTime) / 1000))} ${bot.config.espancar}`, null, bot.colors.espancar)
+		if (uData.roubo > currTime)
+			return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((uData.roubo - currTime) / 1000))} ${bot.config.police}`, null, bot.colors.policia)
+
 
 		return espancamento()
 	})
@@ -257,6 +271,12 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 			return bot.createEmbed(message, `${targetD.username} está em uma rinha, torça para ele perder e espere um pouco ${bot.config.galo}`, null, bot.colors.espancar)
 		if (alvo == uData.conjuge)
 			return bot.createEmbed(message, `Você não pode espancar o seu cônjuge ${bot.config.espancar}`, null, bot.colors.espancar)
+		if (uData.hospitalizado > currTime)
+			return bot.msgHospitalizado(message, uData)
+		if (uData.espancar > currTime)
+			return bot.createEmbed(message, `Você só poderá espancar novamente em ${bot.segToHour(Math.floor((uData.espancar - currTime) / 1000))} ${bot.config.espancar}`, null, bot.colors.espancar)
+		if (uData.roubo > currTime)
+			return bot.createEmbed(message, `Você está sendo procurado pela polícia por mais ${bot.segToHour(Math.floor((uData.roubo - currTime) / 1000))} ${bot.config.police}`, null, bot.colors.policia)
 
 		let tempoHospitalizado = (45 + atkPowerDefensor) * multiplicador_evento_espancado_tempo
 		let tempoHospitalizadoAdicional = 5 + atkPowerDefensor * multiplicador_evento_espancado_tempo
@@ -373,99 +393,104 @@ Você já espancou jogadores \`${uData.espancarW.toLocaleString().replace(/,/g, 
 		//mensagem Você está roubando...
 		const messageRobb = await channelLadrao.messages.fetch(message_robb.id)
 
-		await bot.shard.broadcastEval(async (bot, {
-				channelId, embed, component, alvo,
-				message_robb, atkPowerDefensor, tempoHospitalizado, tempoHospitalizadoAdicional,
-				embeds, membroAvatar, currTime, multiplicador_evento_tempo,
-				uData, authorId, granadaUsada,
-				atkPower, messageId
-			}) => {
-				//canal da mensagem Você está sendo roubado
-				const channel = await bot.channels.cache.get(channelId)
-				if (!channel) return null
+		bot.users.fetch(alvo).then(async user => {
+			user.send({embeds: [embed_robb_private]})
+				.catch(() => console.log(`${targetD.username} (${alvo}) está sendo roubado por ${uData.username} (${authorId}), mas eu não consegui avisá-lo`))
+		})
 
-				let msg = await channel.send({
-					content: `<@${alvo}>`, embeds: [embed]//, components: [component]
-				})
-
-				// setTimeout(() => {
-				// 	if (msg)
-				// 		msg.edit({components: []})
-				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-				// }, 20000)
-
-				// const filterEsp = (button) => button.user.id === alvo
-				//
-				// const collectorEsp = msg.createMessageComponentCollector({
-				// 	filter: filterEsp,
-				// 	time: 59000,
-				// })
-				//
-				// collectorEsp.on('collect', async b => {
-				// 	await b.deferUpdate()
-				// 	let targetD = await bot.data.get(alvo)
-				//
-				// 	if (b.customId === 'brigar') {
-				// 		collectorEsp.stop()
-				//
-				// 		msg.edit({embeds: [embeds.private.brigar]})
-				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-				//
-				// 		messageRobb.edit({embeds: [embeds.inicio.brigar]})
-				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-				//
-				// 		atkPowerDefensor += 5
-				// 		tempoHospitalizado += tempoHospitalizadoAdicional
-				//
-				// 	}
-				// 	else if (b.customId === 'correr') {
-				// 		if (atkPowerDefensor == 0)
-				// 			return msg.reply(`Você está fraco demais para correr! 👟`)
-				//
-				// 		collectorEsp.stop()
-				//
-				// 		msg.edit({embeds: [embeds.private.correr]})
-				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-				//
-				// 		messageRobb.edit({embeds: [embeds.inicio.correr]})
-				// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-				//
-				// 		atkPowerDefensor -= 5
-				// 		tempoHospitalizado -= tempoHospitalizadoAdicional
-				// 	}
-				// })
-				//
-				// collectorEsp.on('end', () => {
-				// 	if (msg) msg.edit({components: []})
-				// 		.catch(() => console.log("Não consegui editar mensagem `espancar`"))
-				//
-				// })
-				//
-				// 
-				//
-				// return
-			},
-			{
-				context: {
-					channelId: targetD.lastCommandChannelId,
-					embed: embed_robb_private,
-					component: rowReagir,
-					alvo,
-					message_robb,
-					atkPowerDefensor,
-					tempoHospitalizado,
-					tempoHospitalizadoAdicional,
-					embeds,
-					membroAvatar: membro.avatarURL(),
-					currTime,
-					multiplicador_evento_tempo,
-					uData,
-					authorId: message.author.id,
-					granadaUsada,
-					atkPower,
-					messageId: message.id,
-				}
-			})
+		// await bot.shard.broadcastEval(async (bot, {
+		// 		channelId, embed, component, alvo,
+		// 		message_robb, atkPowerDefensor, tempoHospitalizado, tempoHospitalizadoAdicional,
+		// 		embeds, membroAvatar, currTime, multiplicador_evento_tempo,
+		// 		uData, authorId, granadaUsada,
+		// 		atkPower, messageId
+		// 	}) => {
+		// 		//canal da mensagem Você está sendo roubado
+		// 		const channel = await bot.channels.cache.get(channelId)
+		// 		if (!channel) return null
+		//
+		// 		let msg = await channel.send({
+		// 			content: `<@${alvo}>`, embeds: [embed]//, components: [component]
+		// 		})
+		//
+		// 		// setTimeout(() => {
+		// 		// 	if (msg)
+		// 		// 		msg.edit({components: []})
+		// 		// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+		// 		// }, 20000)
+		//
+		// 		// const filterEsp = (button) => button.user.id === alvo
+		// 		//
+		// 		// const collectorEsp = msg.createMessageComponentCollector({
+		// 		// 	filter: filterEsp,
+		// 		// 	time: 59000,
+		// 		// })
+		// 		//
+		// 		// collectorEsp.on('collect', async b => {
+		// 		// 	await b.deferUpdate()
+		// 		// 	let targetD = await bot.data.get(alvo)
+		// 		//
+		// 		// 	if (b.customId === 'brigar') {
+		// 		// 		collectorEsp.stop()
+		// 		//
+		// 		// 		msg.edit({embeds: [embeds.private.brigar]})
+		// 		// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+		// 		//
+		// 		// 		messageRobb.edit({embeds: [embeds.inicio.brigar]})
+		// 		// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+		// 		//
+		// 		// 		atkPowerDefensor += 5
+		// 		// 		tempoHospitalizado += tempoHospitalizadoAdicional
+		// 		//
+		// 		// 	}
+		// 		// 	else if (b.customId === 'correr') {
+		// 		// 		if (atkPowerDefensor == 0)
+		// 		// 			return msg.reply(`Você está fraco demais para correr! 👟`)
+		// 		//
+		// 		// 		collectorEsp.stop()
+		// 		//
+		// 		// 		msg.edit({embeds: [embeds.private.correr]})
+		// 		// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+		// 		//
+		// 		// 		messageRobb.edit({embeds: [embeds.inicio.correr]})
+		// 		// 			.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+		// 		//
+		// 		// 		atkPowerDefensor -= 5
+		// 		// 		tempoHospitalizado -= tempoHospitalizadoAdicional
+		// 		// 	}
+		// 		// })
+		// 		//
+		// 		// collectorEsp.on('end', () => {
+		// 		// 	if (msg) msg.edit({components: []})
+		// 		// 		.catch(() => console.log("Não consegui editar mensagem `espancar`"))
+		// 		//
+		// 		// })
+		// 		//
+		// 		// 
+		// 		//
+		// 		// return
+		// 	},
+		// 	{
+		// 		context: {
+		// 			channelId: targetD.lastCommandChannelId,
+		// 			embed: embed_robb_private,
+		// 			component: rowReagir,
+		// 			alvo,
+		// 			message_robb,
+		// 			atkPowerDefensor,
+		// 			tempoHospitalizado,
+		// 			tempoHospitalizadoAdicional,
+		// 			embeds,
+		// 			membroAvatar: membro.avatarURL(),
+		// 			currTime,
+		// 			multiplicador_evento_tempo,
+		// 			uData,
+		// 			authorId: message.author.id,
+		// 			granadaUsada,
+		// 			atkPower,
+		// 			messageId: message.id,
+		// 		}
+		// 	})
 
 		setTimeout(async () => {
 			uData = await bot.data.get(authorId)
